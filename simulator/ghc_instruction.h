@@ -38,6 +38,7 @@ enum GHCArgumentType {
 
 struct GHCArgument {
   GHCArgumentType type;
+  bool as_address;
   unsigned int id;
 };
 
