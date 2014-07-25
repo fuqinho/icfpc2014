@@ -83,10 +83,11 @@ class Simulator {
   static void InitGhostList(std::vector<std::unique_ptr<Ghost> >* ghost_list,
                             const GameMap& game_map) {
     int ai_id = 1;  // TODO
+    int num_ghosts = 0;
     for (size_t y = 0; y < game_map.size(); ++y) {
       for (size_t x = 0; x < game_map[y].size(); ++x) {
         if (game_map[y][x] == '=') {
-          std::unique_ptr<Ghost> ptr(new Ghost(ai_id));
+          std::unique_ptr<Ghost> ptr(new Ghost(num_ghosts++, ai_id));
           ptr->set_initial_position(Position {x, y});
           ptr->set_position(Position {x, y});
           ptr->set_direction(Direction::DOWN);
