@@ -1,3 +1,6 @@
+#ifndef SIMULATOR_GHC_INSTRUCTION_H_
+#define SIMULATOR_GHC_INSTRUCTION_H_
+
 #include <vector>
 
 enum GHCMnemonic {
@@ -47,3 +50,4 @@ struct GHCInstruction {
   std::vector<GHCArgument> arguments;
 };
 
+#endif
