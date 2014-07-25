@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "common.h"
+#include "gamecommon.h"
 
 class Ghost;
 class LambdaMan;
@@ -21,15 +22,22 @@ class GameState {
     return (map_width() * map_height() + 99) / 100;
   }
 
-
   const GameMap& game_map() const { return game_map_; }
   GameMap* mutable_game_map() { return &game_map_; }
+  char tile(const Position& p) const { return game_map_[p.y][p.x]; }
+  char* mutable_tile(const Position& p) { return &game_map_[p.y][p.x]; }
 
   const LambdaMan& lambda_man() const { return *lambda_man_; }
+  void set_lambda_man(std::unique_ptr<LambdaMan> lambda_man) {
+    lambda_man_ = std::move(lambda_man);
+  }
   LambdaMan* mutable_lambda_man() { return lambda_man_.get(); }
 
   const std::vector<std::unique_ptr<Ghost> >& ghost_list() const {
     return ghost_list_;
+  }
+  std::vector<std::unique_ptr<Ghost> >* mutable_ghost_list() {
+    return &ghost_list_;
   }
   size_t ghost_size() const { return ghost_list_.size(); }
 

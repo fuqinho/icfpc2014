@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -5,6 +8,8 @@
 #include "gamestate.h"
 #include "ghost.h"
 #include "lambdaman.h"
+
+#include "glog/logging.h"
 
 const int kGhostTicks[4][3] = {
   { 130, 195, 130, },
@@ -18,19 +23,78 @@ class Simulator {
   Simulator() {
   }
 
+  void set_map_file(const std::string& map_file) {
+    map_file_ = map_file;
+  }
+
+  void add_ai(const std::string& ai_file) {
+    ai_file_list_.push_back(ai_file);
+  }
+
   void Run() {
     Init();
     int end_of_ticks =
         127 * game_state_.map_width() * game_state_.map_height() * 16;
+    // Clear screen and disable cursor.
+    printf("\x1b[2J\x1b[?25l");
+    fflush(stdout);
+    PrintGame(0);
     for (int ticks = 1; ticks < end_of_ticks; ++ticks) {
       if (RunStep(ticks))
         break;
+      PrintGame(ticks);
     }
+    PrintGame(end_of_ticks);
   }
 
  private:
   void Init() {
-    // TODO setup next ticks.
+    LoadMap(game_state_.mutable_game_map(), map_file_);
+    game_state_.set_lambda_man(std::unique_ptr<LambdaMan>(new LambdaMan));
+    InitLambdaMan(game_state_.mutable_lambda_man(), game_state_.game_map());
+    InitGhostList(game_state_.mutable_ghost_list(), game_state_.game_map());
+    game_state_.set_fruit(0);
+    game_state_.set_score(0);
+  }
+
+  static void LoadMap(GameMap* game_map, const std::string& map_file) {
+    std::ifstream in(map_file);
+    std::string line;
+    while (std::getline(in, line)) {
+      game_map->push_back(line);
+    }
+  }
+
+  static void InitLambdaMan(LambdaMan* lambda_man, const GameMap& game_map) {
+    for (size_t y = 0; y < game_map.size(); ++y) {
+      for (size_t x = 0; x < game_map[y].size(); ++x) {
+        if (game_map[y][x] == '\\') {
+          lambda_man->set_initial_position(Position {x, y});
+          lambda_man->set_position(Position {x, y});
+          lambda_man->set_direction(Direction::DOWN);
+          lambda_man->set_life(3);
+          lambda_man->set_next_ticks(127);
+          return;
+        }
+      }
+    }
+  }
+
+  static void InitGhostList(std::vector<std::unique_ptr<Ghost> >* ghost_list,
+                            const GameMap& game_map) {
+    int ai_id = 1;  // TODO
+    for (size_t y = 0; y < game_map.size(); ++y) {
+      for (size_t x = 0; x < game_map[y].size(); ++x) {
+        if (game_map[y][x] == '=') {
+          std::unique_ptr<Ghost> ptr(new Ghost(ai_id));
+          ptr->set_initial_position(Position {x, y});
+          ptr->set_position(Position {x, y});
+          ptr->set_direction(Direction::DOWN);
+          ptr->set_next_ticks(kGhostTicks[ai_id][0]);
+          ghost_list->push_back(std::move(ptr));
+        }
+      }
+    }
   }
 
   bool RunStep(int current_ticks) {
@@ -46,7 +110,6 @@ class Simulator {
     for (size_t i = 0; i < num_ghost; ++i) {
       MoveGhost(game_state_.mutable_ghost(i), current_ticks);
     }
-
     MoveLambdaMan(game_state_.mutable_lambda_man(), current_ticks);
   }
 
@@ -55,13 +118,39 @@ class Simulator {
       return;
     }
 
-    MoveIfAvailable(obj, obj->GetNextDirection(game_state_),
-                    game_state_.game_map()) ||
-        MoveIfAvailable(obj, obj->direction(), game_state_.game_map()) ||
-        MoveIfAvailable(obj, Direction::UP, game_state_.game_map()) ||
-        MoveIfAvailable(obj, Direction::RIGHT, game_state_.game_map()) ||
-        MoveIfAvailable(obj, Direction::DOWN, game_state_.game_map()) ||
-        MoveIfAvailable(obj, Direction::LEFT, game_state_.game_map());
+    Direction next = obj->GetNextDirection(game_state_);
+    Position position = obj->position();
+    size_t num_walls =
+        (game_state_.tile(GetNextPosition(position, Direction::UP)) == '#') +
+        (game_state_.tile(GetNextPosition(position, Direction::RIGHT)) == '#') +
+        (game_state_.tile(GetNextPosition(position, Direction::DOWN)) == '#') +
+        (game_state_.tile(GetNextPosition(position, Direction::LEFT)) == '#');
+    if (num_walls == 3) {
+      // Dead end.
+      MoveIfAvailable(obj, Direction::UP, game_state_.game_map()) ||
+      MoveIfAvailable(obj, Direction::RIGHT, game_state_.game_map()) ||
+      MoveIfAvailable(obj, Direction::DOWN, game_state_.game_map()) ||
+      MoveIfAvailable(obj, Direction::LEFT, game_state_.game_map());
+    } else if (num_walls == 2) {
+      // Corrido or bend.
+      (obj->direction() != Direction::DOWN &&
+       MoveIfAvailable(obj, Direction::UP, game_state_.game_map())) ||
+      (obj->direction() != Direction::LEFT &&
+       MoveIfAvailable(obj, Direction::RIGHT, game_state_.game_map())) ||
+      (obj->direction() != Direction::UP &&
+       MoveIfAvailable(obj, Direction::DOWN, game_state_.game_map())) ||
+      (obj->direction() != Direction::RIGHT &&
+       MoveIfAvailable(obj, Direction::LEFT, game_state_.game_map()));
+    } else {
+      // Junction.
+      (next != GetOppositeDirection(obj->direction()) &&
+       MoveIfAvailable(obj, next, game_state_.game_map())) ||
+      MoveIfAvailable(obj, obj->direction(), game_state_.game_map()) ||
+      MoveIfAvailable(obj, Direction::UP, game_state_.game_map()) ||
+      MoveIfAvailable(obj, Direction::RIGHT, game_state_.game_map()) ||
+      MoveIfAvailable(obj, Direction::DOWN, game_state_.game_map()) ||
+      MoveIfAvailable(obj, Direction::LEFT, game_state_.game_map());
+    }
     obj->set_next_ticks(
         current_ticks +
         kGhostTicks[obj->ai_id()][static_cast<int>(obj->vitality())]);
@@ -122,17 +211,17 @@ class Simulator {
 
   void EatPillPhase(int current_ticks) {
     Position position = game_state_.lambda_man().position();
-    char tile = game_state_.game_map()[position.y][position.x];
+    char tile = game_state_.tile(position);
     if (tile == '.') {
       // Eat pill.
       game_state_.add_score(10);
       game_state_.mutable_lambda_man()->set_next_ticks(137 + current_ticks);
-      game_state_.mutable_game_map()[position.y][position.x] = ' ';
+      *game_state_.mutable_tile(position) = ' ';
     } else if (tile == 'o') {
       // Eat power pill.
       game_state_.add_score(50);
       game_state_.mutable_lambda_man()->set_next_ticks(137 + current_ticks);
-      game_state_.mutable_game_map()[position.y][position.x] = ' ';
+      *game_state_.mutable_tile(position) = ' ';
       size_t num_ghost = game_state_.ghost_size();
       for (size_t i = 0; i < num_ghost; ++i) {
         Ghost* ghost = game_state_.mutable_ghost(i);
@@ -168,6 +257,7 @@ class Simulator {
       if (ghost->vitality() == GhostVitality::FRIGHT) {
         // TODO score.
         ghost->set_position(ghost->initial_position());
+        ghost->set_vitality(GhostVitality::INVISIBLE);
         ghost->set_direction(Direction::DOWN);
       } else {
         // Loose a life.
@@ -211,14 +301,67 @@ class Simulator {
     return false;
   }
 
+  std::string map_file_;
+  // TODO lambda ai file.
+  std::vector<std::string> ai_file_list_;
+
   GameState game_state_;
+
+  void PrintGame(int current_ticks) const {
+    std::stringstream buffer;
+    buffer << "\x1b[H";
+    buffer << "ticks: " << current_ticks
+           << ", score: " << game_state_.score() << "\n";
+    for (size_t y = 0; y < game_state_.map_height(); ++y) {
+      for (size_t x = 0; x < game_state_.map_width(); ++x) {
+        if (game_state_.lambda_man().position() == Position {x, y}) {
+          buffer << "\\";
+          continue;
+        }
+        size_t num_ghost = game_state_.ghost_size();
+        bool is_ghost = false;
+        for (size_t i = 0; i < num_ghost; ++i) {
+          if (game_state_.ghost(i).position() == Position {x, y}) {
+            is_ghost = true;
+            break;
+          }
+        }
+        if (is_ghost) {
+          buffer << "=";
+          continue;
+        }
+        if (game_state_.game_map()[y][x] == '=' ||
+            game_state_.game_map()[y][x] == '\\') {
+          buffer << " ";
+          continue;
+        }
+
+        if (game_state_.game_map()[y][x] == '%') {
+          if (game_state_.fruit() > 0) {
+            buffer << "%";
+          } else {
+            buffer << " ";
+          }
+          continue;
+        }
+
+        buffer << game_state_.game_map()[y][x];
+      }
+      buffer << "\n";
+    }
+    const std::string str = buffer.str();
+    write(1, str.c_str(), str.size());
+  }
   // TODO event optimization.
 
   DISALLOW_COPY_AND_ASSIGN(Simulator);
 };
 
-int main() {
+int main(int argc, char* argv[]) {
+  google::InitGoogleLogging(argv[0]);
+
   Simulator sim;
+  sim.set_map_file(argv[1]);
   sim.Run();
   return 0;
 }

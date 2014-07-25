@@ -14,7 +14,9 @@ class Ghost : public GameObject {
       : ai_id_(ai_id),
         vitality_(GhostVitality::STANDARD) {
   }
-  virtual Direction GetNextDirection(const GameState& game_state) override;
+  virtual Direction GetNextDirection(const GameState& game_state) override {
+    return Direction::RIGHT;
+  }
 
   int ai_id() const { return ai_id_; }
   GhostVitality vitality() const { return vitality_; }
