@@ -31,14 +31,14 @@ enum GHCRegister {
 };
 
 enum GHCArgumentType {
-  Constant,
-  Register,
-  Memory
+  REGISTER,
+  INDIRECT_REGISTER,
+  CONSTANT,
+  MEMORY
 };
 
 struct GHCArgument {
   GHCArgumentType type;
-  bool as_address;
   unsigned int id;
 };
 
