@@ -9,7 +9,16 @@ class LambdaMan : public GameObject {
   LambdaMan();
   virtual Direction GetNextDirection(const GameState& state);
 
+  int life() const { return life_; }
+  void set_life(int life) { life_ = life; }
+
+  int vitality() const { return vitality_; }
+  void set_vitality(int vitality) { vitality_ = vitality; }
+
  private:
+  int life_;
+  int vitality_;
+
   DISALLOW_COPY_AND_ASSIGN(LambdaMan);
 };
 

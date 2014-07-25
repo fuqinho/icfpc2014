@@ -1,6 +1,8 @@
 #ifndef SIMULATOR_GAMEOBJECT_H_
 #define SIMULATOR_GAMEOBJECT_H_
 
+#include <cassert>
+
 #include "common.h"
 
 class GameState;
@@ -31,27 +33,31 @@ inline Position GetNextPosition(const Position& p, Direction d) {
 
 class GameObject {
  public:
-  GameObject() : current_direction_(Direction::DOWN) {
+  GameObject() : direction_(Direction::DOWN) {
   }
 
   virtual ~GameObject() {
   }
 
-  virtual Direction GetNextMove(const GameState& ) = 0;
+  virtual Direction GetNextDirection(const GameState& ) = 0;
 
   const Position& position() const { return position_; }
   void set_position(const Position& p) {
     position_ = p;
   }
 
-  const Direction current_direction() const { return current_direction_; }
-  void set_current_direction(const Direction& d) {
-    current_direction_ = d;
+  const Direction direction() const { return direction_; }
+  void set_direction(const Direction& d) {
+    direction_ = d;
   }
+
+  int next_ticks() const { return next_ticks_; }
+  void set_next_ticks(int next_ticks) { next_ticks_ = next_ticks; }
 
  private:
   Position position_;
-  Direction current_direction_;
+  Direction direction_;
+  int next_ticks_;
 
   DISALLOW_COPY_AND_ASSIGN(GameObject);
 };
