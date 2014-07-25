@@ -1,9 +1,9 @@
 .PHONY: clean
-CXXFLAGS=-lglog -O2 -std=c++11
+CXXFLAGS=-O2 -std=c++11
 CXX=g++
 
 simulator: simulator.o
-	$(CXX) -o $@ $+
+	$(CXX) -o $@ $^ -lglog
 
 simulator.o: simulator.cc
 

@@ -6,8 +6,12 @@
 
 class LambdaMan : public GameObject {
  public:
-  LambdaMan();
-  virtual Direction GetNextDirection(const GameState& state);
+  LambdaMan() {
+  }
+
+  virtual Direction GetNextDirection(const GameState& state) override {
+    return Direction::RIGHT;
+  }
 
   int life() const { return life_; }
   void set_life(int life) { life_ = life; }
