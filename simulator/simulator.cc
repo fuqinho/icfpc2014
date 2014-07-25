@@ -1,11 +1,10 @@
-#include "common.h"
+#include <string>
+#include <vector>
 
+#include "common.h"
 #include "gamestate.h"
 #include "ghost.h"
 #include "lambdaman.h"
-
-#include <vector>
-#include <string>
 
 const int kGhostTicks[4][3] = {
   { 130, 195, 130, },
@@ -24,7 +23,8 @@ class Simulator {
     int end_of_ticks =
         127 * game_state_.map_width() * game_state_.map_height() * 16;
     for (int ticks = 1; ticks < end_of_ticks; ++ticks) {
-      RunStep(ticks);
+      if (RunStep(ticks))
+        break;
     }
   }
 
@@ -33,12 +33,12 @@ class Simulator {
     // TODO setup next ticks.
   }
 
-  void RunStep(int current_ticks) {
+  bool RunStep(int current_ticks) {
     MovePhase(current_ticks);
     ActionPhase(current_ticks);
-    EatPillPhase();
+    EatPillPhase(current_ticks);
     EatGhostPhase();
-    GameOverCheckPhase();
+    return GameOverCheckPhase();
   }
 
   void MovePhase(int current_ticks) {
@@ -76,8 +76,8 @@ class Simulator {
     MoveIfAvailable(obj, d, game_state_.game_map());
     obj->set_direction(d);
 
-    obj->set_next_ticks(
-        current_ticks + (obj->vitality() > 0 ? 137 : 127));
+    // This may be overwritten in following checks.
+    obj->set_next_ticks(current_ticks + 127);
   }
 
   static bool MoveIfAvailable(
@@ -120,16 +120,99 @@ class Simulator {
     }
   }
 
-  void EatPillPhase() {
+  void EatPillPhase(int current_ticks) {
+    Position position = game_state_.lambda_man().position();
+    char tile = game_state_.game_map()[position.y][position.x];
+    if (tile == '.') {
+      // Eat pill.
+      game_state_.add_score(10);
+      game_state_.mutable_lambda_man()->set_next_ticks(137 + current_ticks);
+      game_state_.mutable_game_map()[position.y][position.x] = ' ';
+    } else if (tile == 'o') {
+      // Eat power pill.
+      game_state_.add_score(50);
+      game_state_.mutable_lambda_man()->set_next_ticks(137 + current_ticks);
+      game_state_.mutable_game_map()[position.y][position.x] = ' ';
+      size_t num_ghost = game_state_.ghost_size();
+      for (size_t i = 0; i < num_ghost; ++i) {
+        Ghost* ghost = game_state_.mutable_ghost(i);
+        if (ghost->vitality() == GhostVitality::STANDARD) {
+          ghost->set_vitality(GhostVitality::FRIGHT);
+        }
+        ghost->set_direction(GetOppositeDirection(ghost->direction()));
+      }
+    } else if (tile == '%' && game_state_.fruit() > 0) {
+      // Eat fruit.
+      game_state_.add_score(game_state_.fruit_score());
+      game_state_.set_fruit(0);
+      // Hack.
+      if (game_state_.lambda_man().next_ticks() ==
+          current_ticks + 127) {
+        game_state_.mutable_lambda_man()->set_next_ticks(current_ticks + 137);
+      }
+    }
   }
 
   void EatGhostPhase() {
+    Position position = game_state_.lambda_man().position();
+    size_t num_ghost = game_state_.ghost_size();
+    for (size_t i = 0; i < num_ghost; ++i) {
+      Ghost* ghost = game_state_.mutable_ghost(i);
+      if (ghost->vitality() == GhostVitality::INVISIBLE) {
+        continue;
+      }
+      if (ghost->position() != position) {
+        continue;
+      }
+
+      if (ghost->vitality() == GhostVitality::FRIGHT) {
+        // TODO score.
+        ghost->set_position(ghost->initial_position());
+        ghost->set_direction(Direction::DOWN);
+      } else {
+        // Loose a life.
+        game_state_.mutable_lambda_man()->set_life(
+            game_state_.lambda_man().life() - 1);
+        game_state_.mutable_lambda_man()->set_position(
+            game_state_.lambda_man().initial_position());
+        game_state_.mutable_lambda_man()->set_direction(Direction::DOWN);
+        for (size_t j = 0; j < num_ghost; ++j) {
+          Ghost* ghost2 = game_state_.mutable_ghost(j);
+          ghost2->set_position(ghost2->initial_position());
+          ghost2->set_direction(Direction::DOWN);
+        }
+        break;
+      }
+    }
   }
 
-  void GameOverCheckPhase() {
+  bool GameOverCheckPhase() {
+    // Check if lambdaman wins.
+    bool won = true;
+    for (size_t y = 0; y < game_state_.map_height(); ++y) {
+      for (size_t x = 0; x < game_state_.map_width(); ++x) {
+        if (game_state_.game_map()[y][x] == '.') {
+          won = false;
+          break;
+        }
+      }
+    }
+    if (won) {
+      game_state_.set_score(
+          game_state_.score() * (game_state_.lambda_man().life() + 1));
+      return true;
+    }
+
+    // Check if game is over.
+    if (game_state_.lambda_man().life() == 0) {
+      return true;
+    }
+
+    return false;
   }
 
   GameState game_state_;
+  // TODO event optimization.
 
   DISALLOW_COPY_AND_ASSIGN(Simulator);
 };

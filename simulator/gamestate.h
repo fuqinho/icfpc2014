@@ -17,6 +17,10 @@ class GameState {
 
   size_t map_width() const { return game_map_[0].size(); }
   size_t map_height() const { return game_map_.size(); }
+  int game_level() const {
+    return (map_width() * map_height() + 99) / 100;
+  }
+
 
   const GameMap& game_map() const { return game_map_; }
   GameMap* mutable_game_map() { return &game_map_; }
@@ -35,12 +39,35 @@ class GameState {
   int fruit() const { return fruit_; }
   void set_fruit(int fruit) { fruit_ = fruit; }
 
+  int fruit_score() const {
+    switch (game_level()) {
+      case 1: return 100;
+      case 2: return 300;
+      case 3: return 500;
+      case 4: return 500;
+      case 5: return 700;
+      case 6: return 700;
+      case 7: return 1000;
+      case 8: return 1000;
+      case 9: return 2000;
+      case 10: return 2000;
+      case 11: return 3000;
+      case 12: return 3000;
+      default: return 5000;
+    }
+  }
+
+  int score() const { return score_; }
+  void add_score(int score) { score_ += score; }
+  void set_score(int score) { score_ = score; }
+
  private:
   GameMap game_map_;
   std::unique_ptr<LambdaMan> lambda_man_;
   std::vector<std::unique_ptr<Ghost> > ghost_list_;
 
   int fruit_;
+  int score_;
 
   DISALLOW_COPY_AND_ASSIGN(GameState);
 };
