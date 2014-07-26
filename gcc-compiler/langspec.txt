@@ -1,11 +1,11 @@
 program ::= define*
 define ::= (define (name x1 ... xk) e)
 
-ƒvƒƒOƒ‰ƒ€‚Í
+ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯
   (define (main arg1 arg2) e)
-‚Æ‚¢‚¤–¼‘O‚ÌŠÖ”‚©‚çÀsŠJn‚³‚ê‚Ü‚·
-arg1, arg2 ‚É‚Í "Lambda-Man AI interface" ‚É‘‚¢‚Ä‚ ‚éˆø”‚ª“ü‚éB
-ƒOƒ[ƒoƒ‹‚È define ŠÖ”‚Í‘ŠŒİÄ‹A‚Å‚«‚Ü‚·
+ã¨ã„ã†åå‰ã®é–¢æ•°ã‹ã‚‰å®Ÿè¡Œé–‹å§‹ã•ã‚Œã¾ã™
+arg1, arg2 ã«ã¯ "Lambda-Man AI interface" ã«æ›¸ã„ã¦ã‚ã‚‹å¼•æ•°ãŒå…¥ã‚‹ã€‚
+ã‚°ãƒ­ãƒ¼ãƒãƒ«ãª define é–¢æ•°ã¯ç›¸äº’å†å¸°ã§ãã¾ã™
 
 e ::=
  | (+ e e)
