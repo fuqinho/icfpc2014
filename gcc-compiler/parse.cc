@@ -2,9 +2,9 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
-using ast::AST;
+#include <cassert>
 
-namespace parse_impl {
+namespace {
 
 void skip_spaces(const char*& p)
 {
@@ -12,10 +12,20 @@ void skip_spaces(const char*& p)
 		++p;
 }
 
+bool is_open_paren(char c)
+{
+	return c=='(' || c=='[' || c=='{';
+}
+
+bool is_close_paren(char c)
+{
+	return c==')' || c==']' || c=='}';
+}
+
 std::string parse_token(const char*& p)
 {
 	std::string token;
-	while(*p!=' ' && *p!='\t' && *p!='\n' && *p!=')')
+	while(*p!=' ' && *p!='\t' && *p!='\n' && !is_close_paren(*p))
 		token += *p++;
 	return token;
 }
@@ -33,17 +43,30 @@ bool parse_int(const std::string& s, int* value)
 	return true;
 }
 
-AST parse_expression(const char*& p)
+char paren_match(char op, char cl)
 {
-	AST ast(new ast::Impl);
+	switch(op) {
+	case '(': return cl==')';
+	case '[': return cl==']';
+	case '{': return cl=='}';
+	}
+	return op==cl;
+}
+
+ast::AST parse_expression(const char*& p)
+{
+	ast::AST ast(new ast::Impl);
 
 	skip_spaces(p);
 
-	if(*p == '(') {
+	if(is_open_paren(*p)) {
+		char op = *p;
 		++p; // ')'
-		std::vector<AST> list;
-		while(skip_spaces(p), *p!=')')
+		std::vector<ast::AST> list;
+		while(skip_spaces(p), !is_close_paren(*p))
 			list.emplace_back(parse_expression(p));
+		char cl = *p;
+		assert(paren_match(op,cl));
 		++p; // ')'
 
 		ast->type = ast::LIST;
@@ -62,29 +85,35 @@ AST parse_expression(const char*& p)
 	return ast;
 }
 
-}  // namespace parse_impl
-
-AST parse_expression(const char* p)
+std::string read_skipping_comments(std::istream& in)
 {
-	return parse_impl::parse_expression(p);
+	std::string all;
+	for(std::string str; getline(in, str); ) {
+		size_t i = str.find(';');
+		if(i != std::string::npos)
+			str.resize(i);
+		all += str;
+		all += '\n';
+	}
+	return all;
 }
 
-AST parse_expression(std::istream& in)
+}  // namespace
+
+ast::AST parse_expression(std::istream& in)
 {
-	std::stringstream sin;
-	sin << in.rdbuf();
-	return parse_expression(sin.str().c_str());
+	std::string str = read_skipping_comments(in);
+	const char* p = str.c_str();
+	return parse_expression(p);
 }
 
-std::vector<AST> parse_program(std::istream& in)
+std::vector<ast::AST> parse_program(std::istream& in)
 {
-	std::stringstream sin;
-	sin << in.rdbuf();
-	std::string str = sin.str();
+	std::string str = read_skipping_comments(in);
 	const char* p = str.c_str();
 
-	std::vector<AST> asts;
-	while(parse_impl::skip_spaces(p), *p)
-		asts.push_back(parse_impl::parse_expression(p));
+	std::vector<ast::AST> asts;
+	while(skip_spaces(p), *p)
+		asts.push_back(parse_expression(p));
 	return asts;
 }
