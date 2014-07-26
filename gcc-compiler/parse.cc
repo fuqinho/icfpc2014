@@ -75,3 +75,16 @@ AST parse_expression(std::istream& in)
 	sin << in.rdbuf();
 	return parse_expression(sin.str().c_str());
 }
+
+std::vector<AST> parse_program(std::istream& in)
+{
+	std::stringstream sin;
+	sin << in.rdbuf();
+	std::string str = sin.str();
+	const char* p = str.c_str();
+
+	std::vector<AST> asts;
+	while(parse_impl::skip_spaces(p), *p)
+		asts.push_back(parse_impl::parse_expression(p));
+	return asts;
+}

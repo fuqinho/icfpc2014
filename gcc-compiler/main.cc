@@ -5,11 +5,8 @@
 
 int main()
 {
-	ast::AST ast = parse_expression(std::cin) ;
-	std::cerr << "PARSED:" << std::endl;
-	std::cerr << *ast << std::endl;
-
-	PreLink pl = compile(ast);
+	auto asts = parse_program(std::cin) ;
+	PreLink pl = compile_program(asts);
 	std::cerr << "COMPILED:" << std::endl;
 	std::cerr << pl << std::endl;
 

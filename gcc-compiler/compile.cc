@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -187,12 +188,88 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 
 }  // namespace
 
-PreLink compile(ast::AST ast)
+PreLink compile_expression(ast::AST ast)
 {
 	std::shared_ptr<VarMap> nil_varmap;
 	auto codeblocks = std::make_shared<std::vector<gcc::OperationSequence>>();
 	Context ctx = {nil_varmap, codeblocks};
 	auto mainblock = rec(ast, ctx);
 	PreLink result = {mainblock, *codeblocks};
+	return result;
+}
+
+PreLink compile_program(const std::vector<ast::AST> defines)
+{
+	std::map<std::string, std::pair<
+		std::vector<std::string>,
+		ast::AST
+	>> funcs;
+
+	for(auto ast: defines)
+	{
+		assert(ast->type == ast::LIST);
+		assert(ast->list.size() == 3);
+		assert(ast->list[0]->type == ast::SYMBOL);
+		assert(ast->list[0]->symbol == "define");
+		assert(ast->list[1]->type == ast::LIST);
+		assert(ast->list[1]->list.size() >= 1);
+		assert(ast->list[1]->list[0]->type == ast::SYMBOL);
+		std::string name = ast->list[1]->list[0]->symbol;
+
+		std::vector<std::string> params;
+		for(size_t i=1; i<ast->list[1]->list.size(); ++i) {
+			assert(ast->list[1]->list[i]->type == ast::SYMBOL);
+			params.push_back(ast->list[1]->list[i]->symbol);
+		}
+
+		assert(funcs.count(name) == 0);
+		funcs[name] = std::make_pair(params, ast->list[2]);
+	}
+
+	std::shared_ptr<VarMap> nil_varmap;
+	std::vector<std::string> global_vars;
+	for(auto& kv: funcs)
+		global_vars.push_back(kv.first);
+	std::shared_ptr<VarMap> global_varmap = std::make_shared<VarMap>(nil_varmap, global_vars);
+
+	auto codeblocks = std::make_shared<std::vector<gcc::OperationSequence>>();
+
+	std::vector<int> func_ids;
+	int main_offset = -1, i=0;
+	for(auto& kv: funcs)
+	{
+		Context ctx = {
+			std::make_shared<VarMap>(global_varmap, kv.second.first),
+			codeblocks
+		};
+		auto body_ops = rec(kv.second.second, ctx);
+		gcc::Append(&body_ops, std::make_shared<gcc::OpRTN>());
+		int id = ctx.AddCodeBlock(body_ops);
+		if(kv.first == "main")
+			main_offset = i;
+		func_ids.push_back(id);
+		++i;
+	}
+	assert(main_offset >= 0);
+	// (define (__dummy_main__) (main arg1 arg2))
+	gcc::OperationSequence dummy_main_ops;
+	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(1,1));
+	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(1,0));
+	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(0,main_offset));
+	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpAP>(2));
+	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpRTN>());
+	Context tmp_ctx = {nil_varmap, codeblocks};
+	int dummy_main_id = tmp_ctx.AddCodeBlock(dummy_main_ops);
+
+	gcc::OperationSequence prolog_ops;
+
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpDUM>(func_ids.size()));
+	for(int id: func_ids)
+		gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDF>(id));
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDF>(dummy_main_id));
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpRAP>(func_ids.size()));
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpRTN>());
+
+	PreLink result = {prolog_ops, *codeblocks};
 	return result;
 }

@@ -129,7 +129,36 @@ private:
 	int n;
 };
 
-// AP
+// RAP
+class OpRAP : public Op {
+public:
+	explicit OpRAP(int n) : n(n) {}
+	virtual std::ostream& to_stream(std::ostream& os) const {
+		return os << "RAP " << n;
+	}
+	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
+		return std::make_shared<OpRAP>(n);
+	}
+
+private:
+	int n;
+};
+
+// DUM
+class OpDUM : public Op {
+public:
+	explicit OpDUM(int n) : n(n) {}
+	virtual std::ostream& to_stream(std::ostream& os) const {
+		return os << "DUM " << n;
+	}
+	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
+		return std::make_shared<OpDUM>(n);
+	}
+
+private:
+	int n;
+};
+// SEL
 class OpSEL : public Op {
 public:
 	explicit OpSEL(int tid, int eid) : tid(tid), eid(eid) {}

@@ -1,3 +1,12 @@
+program ::= define*
+define ::= (define (name x1 ... xk) e)
+
+プログラムは
+  (define (main arg1 arg2) e)
+という名前の関数から実行開始されます
+arg1, arg2 には "Lambda-Man AI interface" に書いてある引数が入る。
+グローバルな define 関数は相互再帰できます
+
 e ::=
  | (+ e e)
  | (- e e)
@@ -13,4 +22,4 @@ e ::=
  | (car e)
  | (cdr e)
  | (if e1 e2 e3)    # e1!=0 ? e2 : e3
- | (lambda (x y z) e)
+ | (lambda (x1 ... xk) e)
