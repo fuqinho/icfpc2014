@@ -100,13 +100,6 @@ std::string read_skipping_comments(std::istream& in)
 
 }  // namespace
 
-ast::AST parse_expression(std::istream& in)
-{
-	std::string str = read_skipping_comments(in);
-	const char* p = str.c_str();
-	return parse_expression(p);
-}
-
 std::vector<ast::AST> parse_program(std::istream& in)
 {
 	std::string str = read_skipping_comments(in);

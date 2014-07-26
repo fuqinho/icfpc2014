@@ -20,6 +20,4 @@ struct PreLink
 	}
 };
 
-PreLink compile_expression(ast::AST ast);
-
 PreLink compile_program(const std::vector<ast::AST> defines);

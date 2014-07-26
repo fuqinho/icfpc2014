@@ -23,6 +23,9 @@ public:
 			*index = it - vars.begin();
 			return true;
 		}
+		if(!parent)
+			std::cerr << "!!! VARIABLE " << var << " NOT FOUND !!!" << std::endl;
+		assert(parent);
 		bool b = parent->resolve(var, depth, index);
 		if(b)
 			++*depth;
@@ -223,16 +226,6 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx, IsTailPos tail)
 }
 
 }  // namespace
-
-PreLink compile_expression(ast::AST ast)
-{
-	std::shared_ptr<VarMap> nil_varmap;
-	auto codeblocks = std::make_shared<std::vector<gcc::OperationSequence>>();
-	Context ctx = {nil_varmap, codeblocks};
-	auto mainblock = rec(ast, ctx, NOT_TAIL);
-	PreLink result = {mainblock, *codeblocks};
-	return result;
-}
 
 PreLink compile_program(const std::vector<ast::AST> defines)
 {
