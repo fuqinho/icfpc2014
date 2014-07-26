@@ -15,9 +15,12 @@ class GHCMachine {
  public:
   GHCMachine() : registers_(9, 0), memory_(256, 0), listener_(NULL) {}
 
-  void LoadProgram(std::vector<std::string> lines) {
-     for (size_t i = 0; i < lines.size(); i++)
-       instructions_.push_back(ParseGHCInstruction(lines[i]));
+  void LoadProgram(const std::string& program) {
+    std::stringstream stream(program);
+    std::string line;
+    while (getline(stream, line)) {
+      instructions_.push_back(ParseGHCInstruction(line));
+    }
   }
 
   void Execute() {

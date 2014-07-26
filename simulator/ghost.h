@@ -12,28 +12,13 @@ enum class GhostVitality {
 
 class Ghost : public GameObject, GHCMachineListener {
  public:
-  Ghost(int index, int ai_id)
+  Ghost(int index, int ai_id, const std::string& program)
       : index_(index),
         ai_id_(ai_id),
         vitality_(GhostVitality::STANDARD),
         game_state_(NULL),
         last_direction_(Direction::RIGHT) {
-    std::vector<std::string> lines;
-    lines.push_back("mov a,255");
-    lines.push_back("mov b,0");
-    lines.push_back("mov c,255");
-    lines.push_back("inc c");
-    lines.push_back("jgt 7,[c],a");
-    lines.push_back("mov a,[c]");
-    lines.push_back("mov b,c");
-    lines.push_back("jlt 3,c,3");
-    lines.push_back("mov a,b");
-    lines.push_back("int 0");
-    lines.push_back("int 3");
-    lines.push_back("int 6");
-    lines.push_back("inc [b]");
-    lines.push_back("hlt");
-    machine_.LoadProgram(lines);
+    machine_.LoadProgram(program);
     machine_.SetListener(this);
   }
 

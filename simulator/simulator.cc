@@ -27,7 +27,11 @@ class Simulator {
     map_file_ = map_file;
   }
 
-  void add_ai(const std::string& ai_file) {
+  void set_lambdaman_file(const std::string& lambdaman_file) {
+    lambdaman_file_ = lambdaman_file;
+  }
+
+  void add_ai_file(const std::string& ai_file) {
     ai_file_list_.push_back(ai_file);
   }
 
@@ -52,7 +56,9 @@ class Simulator {
     LoadMap(game_state_.mutable_game_map(), map_file_);
     game_state_.set_lambda_man(std::unique_ptr<LambdaMan>(new LambdaMan));
     InitLambdaMan(game_state_.mutable_lambda_man(), game_state_.game_map());
-    InitGhostList(game_state_.mutable_ghost_list(), game_state_.game_map());
+    InitGhostList(game_state_.mutable_ghost_list(),
+                  ai_file_list_,
+                  game_state_.game_map());
     game_state_.set_fruit(0);
     game_state_.set_score(0);
   }
@@ -81,17 +87,31 @@ class Simulator {
   }
 
   static void InitGhostList(std::vector<std::unique_ptr<Ghost> >* ghost_list,
+                            const std::vector<std::string>& ai_file_list,
                             const GameMap& game_map) {
-    int ai_id = 1;  // TODO
+    std::vector<std::string> ai_list;
+    for (size_t i = 0; i < ai_file_list.size(); ++i) {
+      std::ifstream ifs(ai_file_list[i]);
+      ifs.seekg(0, std::ios::end);
+      int len = ifs.tellg();
+      ifs.seekg(0, std::ios::beg);
+      std::string data;
+      data.resize(len);
+      ifs.read(&data[0], len);
+      ai_list.push_back(std::move(data));
+    }
+
     int num_ghosts = 0;
     for (size_t y = 0; y < game_map.size(); ++y) {
       for (size_t x = 0; x < game_map[y].size(); ++x) {
         if (game_map[y][x] == '=') {
-          std::unique_ptr<Ghost> ptr(new Ghost(num_ghosts++, ai_id));
+          int ai = num_ghosts % ai_list.size();
+          std::unique_ptr<Ghost> ptr(
+              new Ghost(num_ghosts++, ai, ai_list[ai]));
           ptr->set_initial_position(Position {x, y});
           ptr->set_position(Position {x, y});
           ptr->set_direction(Direction::DOWN);
-          ptr->set_next_ticks(kGhostTicks[ai_id][0]);
+          ptr->set_next_ticks(kGhostTicks[ai][0]);
           ghost_list->push_back(std::move(ptr));
         }
       }
@@ -303,7 +323,7 @@ class Simulator {
   }
 
   std::string map_file_;
-  // TODO lambda ai file.
+  std::string lambdaman_file_;
   std::vector<std::string> ai_file_list_;
 
   GameState game_state_;
@@ -351,7 +371,7 @@ class Simulator {
       buffer << "\n";
     }
     const std::string str = buffer.str();
-    write(1, str.c_str(), str.size());
+    puts(str.c_str());
   }
   // TODO event optimization.
 
@@ -361,8 +381,17 @@ class Simulator {
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
+  if (argc < 3 || 7 < argc) {
+    fprintf(stderr, "Usage: %s MAP LAMBDA AI1 [AI2 [AI3 [AI4]]]\n", argv[0]);
+    return 2;
+  }
+
   Simulator sim;
   sim.set_map_file(argv[1]);
+  sim.set_lambdaman_file(argv[2]);
+  for (int i = 3; i < argc; ++i) {
+    sim.add_ai_file(argv[i]);
+  }
   sim.Run();
   return 0;
 }
