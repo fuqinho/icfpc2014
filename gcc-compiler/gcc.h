@@ -67,6 +67,7 @@ DefineOpZ(CDR);
 
 DefineOpZ(RTN);
 DefineOpZ(JOIN);
+DefineOpZ(DBUG);
 
 // Op with single int modifier.
 class OpI : public Op {
@@ -120,6 +121,22 @@ private:
 	int index;
 };
 
+// ST
+class OpST : public Op {
+public:
+	OpST(int depth, int index) : depth(depth), index(index) {}
+	virtual std::ostream& to_stream(std::ostream& os) const {
+		return os << "ST " << depth << " " << index;
+	}
+	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
+		return std::make_shared<OpST>(depth, index);
+	}
+
+private:
+	int depth;
+	int index;
+};
+
 // SEL
 class OpSEL : public Op {
 public:
@@ -150,4 +167,5 @@ public:
 private:
 	int tid, eid;
 };
+
 }  // namespace gcc

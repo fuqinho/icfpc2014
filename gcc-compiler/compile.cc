@@ -164,6 +164,36 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 				if(ast->list.front()->symbol == "cdr")
 					return compile_op1(std::make_shared<gcc::OpCDR>());
 
+				// (dbg! e kont)
+				if(ast->list.front()->symbol == "dbg!") {
+					assert(ast->list.size() == 3);
+
+					gcc::OperationSequence ops;
+					gcc::Append(&ops, compile(ast->list[1], ctx, NOT_TAIL));
+					gcc::Append(&ops, std::make_shared<gcc::OpDBUG>());
+					gcc::Append(&ops, compile(ast->list[2], ctx, tail));
+					return ops;
+				}
+
+				// (set! x e kont)
+				if(ast->list.front()->symbol == "set!") {
+					assert(ast->list.size() == 4);
+					assert(ast->list[1]->type == ast::SYMBOL);
+
+					int depth, index;
+					if(!ctx.varmap->resolve(ast->list[1]->symbol, &depth, &index)) {
+						// TODO: better error logging.
+						std::cerr << "!!! VARIABLE " << ast->symbol << " NOT FOUND !!!" << std::endl;
+						assert(false);
+					}
+
+					gcc::OperationSequence ops;
+					gcc::Append(&ops, compile(ast->list[2], ctx, NOT_TAIL));
+					gcc::Append(&ops, std::make_shared<gcc::OpST>(depth, index));
+					gcc::Append(&ops, compile(ast->list[3], ctx, tail));
+					return ops;
+				}
+
 				// (lambda (vars...) e)
 				if(ast->list.front()->symbol == "lambda") {
 					assert(ast->list.size() == 3);
