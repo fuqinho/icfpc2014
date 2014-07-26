@@ -1,6 +1,7 @@
 #ifndef SIMULATOR_GCC_H_
 #define SIMULATOR_GCC_H_
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -28,6 +29,10 @@ enum class GccMnemonic : uint32_t {
   RTN,
   DUM,
   RAP,
+  TSEL,
+  TAP,
+  TRAP,
+  ST,
 };
 
 struct Code {
@@ -168,6 +173,14 @@ class GCC {
         return Dum(code_[reg_c_].arg1);
       case GccMnemonic::RAP:
         return Rap(code_[reg_c_].arg1);
+      case GccMnemonic::TSEL:
+        return Tsel(code_[reg_c_].arg1, code_[reg_c_].arg2);
+      case GccMnemonic::TAP:
+        return Tap(code_[reg_c_].arg1);
+      case GccMnemonic::TRAP:
+        return Trap(code_[reg_c_].arg1);
+      case GccMnemonic::ST:
+        return St(code_[reg_c_].arg1, code_[reg_c_].arg2);
     }
     assert(false);
     return true;
@@ -314,6 +327,32 @@ class GCC {
         code_.push_back(Code { GccMnemonic::RAP, arg });
         continue;
       }
+      if (mnemonic == "TSEL") {
+        int32_t arg1, arg2;
+        stream >> arg1 >> arg2;
+        code_.push_back(Code { GccMnemonic::TSEL, arg1, arg2 });
+        continue;
+      }
+      if (mnemonic == "TAP") {
+        int32_t arg;
+        stream >> arg;
+        code_.push_back(Code { GccMnemonic::TAP, arg });
+        continue;
+      }
+      if (mnemonic == "TRAP") {
+        int32_t arg;
+        stream >> arg;
+        code_.push_back(Code { GccMnemonic::TRAP, arg });
+        continue;
+      }
+      if (mnemonic == "ST" ) {
+        int32_t arg1, arg2;
+        stream >> arg1 >> arg2;
+        code_.push_back(Code { GccMnemonic::ST, arg1, arg2 });
+        continue;
+      }
+      std::cerr << line << std::endl;
+      abort();
       // Skip otherwise.
     }
   }
@@ -500,6 +539,7 @@ class GCC {
     int32_t f = heap_[x.value].closure.f;
     int32_t e = heap_[x.value].closure.env;
     int32_t frame = AllocFrame(n, e);
+    heap_[frame].frame.parent = e;
     for (int i = n - 1; i >= 0; --i) {
       heap_[frame].frame.values[i] = data_stack_.back();
       data_stack_.pop_back();
@@ -548,7 +588,7 @@ class GCC {
     int32_t fp = heap_[x.value].closure.env;
     if (!heap_[reg_e_].frame.is_dum)
       return OnError(ErrorType::FRAME_MISMATCH);
-    if (!heap_[reg_e_].frame.values.size() != n)
+    if (heap_[reg_e_].frame.values.size() != n)
       return OnError(ErrorType::FRAME_MISMATCH);
     if (reg_e_ != fp)
       return OnError(ErrorType::FRAME_MISMATCH);
@@ -562,6 +602,75 @@ class GCC {
     heap_[fp].frame.is_dum = false;
     reg_e_ = fp;
     reg_c_ = f;
+    return false;
+  }
+
+  bool Tsel(int32_t t, int32_t f) {
+    Value x = data_stack_.back();
+    data_stack_.pop_back();
+    if (x.tag != ValueTag::INT)
+      return OnError(ErrorType::TAG_MISMATCH);
+    if (x.value == 0) {
+      reg_c_ = f;
+    } else {
+      reg_c_ = t;
+    }
+    return false;
+  }
+
+  bool Tap(int32_t n) {
+    Value x = data_stack_.back();
+    data_stack_.pop_back();
+    if (x.tag != ValueTag::CLOSURE)
+      return OnError(ErrorType::TAG_MISMATCH);
+    int32_t f = heap_[x.value].closure.f;
+    int32_t e = heap_[x.value].closure.env;
+    int32_t frame = AllocFrame(n, e);
+    for (int i = n - 1; i >= 0; --i) {
+      heap_[frame].frame.values[i] = data_stack_.back();
+      data_stack_.pop_back();
+    }
+
+    reg_e_ = frame;
+    reg_c_ = f;
+    return false;
+  }
+
+  bool Trap(int32_t n) {
+    Value x = data_stack_.back();
+    data_stack_.pop_back();
+    if (x.tag != ValueTag::CLOSURE)
+      return OnError(ErrorType::TAG_MISMATCH);
+    int32_t f = heap_[x.value].closure.f;
+    int32_t fp = heap_[x.value].closure.env;
+    if (!heap_[reg_e_].frame.is_dum)
+      return OnError(ErrorType::FRAME_MISMATCH);
+    if (heap_[reg_e_].frame.values.size() != n)
+      return OnError(ErrorType::FRAME_MISMATCH);
+    if (reg_e_ != fp)
+      return OnError(ErrorType::FRAME_MISMATCH);
+    for (int i = n - 1; i >= 0; --i) {
+      heap_[fp].frame.values[i] = data_stack_.back();
+      data_stack_.pop_back();
+    }
+    heap_[fp].frame.is_dum = false;
+    reg_e_ = fp;
+    reg_c_ = f;
+    return false;
+  }
+
+  bool St(int32_t n, int32_t i) {
+    int32_t fp = reg_e_;
+    while (n > 0) {
+      fp = heap_[fp].frame.parent;
+      --n;
+    }
+    if (heap_[fp].frame.is_dum)
+      return OnError(ErrorType::FRAME_MISMATCH);
+    Value v = data_stack_.back();
+    data_stack_.pop_back();
+    heap_[fp].frame.values[i] = v;
+    ++reg_c_;
     return false;
   }
 

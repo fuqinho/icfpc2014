@@ -1,0 +1,345 @@
+LD 0 0    ;; ============================ main
+LDF 332  ;; get-next-direction
+CONS
+RTN
+LD 0 0    ;; ============================ nth
+LDC 0
+CEQ
+TSEL 8 11 ;; nth-1 nth-2
+LD 0 1    ;; ==nth-1:
+CAR
+RTN
+LD 0 0      ;; ==nth-2:
+LDC 1
+SUB
+LD 0 1
+CDR
+DUM 2
+LDF 4     ;; nth
+TRAP 2
+LD 0 0    ;; ============================ pos-eq?:
+CAR
+LD 0 1
+CAR
+CEQ
+TSEL 25 31  ;; pos-eq?-1 pos-eq?-2
+LD 0 0      ;; ==pos-eq?-1:
+CDR
+LD 0 1
+CDR
+CEQ
+RTN
+LDC 0       ;; ==pos-eq?-2:
+RTN
+LD 0 1      ;; ========================== find:
+ATOM
+TSEL 36 38  ;; find-1 find-2
+LDC 0       ;; ==find-1:
+RTN
+LD 0 0      ;; ==find-2:
+LD 0 1
+CAR
+CAR
+LDF 19      ;; pos-eq?
+AP 2
+TSEL 45 49  ;; find-2-1 find-2-2
+LD 0 1      ;; ==find-2-1:
+CAR
+CDR
+RTN
+LD 0 1      ;; ==find-2-2:
+LD 0 1
+CDR
+DUM 2
+LDF 33      ;; find
+TRAP 2
+LD 0 0      ;; =========================== lst-rev-internal:
+ATOM
+TSEL 58 60  ;; lst-rev-internal-1 lst-rev-internal-2
+LD 0 1      ;; ==lst-rev-internal-1
+RTN
+LD 0 0      ;; ==lst-rev-internal-2
+CDR
+LD 0 0
+CAR
+LD 0 1
+CONS
+DUM 2
+LDF 55      ;; lst-rev-internal
+TRAP 2
+LD 0 0      ;; ========================== lst-rev
+LDC 0
+LDF 55      ;; lst-rev-internal
+TAP 2
+LD 0 0      ;; ========================== q-push:
+LD 0 1
+CAR
+CONS
+LD 0 1
+CDR
+CONS
+RTN
+LD 0 0      ;; =========================q-take
+CDR
+ATOM
+TSEL 85 94  ;; q-take-1 q-take-2
+LDC 0       ;; ==q-take-1
+LD 0 0
+CAR
+LDF 69      ;; lst-rev
+AP 1
+CONS
+DUM 1
+LDF 81      ;; q-take
+TRAP 1
+LD 0 0      ;; ==q-take-2
+CDR
+CAR
+LD 0 0
+CAR
+LD 0 0
+CDR
+CDR
+CONS
+CONS
+RTN
+LD 0 0      ;; ======================== lambda-pos
+CDR
+CAR
+CDR
+CAR
+RTN
+LD 0 1      ;; ======================== get-tile
+CAR
+LD 0 1
+CDR
+LD 0 0
+CAR
+LDF 4       ;; nth
+AP 2
+LDF 4       ;; nth
+AP 2
+RTN
+LD 0 1     ;; ================================= pos-add
+LDC 0
+CEQ
+TSEL 134 126  ;; pos-add-up pos-add-1
+LD 0 1        ;; == pos-add-1
+LDC 1
+CEQ
+TSEL 142 130  ;; pos-add-right pos-add-2
+LD 0 1        ;; == pos-add-2
+LDC 2
+CEQ
+TSEL 150 158  ;; pos-add-down pos-add-left
+LD 0 0        ;; == pos-add-up
+CAR
+LD 0 0
+CDR
+LDC 1
+SUB
+CONS
+RTN
+LD 0 0        ;; == pos-add-right
+CAR
+LDC 1
+ADD
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 0        ;; == pos-add-down
+CAR
+LD 0 0
+CDR
+LDC 1
+ADD
+CONS
+RTN
+LD 0 0        ;; == pos-add-left
+CAR
+LDC 1
+SUB
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 1        ;; ========================== pos-sub
+LDC 0
+CEQ
+TSEL 150 170  ;; pos-add-down pos-sub-1
+LD 0 1        ;; == pos-sub-1
+LDC 1
+CEQ
+TSEL 158 174  ;;pos-add-left pos-sub-2
+LD 0 1        ;; == pos-sub-2
+LDC 2
+CEQ
+TSEL 134 142  ;; pos-add-up pos-add-right
+LD 1 2  ;; ==get-next-direction-1-iter tmp := q-take q
+LDF 81  ;; q-take
+AP 1
+ST 0 2
+LD 0 2  ;; q <- cdr tmp
+CDR
+ST 1 2
+LD 0 2  ;; pos <- car tmp
+CAR
+ST 0 0
+LD 0 0  ;; dist <- car (find pos assoc-lst)
+LD 1 3
+LDF 33   ;; find
+AP 2
+CAR
+ST 0 1
+LD 0 0  ;; tmp <- iter2 pos UP 0
+LDC 0
+LDC 0
+LDF 238    ;; get-next-direction-1-iter2
+AP 3
+ST 0 2
+LD 0 2  ;; if tmp: tmp
+ATOM
+TSEL 205 203   ;; get-next-direction-1-iter-2 get-next-direction-1-iter-1
+LD 0 2       ;; ==get-next-direction-1-iter-1
+RTN
+LD 0 0       ;; ==get-next-direction-1-iter-2 tmp <- iter2 pos RIGHT 0
+LDC 1
+LDC 0
+LDF 238        ;; get-next-direction-1-iter2
+AP 3
+ST 0 2
+LD 0 2       ;; if tmp: tmp
+ATOM
+TSEL 214 203   ;; get-next-direction-1-iter-3 get-next-direction-1-iter-1
+LD 0 0  ;; ==get-next-direction-1-iter-3   tmp <- iter2 pos DOWN 0
+LDC 2
+LDC 0
+LDF 238     ;; get-next-direction-1-iter2
+AP 3
+ST 0 2
+LD 0 2  ;; if tmp: tmp
+ATOM
+TSEL 223 203   ;; get-next-direction-1-iter-4 get-next-direction-1-iter-1
+LD 0 0  ;; ==get-next-direction-1-iter-4 tmp <- iter2 pos LEFT 0
+LDC 3
+LDC 0
+LDF 238     ;; get-next-direction-1-iter2
+AP 3
+ST 0 2
+LD 0 2       ;; if tmp: tmp
+ATOM
+TSEL 232 203   ;; get-next-direction-1-iter-5 get-next-direction-1-iter-1
+LDC 0  ;;  ==get-next-direction-1-iter-5
+LDC 0
+LDC 0
+DUM 3
+LDF 178    ;; get-next-direction-1-iter
+TRAP 3
+LD 0 0    ;; ===============get-next-direction-1-iter2 pos <- pos-add pos dir
+LD 0 1
+LDF 122   ;; pos-add
+AP 2
+ST 0 0
+LD 2 0  ;; tile <- get-tile state pos
+LD 0 0
+LDF 111    ;; get-tile
+AP 2
+ST 0 2
+LD 0 2
+LDC 0
+CEQ
+TSEL 283 252 ;; get-next-direction-1-iter2-notfound get-next-direction-1-iter2-1
+LD 0 0      ;; ==get-next-direction-1-iter2-1
+LD 2 3
+LDF 33      ;; find
+AP 2
+ATOM
+TSEL 258 283 ;; get-next-direction-1-iter2-2 get-next-direction-1-iter2-notfound
+LD 0 0  ;; ==get-next-direction-1-iter2-2 assoc-lst := (cons (cons pos (cons (dist + 1) dir)) assoc-lst)
+LD 1 1
+LDC 1
+ADD
+LD 0 1
+CONS
+CONS
+LD 2 3
+CONS
+ST 2 3
+LD 0 0 ;; q := q-push pos q
+LD 2 2
+LDF 73       ;; q-push
+AP 2
+ST 2 2
+LD 0 2
+LDC 2
+CEQ
+TSEL 281 277  ;; get-next-direction-1-iter2-found get-next-direction-1-iter2-3
+LD 0 2   ;; ==get-next-direction-1-iter2-3
+LDC 3
+CEQ
+TSEL 281 283    ;; get-next-direction-1-iter2-found get-next-direction-1-iter2-notfound
+LD 0 0   ;; ==get-next-direction-1-iter2-found
+RTN
+LDC 0    ;; ==get-next-direction-1-iter2-notfound
+RTN
+LD 0 0     ;; ====================get-next-direction-1-iter3
+LD 1 3
+LDF 33     ;; find
+AP 2
+CDR
+ST 0 1
+LD 0 0
+LD 0 1
+LDF 166    ;; pos-sub
+AP 2
+ST 0 2
+LD 0 2
+LD 1 1
+LDF 19     ;; pos-eq?
+AP 2
+TSEL 301 303  ;; get-next-direction-1-iter3-1 get-next0direction-1-iter3-2
+LD 0 1     ;; == get-next-direction-1-iter3-1
+RTN
+LD 0 2      ;; == get-next-direction-1-iter3-2
+LDC 0
+LDC 0
+DUM 3
+LDF 285      ;; get-next-direction-1-iter3
+TRAP 3
+LD 0 1  ;; ======================= get-next-direction-1
+LD 0 2
+LDF 73   ;; q-push
+AP 2
+ST 0 2
+LD 0 1   ;; assco
+LDC 0
+LDC -1
+CONS
+CONS
+LD 0 3
+CONS
+ST 0 3
+LDC 0      ;;
+LDC 0
+LDC 0
+LDF 178    ;; get-next-direction-1-iter
+AP 3
+LDC 0
+LDC 0
+LDF 285    ;; get-next-direction-1-iter3
+AP 3
+RTN
+LDC 0      ;; ======================== get-next-direction
+LD 0 1
+LD 0 1
+LDF 105    ;; lambda-pos
+AP 1
+LDC 0
+LDC 0
+CONS
+LDC 0
+LDF 309     ;; get-next-direction-1
+AP 4
+CONS
+RTN
