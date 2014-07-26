@@ -12,7 +12,7 @@ struct PreLink
 	friend std::ostream& operator<<(std::ostream& os, const PreLink& me) {
 		for(auto& op: me.main_expression)
 			os << *op << std::endl;
-		for(int i=0; i<me.sub_blocks.size(); ++i) {
+		for(size_t i=0; i<me.sub_blocks.size(); ++i) {
 			if(me.sub_blocks[i].second.empty())
 				os << i << ":" << std::endl;
 			else

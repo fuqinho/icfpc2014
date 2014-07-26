@@ -1,28 +1,40 @@
-Program starts from the function defined as:
-  (define (main) e).
+* Program Startup
 
-The global variables |arg1| and |arg2| hold the arugments as written in
-the "Lambda-Man AI interface" section of the spec.
+    Program starts from the function defined as:
+      (define (main) e).
 
-Top-level |define|'ed functions can be mutually recursively called.
+    The global variables |arg1| and |arg2| hold the arugments as written in
+    the "Lambda-Man AI interface" section of the spec.
 
-program ::= define*
-define ::= (define (name x1 ... xk) e)
+* Readability Features
 
-e ::=
- | (+ e e)
- | (- e e)
- | (* e e)
- | (/ e e)
- | (= e e)      # compare. returns 0/1
- | (< e e)
- | (> e e)
- | (<= e e)
- | (>= e e)
- | (int? e)     # ATOM
- | (cons e e)
- | (car e)
- | (cdr e)
- | (if e1 e2 e3)    # e1!=0 ? e2 : e3
- | (lambda (x1 ... xk) e)
- | (let ((x1 e1) ... (xk ek)) e)
+    Line-comments start with semicolon (;)
+    Parentheses are either () or [] or {}.
+
+* Variable Scope
+
+    Top-level |define|'ed functions can be mutually recursively called.
+    (let (...) ...) is let. Not let* nor letrec.
+
+* Syntax
+
+    program ::= define*
+    define ::= (define (name x1 ... xk) e)
+
+    e ::=
+     | (+ e e)
+     | (- e e)
+     | (* e e)
+     | (/ e e)
+     | (= e e)      # compare. returns 0/1
+     | (< e e)
+     | (> e e)
+     | (<= e e)
+     | (>= e e)
+     | (int? e)     # ATOM
+     | (cons e e)
+     | (car e)
+     | (cdr e)
+     | (if e1 e2 e3)    # e1!=0 ? e2 : e3
+     | (lambda (x1 ... xk) e)
+     | (let ((x1 e1) ... (xk ek)) e)

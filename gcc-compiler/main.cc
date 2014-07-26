@@ -7,5 +7,5 @@ int main()
 {
 	auto asts = parse_program(std::cin) ;
 	PreLink pl = compile_program(asts);
-	link_and_emit(std::cout, pl);
+	link_and_emit(std::cout, pl, true);
 }

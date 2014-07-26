@@ -59,7 +59,7 @@ std::vector<std::string> verify_lambda_param_node(ast::AST ast) {
 	assert(ast->type == ast::LIST);
 
 	std::vector<std::string> vars;
-	for(int i=0; i<ast->list.size(); ++i) {
+	for(size_t i=0; i<ast->list.size(); ++i) {
 		assert(ast->list[i]->type == ast::SYMBOL);
 		vars.push_back(ast->list[i]->symbol);
 	}
@@ -122,7 +122,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 				assert(false);
 			}
 			gcc::OperationSequence ops;
-			gcc:Append(&ops, std::make_shared<gcc::OpLD>(depth, index));
+			gcc::Append(&ops, std::make_shared<gcc::OpLD>(depth, index));
 			if(tail)
 				gcc::Append(&ops, std::make_shared<gcc::OpRTN>());
 			return ops;
@@ -239,7 +239,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 			// general function applications
 			gcc::OperationSequence ops;
-			for(int i=1; i<ast->list.size(); ++i)
+			for(size_t i=1; i<ast->list.size(); ++i)
 				gcc::Append(&ops, compile(ast->list[i], ctx, NOT_TAIL));
 			gcc::Append(&ops, compile(ast->list[0], ctx, NOT_TAIL));
 			if(tail)
@@ -250,6 +250,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 		}
 	}
 	assert(false);
+	return gcc::OperationSequence();
 }
 
 }  // namespace

@@ -1,6 +1,6 @@
 #include "link.h"
 
-void link_and_emit(std::ostream& os, const PreLink& pl)
+void link_and_emit(std::ostream& os, const PreLink& pl, bool show_label)
 {
 	std::vector<int> offset;
 	offset.push_back(pl.main_expression.size());
@@ -18,7 +18,7 @@ void link_and_emit(std::ostream& os, const PreLink& pl)
 		bool first = true;
 		for(auto& op: block.first) {
 			os << *op->resolve(offset);
-			if(first) {
+			if(first && show_label) {
 				os << "\t\t; [" << line << "] " << block.second;
 				first = false;
 			}
