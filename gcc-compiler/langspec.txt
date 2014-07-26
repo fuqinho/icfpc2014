@@ -9,7 +9,10 @@
 * Readability Features
 
     Line-comments start with semicolon (;)
-    Parentheses are either () or [] or {}.
+    Parentheses can either be () or [] or {}.
+
+       ; example
+       (let [(x 1) (y 2)] {+ x y})
 
 * Variable Scope
 
@@ -21,15 +24,19 @@
     (set! x e1 e2)   :: set |e1| to |x|, and evaluate |e2|
     (dbg! e1 e2)     :: debug output |e1|, and evaluate |e2|.
 
-* More Features
+* Tuple decomposition
 
     (let ((x y z tup)) e)  ::  x=car tup, y=car cdr tup, z=car cdr cdr tup, then e.
+
+* Auto extension of Binary Operators
+
+   (- x y z)  ==>  (- (- x y) z)            associates to the left
+   (cons x y z)  ==>  (cons x (cons y z))   associates to the right (cons only)
 
 * Syntax
 
     program ::= define*
     define ::= (define (name x1 ... xk) e)
-
     e ::=
      | (+ e e)
      | (- e e)

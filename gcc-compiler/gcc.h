@@ -15,6 +15,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const Op& me) {
 		return me.to_stream(os);
 	}
+	virtual bool assoc_left() const { return true; }
 };
 
 // Operation sequence
@@ -61,9 +62,17 @@ DefineOpZ(CEQ);
 DefineOpZ(CGT);
 DefineOpZ(CGTE);
 DefineOpZ(ATOM);
-DefineOpZ(CONS);
 DefineOpZ(CAR);
 DefineOpZ(CDR);
+
+class OpCONS : public OpZ {
+public:
+	OpCONS() : OpZ("CONS") {}
+	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
+		return std::make_shared<OpCONS>();
+	}
+	virtual bool assoc_left() const { return false; }
+};
 
 DefineOpZ(RTN);
 DefineOpZ(JOIN);

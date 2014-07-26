@@ -70,12 +70,21 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 {
 	auto compile_op2 = [&](std::shared_ptr<gcc::Op> op) {
 		assert(ast->type == ast::LIST);
-		assert(ast->list.size() == 3);
+		assert(ast->list.size() >= 3);
 
 		gcc::OperationSequence ops;
 		gcc::Append(&ops, compile(ast->list[1], ctx, NOT_TAIL));
-		gcc::Append(&ops, compile(ast->list[2], ctx, NOT_TAIL));
-		gcc::Append(&ops, op);
+		if(op->assoc_left()) {
+			for(size_t i=2; i<ast->list.size(); ++i) {
+				gcc::Append(&ops, compile(ast->list[i], ctx, NOT_TAIL));
+				gcc::Append(&ops, op);
+			}
+		} else {
+			for(size_t i=2; i<ast->list.size(); ++i)
+				gcc::Append(&ops, compile(ast->list[i], ctx, NOT_TAIL));
+			for(size_t i=2; i<ast->list.size(); ++i)
+				gcc::Append(&ops, op);
+		}
 		if(tail)
 			gcc::Append(&ops, std::make_shared<gcc::OpRTN>());
 		return ops;
