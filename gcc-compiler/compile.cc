@@ -158,7 +158,34 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 				}
 
 				// (let ((x e) (x e)) e)
+				if(ast->list.front()->symbol == "let") {
+					assert(ast->list.size() == 3);
+					assert(ast->list[1]->type == ast::LIST);
 
+					std::vector<std::string> vars;
+					std::vector<ast::AST>    args;
+					for(auto& kv: ast->list[1]->list) {
+						assert(kv->type == ast::LIST);
+						assert(kv->list.size() == 2);
+						assert(kv->list[0]->type == ast::SYMBOL);
+						vars.push_back(kv->list[0]->symbol);
+						args.push_back(kv->list[1]);
+					}
+
+					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
+					Context neo_ctx = {neo_varmap, ctx.codeblocks};
+
+					gcc::OperationSequence body_ops = rec(ast->list[2], neo_ctx);
+					gcc::Append(&body_ops, std::make_shared<gcc::OpRTN>());
+					int id = ctx.AddCodeBlock(body_ops);
+
+					gcc::OperationSequence ops;
+					for(auto& arg: args)
+						gcc::Append(&ops, rec(arg, ctx));
+					gcc::Append(&ops, std::make_shared<gcc::OpLDF>(id));
+					gcc::Append(&ops, std::make_shared<gcc::OpAP>(args.size()));
+					return ops;
+				}
 
 				// (if c t e)
 				if(ast->list.front()->symbol == "if") {
