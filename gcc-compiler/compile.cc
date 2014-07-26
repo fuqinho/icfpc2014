@@ -140,7 +140,7 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 				if(ast->list.front()->symbol == "cdr")
 					return compile_op1(std::make_shared<gcc::OpCDR>());
 
-				// lambda
+				// (lambda (vars...) e)
 				if(ast->list.front()->symbol == "lambda") {
 					assert(ast->list.size() == 3);
 
@@ -157,7 +157,10 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 					return ops;
 				}
 
-				// if
+				// (let ((x e) (x e)) e)
+
+
+				// (if c t e)
 				if(ast->list.front()->symbol == "if") {
 					assert(ast->list.size() == 4);
 
