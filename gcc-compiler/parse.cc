@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cassert>
 
-namespace parse_impl {
+namespace {
 
 void skip_spaces(const char*& p)
 {
@@ -85,29 +85,35 @@ ast::AST parse_expression(const char*& p)
 	return ast;
 }
 
-}  // namespace parse_impl
-
-ast::AST parse_expression(const char* p)
+std::string read_skipping_comments(std::istream& in)
 {
-	return parse_impl::parse_expression(p);
+	std::string all;
+	for(std::string str; getline(in, str); ) {
+		size_t i = str.find(';');
+		if(i != std::string::npos)
+			str.resize(i);
+		all += str;
+		all += '\n';
+	}
+	return all;
 }
+
+}  // namespace
 
 ast::AST parse_expression(std::istream& in)
 {
-	std::stringstream sin;
-	sin << in.rdbuf();
-	return parse_expression(sin.str().c_str());
+	std::string str = read_skipping_comments(in);
+	const char* p = str.c_str();
+	return parse_expression(p);
 }
 
 std::vector<ast::AST> parse_program(std::istream& in)
 {
-	std::stringstream sin;
-	sin << in.rdbuf();
-	std::string str = sin.str();
+	std::string str = read_skipping_comments(in);
 	const char* p = str.c_str();
 
 	std::vector<ast::AST> asts;
-	while(parse_impl::skip_spaces(p), *p)
-		asts.push_back(parse_impl::parse_expression(p));
+	while(skip_spaces(p), *p)
+		asts.push_back(parse_expression(p));
 	return asts;
 }
