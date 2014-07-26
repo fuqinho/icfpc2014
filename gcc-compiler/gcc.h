@@ -83,18 +83,9 @@ protected:
 #define DefineOpI(name)                           \
 	class PP_CAT(Op,name) : public OpI {          \
 	public:                                       \
-		PP_CAT(Op,name)(int n) : OpI(#name, n) {} \
+		explicit PP_CAT(Op,name)(int n) : OpI(#name, n) {} \
 		virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const { \
 			return std::make_shared<PP_CAT(Op,name)>(n); \
-		} \
-	}
-
-#define DefineOpI_Resolve(name)                   \
-	class PP_CAT(Op,name) : public OpI {          \
-	public:                                       \
-		PP_CAT(Op,name)(int n) : OpI(#name, n) {} \
-		virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const { \
-			return std::make_shared<PP_CAT(Op,name)>(codeid_offset[n]); \
 		} \
 	}
 
@@ -104,12 +95,19 @@ DefineOpI(AP);
 DefineOpI(RAP);
 DefineOpI(TAP);
 DefineOpI(TRAP);
-DefineOpI_Resolve(LDF);
+
+class OpLDF : public OpI {
+public:
+	explicit OpLDF(int n) : OpI("LDF", n) {}
+	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
+		return std::make_shared<OpLDF>(codeid_offset[n]);
+	}
+};
 
 // LD
 class OpLD : public Op {
 public:
-	explicit OpLD(int depth, int index) : depth(depth), index(index) {}
+	OpLD(int depth, int index) : depth(depth), index(index) {}
 	virtual std::ostream& to_stream(std::ostream& os) const {
 		return os << "LD " << depth << " " << index;
 	}
@@ -125,7 +123,7 @@ private:
 // SEL
 class OpSEL : public Op {
 public:
-	explicit OpSEL(int tid, int eid) : tid(tid), eid(eid) {}
+	OpSEL(int tid, int eid) : tid(tid), eid(eid) {}
 	virtual std::ostream& to_stream(std::ostream& os) const {
 		return os << "SEL " << tid << " " << eid;
 	}
@@ -141,7 +139,7 @@ private:
 // TSEL
 class OpTSEL : public Op {
 public:
-	explicit OpTSEL(int tid, int eid) : tid(tid), eid(eid) {}
+	OpTSEL(int tid, int eid) : tid(tid), eid(eid) {}
 	virtual std::ostream& to_stream(std::ostream& os) const {
 		return os << "TSEL " << tid << " " << eid;
 	}
