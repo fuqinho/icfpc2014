@@ -64,8 +64,8 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 		assert(ast->list.size() == 3);
 
 		gcc::OperationSequence ops;
-		gcc::Append(&ops, rec(ast->list[2], ctx));
 		gcc::Append(&ops, rec(ast->list[1], ctx));
+		gcc::Append(&ops, rec(ast->list[2], ctx));
 		gcc::Append(&ops, op);
 		return ops;
 	};
@@ -74,8 +74,8 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 		assert(ast->list.size() == 3);
 
 		gcc::OperationSequence ops;
-		gcc::Append(&ops, rec(ast->list[1], ctx));  // note: reversed
-		gcc::Append(&ops, rec(ast->list[2], ctx));
+		gcc::Append(&ops, rec(ast->list[2], ctx)); // note: reversed
+		gcc::Append(&ops, rec(ast->list[1], ctx));
 		gcc::Append(&ops, op);
 		return ops;
 	};
@@ -259,7 +259,7 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 	// (define (__dummy_main__) (main))
 	gcc::OperationSequence dummy_main_ops;
 	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(0,main_offset));
-	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpAP>(1));
+	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpAP>(0));
 	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpRTN>());
 	Context tmp_ctx = {nil_varmap, codeblocks};
 	int dummy_main_id = tmp_ctx.AddCodeBlock(dummy_main_ops);
