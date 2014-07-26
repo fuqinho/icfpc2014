@@ -61,47 +61,42 @@
    (lambda-pos state)))
 
 (define (get-next-direction-1 state q assoc-lst)
-  ((lambda (pop-result)
-     ((lambda (pos0 q)
-        ((lambda (nextdist)
-           (get-next-direction-2
-            state q assoc-lst (pos-add pos0 0) 0 nextdist
-            (lambda (pos q assoc-lst)
-              (if (not (int? pos)) (cons pos assoc-lst)
-                (get-next-direction-2
-                 state q assoc-lst (pos-add pos0 1) 1 nextdist
-                 (lambda (pos q assoc-lst)
-                   (if (not (int? pos)) (cons pos assoc-lst)
-                     (get-next-direction-2
-                      state q assoc-lst (pos-add pos0 2) 2 nextdist
-                      (lambda (pos q assoc-lst)
-                        (if (not (int? pos)) (cons pos assoc-lst)
-                          (get-next-direction-2
-                           state q assoc-lst (pos-add pos0 3) 3 nextdist
-                           (lambda (pos q assoc-lst)
-                             (if (not (int? pos)) (cons pos assoc-lst)
-                               (get-next-direction-1
-                                state q assoc-lst))))))))))))))
-         (+ (car (find pos0 assoc-lst)) 1)))
-      (car pop-result) (cdr pop-result)))
-   (q-pop q)))
+  (let ((pop-result (q-pop q)))
+    (let ((pos0 (car pop-result))
+          (q (cdr pop-result)))
+      (let ((nextdist (+ (car (find pos0 assoc-lst)) 1)))
+        (get-next-direction-2
+         state q assoc-lst (pos-add pos0 0) 0 nextdist
+         (lambda (pos q assoc-lst)
+           (if (not (int? pos)) (cons pos assoc-lst)
+             (get-next-direction-2
+              state q assoc-lst (pos-add pos0 1) 1 nextdist
+              (lambda (pos q assoc-lst)
+                (if (not (int? pos)) (cons pos assoc-lst)
+                  (get-next-direction-2
+                   state q assoc-lst (pos-add pos0 2) 2 nextdist
+                   (lambda (pos q assoc-lst)
+                     (if (not (int? pos)) (cons pos assoc-lst)
+                       (get-next-direction-2
+                        state q assoc-lst (pos-add pos0 3) 3 nextdist
+                        (lambda (pos q assoc-lst)
+                          (if (not (int? pos)) (cons pos assoc-lst)
+                            (get-next-direction-1
+                             state q assoc-lst)))))))))))))))))
 
 (define (get-next-direction-2 state q assoc-lst pos dir dist cont)
-  ((lambda (tile)
-     (if (= tile 0) (cont 0 q assoc-lst)
-     (if (not (int? (find pos assoc-lst))) (cont 0 q assoc-lst)
-       ((lambda (q assoc-lst)
-          (if (= tile 2) (cont pos q assoc-lst)
-          (if (= tile 3) (cont pos q assoc-lst)
-            (cont 0 q assoc-lst))))
-        (q-push pos q) (cons (cons pos (cons dist dir)) assoc-lst)))))
-   (get-tile state pos)))
+  (let ((tile (get-tile state pos)))
+    (if (= tile 0) (cont 0 q assoc-lst)
+    (if (not (int? (find pos assoc-lst))) (cont 0 q assoc-lst)
+      (let ((q (q-push pos q))
+            (assoc-lst (cons (cons pos (cons dist dir)) assoc-lst)))
+        (if (= tile 2) (cont pos q assoc-lst)
+        (if (= tile 3) (cont pos q assoc-lst)
+          (cont 0 q assoc-lst))))))))
 
 (define (find-next-move pos original-pos assoc-lst)
-  ((lambda (dir)
-     ((lambda (prev-pos)
-        (if (pos-eq? original-pos prev-pos)
-            dir
-            (find-next-move prev-pos original-pos assoc-lst)))
-      (pos-sub pos dir)))
-   (cdr (find pos assoc-lst))))
+  (let ((dir (cdr (find pos assoc-lst))))
+    (let ((prev-pos (pos-sub pos dir)))
+      (if (pos-eq? original-pos prev-pos)
+          dir
+          (find-next-move prev-pos original-pos assoc-lst)))))
