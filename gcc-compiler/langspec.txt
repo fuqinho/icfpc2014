@@ -1,13 +1,13 @@
+Program starts from the function defined as:
+  (define (main) e).
+
+The global variables |arg1| and |arg2| hold the arugments as written in
+the "Lambda-Man AI interface" section of the spec.
+
+Top-level |define|'ed functions can be mutually recursively called.
+
 program ::= define*
 define ::= (define (name x1 ... xk) e)
-
-プログラムは
-  (define (main) e)
-という名前の関数から実行開始されます。
-
-グローバル変数 arg1, arg2 に "Lambda-Man AI interface" に書いてある引数が入っています。
-
-グローバルな define 関数は相互再帰できます
 
 e ::=
  | (+ e e)
@@ -25,3 +25,4 @@ e ::=
  | (cdr e)
  | (if e1 e2 e3)    # e1!=0 ? e2 : e3
  | (lambda (x1 ... xk) e)
+ | (let ((x1 e1) ... (xk ek)) e)
