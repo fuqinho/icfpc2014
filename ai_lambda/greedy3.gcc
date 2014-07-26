@@ -18,53 +18,53 @@ LDF 448
 LDF 452
 LDF 460
 TRAP 17
-LDC 0
+LDC 0		; [20] 
 RTN
-LD 0 1
+LD 0 1		; [22] 
 CAR
 CDR
 RTN
-LD 0 0
+LD 0 0		; [26] 
 LD 0 1
 CDR
 LD 1 0
 TAP 2
-LD 0 0
+LD 0 0		; [31] 
 LD 0 1
 CAR
 CAR
 LD 1 13
 AP 2
 TSEL 22 26
-LD 0 1
+LD 0 1		; [38] find
 ATOM
 TSEL 20 31
-LD 1 0
+LD 1 0		; [41] 
 RTN
-LD 0 0
+LD 0 0		; [43] 
 LD 2 1
 LD 2 2
 LD 3 1
 TAP 3
-LD 2 1
+LD 2 1		; [48] 
 LD 0 0
 LD 3 13
 AP 2
 TSEL 41 43
-LD 1 0
+LD 1 0		; [53] 
 LD 0 0
 LD 2 14
 AP 2
 LDF 48
 TAP 1
-LD 0 0
+LD 0 0		; [59] find-next-move
 LD 0 2
 LD 1 0
 AP 2
 CDR
 LDF 53
 TAP 1
-LDC 0
+LDC 0		; [66] 
 LD 0 0
 CAR
 LD 1 0
@@ -74,7 +74,7 @@ LD 3 1
 AP 3
 CONS
 RTN
-LD 1 1
+LD 1 1		; [76] 
 LD 0 0
 LDC 0
 LDC 0
@@ -92,38 +92,38 @@ LD 2 3
 AP 3
 LDF 66
 TAP 1
-LD 0 1
+LD 0 1		; [94] get-next-direction
 LD 1 6
 AP 1
 LDF 76
 TAP 1
-LD 0 0
+LD 0 0		; [99] 
 LD 0 2
 CONS
 RTN
-LD 0 0
+LD 0 0		; [103] 
 LD 0 2
 CONS
 RTN
-LD 0 0
+LD 0 0		; [107] 
 LD 0 2
 CONS
 RTN
-LD 0 0
+LD 0 0		; [111] 
 LD 0 2
 CONS
 RTN
-LD 7 0
+LD 7 0		; [115] 
 LD 0 1
 LD 0 2
 LD 8 3
 TAP 3
-LD 0 0
+LD 0 0		; [120] 
 ATOM
 LD 8 10
 AP 1
 TSEL 111 115
-LD 6 0
+LD 6 0		; [125] 
 LD 0 1
 LD 0 2
 LD 4 0
@@ -135,12 +135,12 @@ LD 3 0
 LDF 120
 LD 7 4
 TAP 7
-LD 0 0
+LD 0 0		; [137] 
 ATOM
 LD 7 10
 AP 1
 TSEL 107 125
-LD 5 0
+LD 5 0		; [142] 
 LD 0 1
 LD 0 2
 LD 3 0
@@ -152,12 +152,12 @@ LD 2 0
 LDF 137
 LD 6 4
 TAP 7
-LD 0 0
+LD 0 0		; [154] 
 ATOM
 LD 6 10
 AP 1
 TSEL 103 142
-LD 4 0
+LD 4 0		; [159] 
 LD 0 1
 LD 0 2
 LD 2 0
@@ -169,12 +169,12 @@ LD 1 0
 LDF 154
 LD 5 4
 TAP 7
-LD 0 0
+LD 0 0		; [171] 
 ATOM
 LD 5 10
 AP 1
 TSEL 99 159
-LD 3 0
+LD 3 0		; [176] 
 LD 1 1
 LD 3 2
 LD 1 0
@@ -186,7 +186,7 @@ LD 0 0
 LDF 171
 LD 4 4
 TAP 7
-LD 0 0
+LD 0 0		; [188] 
 LD 2 2
 LD 3 0
 AP 2
@@ -195,51 +195,51 @@ LDC 1
 ADD
 LDF 176
 TAP 1
-LD 0 0
+LD 0 0		; [197] 
 CAR
 LD 0 0
 CDR
 LDF 188
 TAP 2
-LD 0 1
+LD 0 1		; [203] get-next-direction-1
 LD 1 15
 AP 1
 LDF 197
 TAP 1
-LDC 0
+LDC 0		; [208] 
 LD 1 1
 LD 1 2
 LD 1 6
 TAP 3
-LDC 0
+LDC 0		; [213] 
 LD 1 1
 LD 1 2
 LD 1 6
 TAP 3
-LD 2 3
+LD 2 3		; [218] 
 LD 0 0
 LD 0 1
 LD 2 6
 TAP 3
-LD 2 3
+LD 2 3		; [223] 
 LD 0 0
 LD 0 1
 LD 2 6
 TAP 3
-LDC 0
+LDC 0		; [228] 
 LD 0 0
 LD 0 1
 LD 2 6
 TAP 3
-LD 1 0
+LD 1 0		; [233] 
 LDC 3
 CEQ
 TSEL 223 228
-LD 1 0
+LD 1 0		; [237] 
 LDC 2
 CEQ
 TSEL 218 233
-LD 1 3
+LD 1 3		; [241] 
 LD 1 1
 LD 2 16
 AP 2
@@ -252,7 +252,7 @@ LD 1 2
 CONS
 LDF 237
 TAP 2
-LD 1 3
+LD 1 3		; [254] 
 LD 1 2
 LD 2 0
 AP 2
@@ -260,17 +260,17 @@ ATOM
 LD 2 10
 AP 1
 TSEL 213 241
-LD 0 0
+LD 0 0		; [262] 
 LDC 0
 CEQ
 TSEL 208 254
-LD 0 0
+LD 0 0		; [266] get-next-direction-2
 LD 0 3
 LD 1 5
 AP 2
 LDF 262
 TAP 1
-LD 0 1
+LD 0 1		; [272] get-tile
 CAR
 LD 0 1
 CDR
@@ -280,19 +280,19 @@ LD 1 11
 AP 2
 LD 1 11
 TAP 2
-LD 0 0
+LD 0 0		; [282] lambda-pos
 CDR
 CAR
 CDR
 CAR
 RTN
-LD 0 0
+LD 0 0		; [288] lst-rev
 LDC 0
 LD 1 8
 TAP 2
-LD 0 1
+LD 0 1		; [292] 
 RTN
-LD 0 0
+LD 0 0		; [294] 
 CDR
 LD 0 0
 CAR
@@ -300,32 +300,32 @@ LD 0 1
 CONS
 LD 1 8
 TAP 2
-LD 0 0
+LD 0 0		; [302] lst-rev-internal
 ATOM
 TSEL 292 294
-LDC 0
+LDC 0		; [305] main
 LD 1 2
 CONS
 RTN
-LD 0 0
+LD 0 0		; [309] not
 LDC 0
 CEQ
 RTN
-LD 0 1
+LD 0 1		; [313] 
 CAR
 RTN
-LD 0 0
+LD 0 0		; [316] 
 LDC 1
 SUB
 LD 0 1
 CDR
 LD 1 11
 TAP 2
-LD 0 0
+LD 0 0		; [323] nth
 LDC 0
 CEQ
 TSEL 313 316
-LD 0 0
+LD 0 0		; [327] 
 CAR
 LD 0 0
 CDR
@@ -333,7 +333,7 @@ LDC 1
 SUB
 CONS
 RTN
-LD 0 0
+LD 0 0		; [335] 
 CAR
 LDC 1
 ADD
@@ -341,7 +341,7 @@ LD 0 0
 CDR
 CONS
 RTN
-LD 0 0
+LD 0 0		; [343] 
 CAR
 LD 0 0
 CDR
@@ -349,7 +349,7 @@ LDC 1
 ADD
 CONS
 RTN
-LD 0 0
+LD 0 0		; [351] 
 CAR
 LDC 1
 SUB
@@ -357,33 +357,33 @@ LD 0 0
 CDR
 CONS
 RTN
-LD 0 1
+LD 0 1		; [359] 
 LDC 2
 CEQ
 TSEL 343 351
-LD 0 1
+LD 0 1		; [363] 
 LDC 1
 CEQ
 TSEL 335 359
-LD 0 1
+LD 0 1		; [367] pos-add
 LDC 0
 CEQ
 TSEL 327 363
-LD 0 0
+LD 0 0		; [371] 
 CDR
 LD 0 1
 CDR
 CEQ
 RTN
-LDC 0
+LDC 0		; [377] 
 RTN
-LD 0 0
+LD 0 0		; [379] pos-eq?
 CAR
 LD 0 1
 CAR
 CEQ
 TSEL 371 377
-LD 0 0
+LD 0 0		; [385] 
 CAR
 LD 0 0
 CDR
@@ -391,7 +391,7 @@ LDC 1
 ADD
 CONS
 RTN
-LD 0 0
+LD 0 0		; [393] 
 CAR
 LDC 1
 SUB
@@ -399,7 +399,7 @@ LD 0 0
 CDR
 CONS
 RTN
-LD 0 0
+LD 0 0		; [401] 
 CAR
 LD 0 0
 CDR
@@ -407,7 +407,7 @@ LDC 1
 SUB
 CONS
 RTN
-LD 0 0
+LD 0 0		; [409] 
 CAR
 LDC 1
 ADD
@@ -415,19 +415,19 @@ LD 0 0
 CDR
 CONS
 RTN
-LD 0 1
+LD 0 1		; [417] 
 LDC 2
 CEQ
 TSEL 401 409
-LD 0 1
+LD 0 1		; [421] 
 LDC 1
 CEQ
 TSEL 393 417
-LD 0 1
+LD 0 1		; [425] pos-sub
 LDC 0
 CEQ
 TSEL 385 421
-LDC 0
+LDC 0		; [429] 
 LD 0 0
 CAR
 LD 1 7
@@ -435,7 +435,7 @@ AP 1
 CONS
 LD 1 15
 TAP 1
-LD 0 0
+LD 0 0		; [437] 
 CDR
 CAR
 LD 0 0
@@ -446,11 +446,11 @@ CDR
 CONS
 CONS
 RTN
-LD 0 0
+LD 0 0		; [448] q-pop
 CDR
 ATOM
 TSEL 429 437
-LD 0 0
+LD 0 0		; [452] q-push
 LD 0 1
 CAR
 CONS
@@ -458,5 +458,5 @@ LD 0 1
 CDR
 CONS
 RTN
-LD 0 9
+LD 0 9		; [460] 
 TAP 0
