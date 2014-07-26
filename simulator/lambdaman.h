@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "gameobject.h"
+#include "gcc.h"
 
 class LambdaMan : public GameObject {
  public:
@@ -22,6 +23,7 @@ class LambdaMan : public GameObject {
  private:
   int life_;
   int vitality_;
+  GCC gcc_;
 
   DISALLOW_COPY_AND_ASSIGN(LambdaMan);
 };
