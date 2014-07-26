@@ -177,8 +177,9 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 
 			// general function applications
 			gcc::OperationSequence ops;
-			for(int i=ast->list.size()-1; i>=0; --i)
+			for(int i=1; i<ast->list.size(); ++i)
 				gcc::Append(&ops, rec(ast->list[i], ctx));
+			gcc::Append(&ops, rec(ast->list[0], ctx));
 			gcc::Append(&ops, std::make_shared<gcc::OpAP>(ast->list.size() - 1));
 			return ops;
 		}
