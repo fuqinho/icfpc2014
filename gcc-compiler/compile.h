@@ -2,18 +2,22 @@
 #include "ast.h"
 #include "gcc.h"
 #include <ostream>
+#include <utility>
 
 struct PreLink
 {
 	gcc::OperationSequence              main_expression;
-	std::vector<gcc::OperationSequence> sub_blocks;
+	std::vector<std::pair<gcc::OperationSequence, std::string>> sub_blocks;
 
 	friend std::ostream& operator<<(std::ostream& os, const PreLink& me) {
 		for(auto& op: me.main_expression)
 			os << *op << std::endl;
 		for(int i=0; i<me.sub_blocks.size(); ++i) {
-			os << i << ":" << std::endl;
-			for(auto& op: me.sub_blocks[i])
+			if(me.sub_blocks[i].second.empty())
+				os << i << ":" << std::endl;
+			else
+				os << i << "<" << me.sub_blocks[i].second << ">:" << std::endl;
+			for(auto& op: me.sub_blocks[i].first)
 				os << "  " << *op << std::endl;
 		}
 		return os;

@@ -24,8 +24,7 @@ public:
 			return true;
 		}
 		if(!parent)
-			std::cerr << "!!! VARIABLE " << var << " NOT FOUND !!!" << std::endl;
-		assert(parent);
+			return false;
 		bool b = parent->resolve(var, depth, index);
 		if(b)
 			++*depth;
@@ -40,11 +39,15 @@ private:
 struct Context
 {
 	const std::shared_ptr<VarMap> varmap;
-	const std::shared_ptr<std::vector<gcc::OperationSequence>> codeblocks;
+	const std::shared_ptr<std::vector<std::pair<gcc::OperationSequence, std::string>>> codeblocks;
 
 	int AddCodeBlock(const gcc::OperationSequence& ops) const {
+		return AddCodeBlock(ops, "");
+	}
+
+	int AddCodeBlock(const gcc::OperationSequence& ops, const std::string& label) const {
 		int id = codeblocks->size();
-		codeblocks->push_back(ops);
+		codeblocks->emplace_back(ops, label);
 		return id;
 	}
 };
@@ -112,8 +115,11 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 		case ast::SYMBOL: {
 			// variable
 			int depth, index;
-			if(!ctx.varmap->resolve(ast->symbol, &depth, &index))
+			if(!ctx.varmap->resolve(ast->symbol, &depth, &index)) {
+				// TODO: better error logging.
+				std::cerr << "!!! VARIABLE " << ast->symbol << " NOT FOUND !!!" << std::endl;
 				assert(false);
+			}
 			gcc::OperationSequence ops;
 			gcc:Append(&ops, std::make_shared<gcc::OpLD>(depth, index));
 			if(tail)
@@ -285,7 +291,7 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 		global_vars.push_back(kv.first);
 	std::shared_ptr<VarMap> global_varmap = std::make_shared<VarMap>(init_varmap, global_vars);
 
-	auto codeblocks = std::make_shared<std::vector<gcc::OperationSequence>>();
+	auto codeblocks = std::make_shared<std::vector<std::pair<gcc::OperationSequence,std::string>>>();
 
 	std::vector<int> func_ids;
 	int main_offset = -1, i=0;
@@ -296,7 +302,7 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 			codeblocks
 		};
 		auto body_ops = compile(kv.second.second, ctx, TAIL);
-		int id = ctx.AddCodeBlock(body_ops);
+		int id = ctx.AddCodeBlock(body_ops, kv.first);
 		if(kv.first == "main")
 			main_offset = i;
 		func_ids.push_back(id);

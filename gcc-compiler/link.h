@@ -1,5 +1,6 @@
 #pragma once
 #include "compile.h"
 #include "gcc.h"
+#include <ostream>
 
-gcc::OperationSequence link(const PreLink& pl);
+void link_and_emit(std::ostream& os, const PreLink& pl);

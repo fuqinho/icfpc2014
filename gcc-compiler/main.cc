@@ -7,11 +7,5 @@ int main()
 {
 	auto asts = parse_program(std::cin) ;
 	PreLink pl = compile_program(asts);
-	std::cerr << "COMPILED:" << std::endl;
-	std::cerr << pl << std::endl;
-
-	std::cerr << "LINKED:" << std::endl;
-	gcc::OperationSequence ops = link(pl);
-	for(auto& op: ops)
-		std::cout << *op << std::endl;
+	link_and_emit(std::cout, pl);
 }
