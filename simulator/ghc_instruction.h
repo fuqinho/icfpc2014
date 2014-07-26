@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <cassert>
+#include <iostream>
 
 enum GHCMnemonic {
   MOV,
@@ -54,7 +55,7 @@ struct GHCInstruction {
   std::vector<GHCArgument> arguments;
 };
 
-unsigned int ParseArgumentId(std::string str) {
+inline unsigned int ParseArgumentId(std::string str) {
   if (str == "pc") return PC;
   if (str >= "a" && str <= "h") return str[0] - 'a';
   int id;
@@ -63,7 +64,7 @@ unsigned int ParseArgumentId(std::string str) {
   return id;
 };
 
-GHCArgument ParseGHCArgument(std::string str) {
+inline GHCArgument ParseGHCArgument(std::string str) {
   GHCArgument argument;
   if (str[0] == '[') {
     if (isdigit(str[1])) {
@@ -83,12 +84,10 @@ GHCArgument ParseGHCArgument(std::string str) {
   return argument;
 }
 
-#include <iostream>
-
-GHCInstruction ParseGHCInstruction(std::string line) {
+inline GHCInstruction ParseGHCInstruction(std::string line) {
   GHCInstruction instruction;
 
-  transform(line.begin(), line.end(), line.begin(), tolower);
+  std::transform(line.begin(), line.end(), line.begin(), tolower);
   std::replace(line.begin(), line.end(), ',', ' ');
   std::stringstream ss(line);
 

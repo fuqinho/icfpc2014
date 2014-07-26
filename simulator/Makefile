@@ -1,11 +1,13 @@
 .PHONY: clean
-CXXFLAGS=-O2 -std=c++11
-CXX=g++
+CXXFLAGS=-O2 -std=c++11 -g
+CC=g++
 
-simulator: simulator.o
-	$(CXX) -o $@ $^ -lglog
+simulator: simulator.o lambdaman.o ghost.o
+	$(CC) -o $@ $^ -lglog
 
 simulator.o: simulator.cc
+lambdaman.o: lambdaman.cc
+ghost.o: ghost.cc
 
 clean:
 	rm -rf *~ *.o simulator
