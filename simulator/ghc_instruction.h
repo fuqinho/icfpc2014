@@ -1,6 +1,7 @@
 #ifndef SIMULATOR_GHC_INSTRUCTION_H_
 #define SIMULATOR_GHC_INSTRUCTION_H_
 
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -88,7 +89,7 @@ GHCInstruction ParseGHCInstruction(std::string line) {
   GHCInstruction instruction;
 
   transform(line.begin(), line.end(), line.begin(), tolower);
-  replace(line.begin(), line.end(), ',', ' ');
+  std::replace(line.begin(), line.end(), ',', ' ');
   std::stringstream ss(line);
 
   std::string str_mnemonic, tmp;
