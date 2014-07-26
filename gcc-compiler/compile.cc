@@ -217,14 +217,29 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 					assert(ast->list.size() == 3);
 					assert(ast->list[1]->type == ast::LIST);
 
+					gcc::OperationSequence ops;
+
 					std::vector<std::string> vars;
-					std::vector<ast::AST>    args;
 					for(auto& kv: ast->list[1]->list) {
 						assert(kv->type == ast::LIST);
-						assert(kv->list.size() == 2);
-						assert(kv->list[0]->type == ast::SYMBOL);
-						vars.push_back(kv->list[0]->symbol);
-						args.push_back(kv->list[1]);
+						assert(kv->list.size() >= 2);
+						for(size_t i=0; i+1<kv->list.size(); ++i) {
+							assert(kv->list[i]->type == ast::SYMBOL);
+							vars.push_back(kv->list[i]->symbol);
+						}
+						gcc::Append(&ops, compile(kv->list.back(), ctx, NOT_TAIL));
+
+						// tuple decomposition
+						int depth, index;
+						if(!ctx.varmap->resolve("__compiler_dummy__", &depth, &index))
+							assert(false);
+						for(int tuple=kv->list.size()-1; tuple>=2; --tuple) {
+							gcc::Append(&ops, std::make_shared<gcc::OpST>(depth, index));
+							gcc::Append(&ops, std::make_shared<gcc::OpLD>(depth, index));
+							gcc::Append(&ops, std::make_shared<gcc::OpCAR>());
+							gcc::Append(&ops, std::make_shared<gcc::OpLD>(depth, index));
+							gcc::Append(&ops, std::make_shared<gcc::OpCDR>());
+						}
 					}
 
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
@@ -233,14 +248,11 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 					gcc::OperationSequence body_ops = compile(ast->list[2], neo_ctx, TAIL);
 					int id = ctx.AddCodeBlock(body_ops, "("+ctx.name+"-let)");
 
-					gcc::OperationSequence ops;
-					for(auto& arg: args)
-						gcc::Append(&ops, compile(arg, ctx, NOT_TAIL));
 					gcc::Append(&ops, std::make_shared<gcc::OpLDF>(id));
 					if(tail)
-						gcc::Append(&ops, std::make_shared<gcc::OpTAP>(args.size()));
+						gcc::Append(&ops, std::make_shared<gcc::OpTAP>(vars.size()));
 					else
-						gcc::Append(&ops, std::make_shared<gcc::OpAP>(args.size()));
+						gcc::Append(&ops, std::make_shared<gcc::OpAP>(vars.size()));
 					return ops;
 				}
 
@@ -324,6 +336,7 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 	std::vector<std::string> global_vars;
 	for(auto& kv: funcs)
 		global_vars.push_back(kv.first);
+	global_vars.push_back("__compiler_dummy__");
 	std::shared_ptr<VarMap> global_varmap = std::make_shared<VarMap>(init_varmap, global_vars);
 
 	auto codeblocks = std::make_shared<std::vector<std::pair<gcc::OperationSequence,std::string>>>();
@@ -354,11 +367,12 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 
 	gcc::OperationSequence prolog_ops;
 
-	gcc::Append(&prolog_ops, std::make_shared<gcc::OpDUM>(func_ids.size()));
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpDUM>(func_ids.size()+1));
 	for(int id: func_ids)
 		gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDF>(id));
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDC>(12345678));  // dummy variable "_"
 	gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDF>(dummy_main_id));
-	gcc::Append(&prolog_ops, std::make_shared<gcc::OpTRAP>(func_ids.size()));
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpTRAP>(func_ids.size()+1));
 
 	PreLink result = {prolog_ops, *codeblocks};
 	return result;
