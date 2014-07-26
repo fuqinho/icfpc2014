@@ -19,3 +19,6 @@
 *.exe
 *.out
 *.app
+
+simulator/simulator
+gcc-compiler/compiler
