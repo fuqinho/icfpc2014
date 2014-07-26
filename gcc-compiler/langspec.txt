@@ -21,6 +21,10 @@
     (set! x e1 e2)   :: set |e1| to |x|, and evaluate |e2|
     (dbg! e1 e2)     :: debug output |e1|, and evaluate |e2|.
 
+* More Features
+
+    (let ((x y z tup)) e)  ::  x=car tup, y=car cdr tup, z=car cdr cdr tup, then e.
+
 * Syntax
 
     program ::= define*
