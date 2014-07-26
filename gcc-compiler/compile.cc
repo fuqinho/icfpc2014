@@ -228,10 +228,14 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 	}
 
 	std::shared_ptr<VarMap> nil_varmap;
+
+	std::vector<std::string> init_vars = {"arg1", "arg2"};
+	std::shared_ptr<VarMap> init_varmap = std::make_shared<VarMap>(nil_varmap, init_vars);
+
 	std::vector<std::string> global_vars;
 	for(auto& kv: funcs)
 		global_vars.push_back(kv.first);
-	std::shared_ptr<VarMap> global_varmap = std::make_shared<VarMap>(nil_varmap, global_vars);
+	std::shared_ptr<VarMap> global_varmap = std::make_shared<VarMap>(init_varmap, global_vars);
 
 	auto codeblocks = std::make_shared<std::vector<gcc::OperationSequence>>();
 
@@ -252,12 +256,10 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 		++i;
 	}
 	assert(main_offset >= 0);
-	// (define (__dummy_main__) (main arg1 arg2))
+	// (define (__dummy_main__) (main))
 	gcc::OperationSequence dummy_main_ops;
-	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(1,1));
-	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(1,0));
 	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(0,main_offset));
-	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpAP>(2));
+	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpAP>(1));
 	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpRTN>());
 	Context tmp_ctx = {nil_varmap, codeblocks};
 	int dummy_main_id = tmp_ctx.AddCodeBlock(dummy_main_ops);
