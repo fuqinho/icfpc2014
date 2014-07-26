@@ -15,16 +15,18 @@ void LambdaMan::LoadProgram(const std::string& program) {
 
 void LambdaMan::Init(const GameState& game_state) {
   Value result =
-      gcc_.Run(0, BuildWorld(game_state),
+      gcc_.Run(0, -1, BuildWorld(game_state),
                Value {ValueTag::INT, 0}, Value {ValueTag::INT, 0});
-  ai_state_ = gcc_.ConsCar(result);
+    ai_state_ = gcc_.ConsCar(result);
   step_function_ = gcc_.ConsCdr(result);
 }
 
 Direction LambdaMan::GetNextDirection(const GameState& state) {
   Value result =
       gcc_.Run(gcc_.GetIp(step_function_),
-               ai_state_, BuildWorld(state),
+               gcc_.GetEnv(step_function_),
+               ai_state_,
+               BuildWorld(state),
                step_function_);
   ai_state_ = gcc_.ConsCar(result);
   Value direction = gcc_.ConsCdr(result);

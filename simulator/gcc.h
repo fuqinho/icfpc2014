@@ -106,7 +106,7 @@ class GCC {
     max_heap_pos_ = 0;
   }
 
-  Value Run(int32_t ip, Value arg1, Value arg2, Value arg3) {
+  Value Run(int32_t ip, int32_t env, Value arg1, Value arg2, Value arg3) {
     // Prologue.
     reg_c_ = ip;
     data_stack_.clear();
@@ -119,6 +119,7 @@ class GCC {
     control_stack_.push_back(ControlValue {ControlTag::STOP, 0});
 
     int32_t frame = AllocFrame(3, -1);
+    heap_[frame].frame.parent = env;
     heap_[frame].frame.values[0] = arg1;
     heap_[frame].frame.values[1] = arg2;
     heap_[frame].frame.values[2] = arg3;
@@ -134,6 +135,8 @@ class GCC {
   }
 
   bool RunStep() {
+    // std::cerr << "reg_c: " << reg_c_ << std::endl;
+
     switch(code_[reg_c_].mnemonic) {
       case GccMnemonic::LDC:
         return Ldc(code_[reg_c_].arg1);
@@ -163,6 +166,8 @@ class GCC {
         return Cdr();
       case GccMnemonic::SEL:
         return Sel(code_[reg_c_].arg1, code_[reg_c_].arg2);
+      case GccMnemonic::JOIN:
+        return Join();
       case GccMnemonic::LDF:
         return Ldf(code_[reg_c_].arg1);
       case GccMnemonic::AP:
@@ -196,6 +201,10 @@ class GCC {
 
   int32_t GetIp(const Value& v) {
     return heap_[v.value].closure.f;
+  }
+
+  int32_t GetEnv(const Value& v) {
+    return heap_[v.value].closure.env;
   }
 
   void RunFullGC(const Value& ai_state, const Value& step) {
