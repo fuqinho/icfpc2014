@@ -1,5 +1,5 @@
 .PHONY: clean
-CXXFLAGS=-O2 -std=c++11 -g
+CXXFLAGS=-std=c++11 -g
 CC=g++
 
 simulator: simulator.o lambdaman.o ghost.o
