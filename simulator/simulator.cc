@@ -257,6 +257,7 @@ class Simulator {
       // Eat power pill.
       game_state_.add_score(50);
       game_state_.mutable_lambda_man()->set_next_ticks(137 + current_ticks);
+      game_state_.mutable_lambda_man()->set_vitality(127 * 20);
       *game_state_.mutable_tile(position) = ' ';
       size_t num_ghost = game_state_.ghost_size();
       for (size_t i = 0; i < num_ghost; ++i) {
@@ -408,5 +409,6 @@ int main(int argc, char* argv[]) {
     sim.add_ai_file(argv[i]);
   }
   sim.Run();
+  printf("\e[?25h");
   return 0;
 }
