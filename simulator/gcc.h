@@ -635,6 +635,7 @@ class GCC {
     int32_t f = heap_[x.value].closure.f;
     int32_t e = heap_[x.value].closure.env;
     int32_t frame = AllocFrame(n, e);
+    heap_[frame].frame.parent = e;
     for (int i = n - 1; i >= 0; --i) {
       heap_[frame].frame.values[i] = data_stack_.back();
       data_stack_.pop_back();
