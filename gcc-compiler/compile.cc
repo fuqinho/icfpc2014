@@ -36,11 +36,17 @@ private:
 	std::vector<std::string> vars;
 };
 
+typedef std::map<std::string, std::pair<
+	std::vector<std::string>,
+	ast::AST
+>> MacroMap;
+
 struct Context
 {
 	const std::shared_ptr<VarMap> varmap;
 	const std::shared_ptr<std::vector<std::pair<gcc::OperationSequence, std::string>>> codeblocks;
 	const std::string name;
+	const std::shared_ptr<MacroMap> macros;
 
 	int AddCodeBlock(const gcc::OperationSequence& ops) const {
 		return AddCodeBlock(ops, "");
@@ -64,6 +70,26 @@ std::vector<std::string> verify_lambda_param_node(ast::AST ast) {
 		vars.push_back(ast->list[i]->symbol);
 	}
 	return vars;
+}
+
+ast::AST substitute(ast::AST orig, std::map<std::string, ast::AST>& sub)
+{
+	switch(orig->type) {
+	case ast::VALUE:
+		break;
+	case ast::SYMBOL:
+		if(sub.count(orig->symbol))
+			return sub[orig->symbol];
+		break;
+	case ast::LIST: {
+		ast::AST after = std::make_shared<ast::Impl>();
+		after->type = ast::LIST;
+		for(auto& e: orig->list)
+			after->list.push_back(substitute(e, sub));
+		return after;
+		}
+	}
+	return orig;
 }
 
 gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
@@ -209,7 +235,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 					std::vector<std::string> vars = verify_lambda_param_node(ast->list[1]);
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
-					Context neo_ctx = {neo_varmap, ctx.codeblocks, ctx.name+"L"};
+					Context neo_ctx = {neo_varmap, ctx.codeblocks, ctx.name+"L", ctx.macros};
 
 					gcc::OperationSequence body_ops = compile(ast->list[2], neo_ctx, TAIL);
 					int id = ctx.AddCodeBlock(body_ops, ctx.name+"L");
@@ -252,7 +278,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 					}
 
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
-					Context neo_ctx = {neo_varmap, ctx.codeblocks, ctx.name};
+					Context neo_ctx = {neo_varmap, ctx.codeblocks, ctx.name, ctx.macros};
 
 					gcc::OperationSequence body_ops = compile(ast->list[2], neo_ctx, TAIL);
 					int id = ctx.AddCodeBlock(body_ops, "("+ctx.name+"-let)");
@@ -286,6 +312,19 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 						gcc::Append(&ops, std::make_shared<gcc::OpSEL>(tid, eid));
 					return ops;
 				}
+
+				// (macro ...)
+				if(ctx.macros->count(ast->list.front()->symbol)) {
+					std::vector<std::string> params = ctx.macros->at(ast->list.front()->symbol).first;
+					ast::AST mbody = ctx.macros->at(ast->list.front()->symbol).second;
+					assert(params.size() == ast->list.size()-1);
+
+					std::map<std::string, ast::AST> sub;
+					for(size_t i=0; i<params.size(); ++i)
+						sub[params[i]] = ast->list[i+1];
+					ast::AST mbody_subst = substitute(mbody, sub);
+					return compile(mbody_subst, ctx, tail);
+				}
 			}
 
 			// general function applications
@@ -313,28 +352,36 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 		ast::AST
 	>> funcdef;
 	std::vector<funcdef> funcs;
+	std::map<std::string, std::pair<
+		std::vector<std::string>,
+		ast::AST
+	>> macros;
 
 	for(auto ast: defines)
 	{
 		assert(ast->type == ast::LIST);
 		assert(ast->list.size() == 3);
 		assert(ast->list[0]->type == ast::SYMBOL);
-		assert(ast->list[0]->symbol == "define");
+		assert(ast->list[0]->symbol == "define" || ast->list[0]->symbol == "defmacro");
 		assert(ast->list[1]->type == ast::LIST);
 		assert(ast->list[1]->list.size() >= 1);
 		assert(ast->list[1]->list[0]->type == ast::SYMBOL);
-		std::string name = ast->list[1]->list[0]->symbol;
 
+		std::string name = ast->list[1]->list[0]->symbol;
 		std::vector<std::string> params;
 		for(size_t i=1; i<ast->list[1]->list.size(); ++i) {
 			assert(ast->list[1]->list[i]->type == ast::SYMBOL);
 			params.push_back(ast->list[1]->list[i]->symbol);
 		}
 
-		assert(count_if(funcs.begin(), funcs.end(), [&](const funcdef& fd) {
-			return fd.first == name;
-		}) == 0);
-		funcs.emplace_back(name, std::make_pair(params, ast->list[2]));
+		if(ast->list[0]->symbol == "define") {
+			assert(count_if(funcs.begin(), funcs.end(), [&](const funcdef& fd) {
+				return fd.first == name;
+			}) == 0);
+			funcs.emplace_back(name, std::make_pair(params, ast->list[2]));
+		} else {
+			macros[name] = std::make_pair(params, ast->list[2]);
+		}
 	}
 
 	std::shared_ptr<VarMap> nil_varmap;
@@ -357,7 +404,8 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 		Context ctx = {
 			std::make_shared<VarMap>(global_varmap, kv.second.first),
 			codeblocks,
-			kv.first
+			kv.first,
+			std::make_shared<MacroMap>(macros)
 		};
 		auto body_ops = compile(kv.second.second, ctx, TAIL);
 		int id = ctx.AddCodeBlock(body_ops, kv.first);

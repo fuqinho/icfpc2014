@@ -33,11 +33,20 @@
    (- x y z)  ==>  (- (- x y) z)            associates to the left
    (cons x y z)  ==>  (cons x (cons y z))   associates to the right (cons only)
 
+* Macro
+
+   (defmacro (or x y) (if x 1 y))
+   (defmacro (and x y) (if x y 0))
+   etc.
+
 * Syntax
 
-    program ::= define*
+    program ::= (define|defmacro)*
     define ::= (define (name x1 ... xk) e)
+    defmacro ::= (defmacro (name x1 ... xk) e)
     e ::=
+     | variable     # [^0-9][any]*
+     | integer      # [0-9]+  (natural number?)
      | (+ e e)
      | (- e e)
      | (* e e)
@@ -56,3 +65,4 @@
      | (let ((x1 e1) ... (xk ek)) e)
      | (set! x e e)
      | (dbg! e e)
+     | (e e1 ... ek)    # when |e| is none of above : function application
