@@ -1,0 +1,16 @@
+e ::=
+ | (+ e e)
+ | (- e e)
+ | (* e e)
+ | (/ e e)
+ | (= e e)      # compare. returns 0/1
+ | (< e e)
+ | (> e e)
+ | (<= e e)
+ | (>= e e)
+ | (int? e)     # ATOM
+ | (cons e e)
+ | (car e)
+ | (cdr e)
+ | (if e1 e2 e3)    # e1!=0 ? e2 : e3
+ | (lambda (x y z) e)
