@@ -1,3 +1,6 @@
+(defmacro (or x y) (if x 1 y))
+(defmacro (and x y) (if x y 0))
+
 ;; Returns not of boolean value.
 (define (not a) (= a 0))
 
@@ -35,12 +38,24 @@
       (q-pop (cons 0 (lst-rev (car q))))
       (cons (car (cdr q)) (cons (car q) (cdr (cdr q))))))
 
+;; Returns true if queue is empty.
+(define (q-empty? q)
+  (and (int? (car q)) (int? (cdr q))))
+
 ;; Returns the lambda-man's position.
 (define (lambda-pos state)
   (car (cdr (car (cdr state)))))
 
+;; Returns the lambda-man's vitality.
+(define (lambda-vitality state)
+  (car (car (cdr state))))
+
 ;; Returns the map data.
 (define (get-map state) (car state))
+
+;; Reutns a list of ghost.
+(define (get-ghost-list state)
+  (car (cdr (cdr state))))
 
 ;; Returns a tile in the map at the |pos|.
 (define (get-tile map pos)
@@ -63,19 +78,21 @@
 ;; Returns neighbot position alog the opposite direction.
 (define (pos-sub pos dir) (pos-add pos (opposite dir)))
 
-
 ;; BFS. Takes map, starting position, and condition-function.
 ;; Condition will take pos and tile.
-(define (bfs map start cond)
+(define (bfs map start threashold cond)
   (bfs-iter
    map
+   threashold
    cond
    (q-push start (cons 0 0))
    (cons (cons start (cons 0 5)) 0)))
 
-(define (bfs-iter map cond q assoc-lst)
+(define (bfs-iter map threashold cond q assoc-lst)
+  (if (q-empty? q) 0
   (let ((pos0 q (q-pop q)))
   (let ((nextdist (+ (car (find pos0 assoc-lst)) 1)))
+  (if (> nextdist threashold) (bfs-iter map threashold cond q assoc-lst)
   (let ((pos q assoc-lst
          (bfs-iter2 map cond q assoc-lst (pos-add pos0 0) 0 nextdist)))
   (if (not (int? pos)) (cons pos assoc-lst)
@@ -88,7 +105,7 @@
   (let ((pos q assoc-lst
          (bfs-iter2 map cond q assoc-lst (pos-add pos0 3) 3 nextdist)))
   (if (not (int? pos)) (cons pos assoc-lst)
-    (bfs-iter map cond q assoc-lst))))))))))))
+    (bfs-iter map threashold cond q assoc-lst))))))))))))))
 
 (define (bfs-iter2 map cond q assoc-lst pos dir dist)
   (let ((tile (get-tile map pos)))
@@ -107,13 +124,14 @@
   (if (pos-eq? origin prev-pos) dir
     (backtrack prev-pos origin assoc-lst)))))
 
-;; Returns the (cons distance direction)
-(define (find-nearest-ghost map start ghost-lst)
-  (let ((pos assoc-lst
-         (bfs map start
+;; Returns the distance.
+(define (find-nearest-ghost map start ghost-lst threashold)
+  (let ((bfs-result
+         (bfs map start threashold
               (lambda (pos _) (is-ghost pos ghost-lst)))))
-  (cons (car (find pos assoc-lst))
-        (backtrack pos start assoc-lst))))
+  (if (int? bfs-result) 1000000
+  (let ((pos assoc-lst bfs-result))
+  (car (find pos assoc-lst))))))
 
 ;; Returns 1 if there is a ghost at |pos|.
 (define (is-ghost pos ghost-lst)
@@ -128,9 +146,52 @@
 
 ;; Step function.
 (define (get-next-direction ai_state state)
-  (let ((origin (lambda-pos state)))
-  (let ((pos assoc-lst
-         (bfs (get-map state)
-              origin
-              (lambda (_ tile) (if (= tile 2) 1 (= tile 3))))))
-  (cons 0 (backtrack pos origin assoc-lst)))))
+  (let ((origin (lambda-pos state))
+        (map (get-map state))
+        (ghost-lst (get-ghost-list state)))
+  (if (and (= (lambda-vitality state) 0)
+           (<= (find-nearest-ghost map origin ghost-lst 3) 3))
+      (cons 0 (find-farthest-ghost-direction map origin ghost-lst))
+      (let ((pos assoc-lst
+                 (bfs map
+                      origin
+                      1000000000
+                      (lambda (_ tile) (if (= tile 2) 1 (= tile 3))))))
+      (cons 0 (backtrack pos origin assoc-lst))))))
+
+(define (find-farthest-ghost-direction map origin ghost-lst)
+  (let ((up (pos-add origin 0))
+        (right (pos-add origin 1))
+        (down (pos-add origin 2))
+        (left (pos-add origin 3)))
+  (let ((up-distance
+         (if (= (get-tile map up) 0)
+             0
+             (find-nearest-ghost map up ghost-lst 15)))
+        (right-distance
+         (if (= (get-tile map right) 0)
+             0
+             (find-nearest-ghost map right ghost-lst 15)))
+        (down-distance
+         (if (= (get-tile map down) 0)
+             0
+             (find-nearest-ghost map down ghost-lst 15)))
+        (left-distance
+         (if (= (get-tile map left) 0)
+             0
+             (find-nearest-ghost map left ghost-lst 15))))
+  (let ((farthest-distance up-distance)
+        (farthest-direction 0))
+  (let ((farthest-distance farthest-direction
+        (if (> right-distance farthest-distance)
+            (cons right-distance 1)
+            (cons farthest-distance farthest-direction))))
+  (let ((farthest-distance farthest-direction
+        (if (> down-distance farthest-distance)
+            (cons down-distance 2)
+            (cons farthest-distance farthest-direction))))
+  (let ((farthest-distance farthest-direction
+        (if (> left-distance farthest-distance)
+            (cons left-distance 3)
+            (cons farthest-distance farthest-direction))))
+  farthest-direction)))))))
