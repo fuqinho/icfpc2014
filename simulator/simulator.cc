@@ -55,12 +55,15 @@ class Simulator {
   void Init() {
     LoadMap(game_state_.mutable_game_map(), map_file_);
     game_state_.set_lambda_man(std::unique_ptr<LambdaMan>(new LambdaMan));
-    InitLambdaMan(game_state_.mutable_lambda_man(), game_state_.game_map());
+    InitLambdaMan(game_state_.mutable_lambda_man(),
+                  lambdaman_file_, game_state_.game_map());
     InitGhostList(game_state_.mutable_ghost_list(),
                   ai_file_list_,
                   game_state_.game_map());
     game_state_.set_fruit(0);
     game_state_.set_score(0);
+
+    game_state_.mutable_lambda_man()->Init(game_state_);
   }
 
   static void LoadMap(GameMap* game_map, const std::string& map_file) {
@@ -71,7 +74,19 @@ class Simulator {
     }
   }
 
-  static void InitLambdaMan(LambdaMan* lambda_man, const GameMap& game_map) {
+  static void InitLambdaMan(LambdaMan* lambda_man,
+                            const std::string& lambdaman_file,
+                            const GameMap& game_map) {
+    {
+      std::ifstream ifs(lambdaman_file);
+      ifs.seekg(0, std::ios::end);
+      int len = ifs.tellg();
+      ifs.seekg(0, std::ios::beg);
+      std::string data;
+      data.resize(len);
+      ifs.read(&data[0], len);
+      lambda_man->LoadProgram(data);
+    }
     for (size_t y = 0; y < game_map.size(); ++y) {
       for (size_t x = 0; x < game_map[y].size(); ++x) {
         if (game_map[y][x] == '\\') {

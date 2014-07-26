@@ -2,6 +2,8 @@
 #define SIMULATOR_GCC_H_
 
 #include <vector>
+#include <string>
+#include <sstream>
 
 #include "common.h"
 
@@ -91,14 +93,39 @@ enum class ErrorType {
 class GCC {
  public:
   GCC() {
+    heap_.resize(10 * 1024 * 1024);
+    for (size_t i = 0; i < heap_.size(); ++i) {
+      heap_[i].visited = false;
+    }
+    current_heap_pos_ = 0;
+    max_heap_pos_ = 0;
   }
 
-  bool Run() {
+  Value Run(int32_t ip, Value arg1, Value arg2, Value arg3) {
+    // Prologue.
+    reg_c_ = ip;
+    data_stack_.clear();
+    // Keep ref to avoid GC.
+    data_stack_.push_back(arg1);
+    data_stack_.push_back(arg2);
+    data_stack_.push_back(arg3);
+
+    control_stack_.clear();
+    control_stack_.push_back(ControlValue {ControlTag::STOP, 0});
+
+    int32_t frame = AllocFrame(3, -1);
+    heap_[frame].frame.values[0] = arg1;
+    heap_[frame].frame.values[1] = arg2;
+    heap_[frame].frame.values[2] = arg3;
+    reg_e_ = frame;
+
     int max_step = 3072 * 1000;
     for (int step = 0; step < max_step; ++step) {
       if (RunStep())
         break;
     }
+
+    return data_stack_.back();
   }
 
   bool RunStep() {
@@ -144,6 +171,151 @@ class GCC {
     }
     assert(false);
     return true;
+  }
+
+  Value ConsCar(const Value& v) {
+    return heap_[v.value].cons.car;
+  }
+
+  Value ConsCdr(const Value& v) {
+    return heap_[v.value].cons.cdr;
+  }
+
+  int32_t GetIp(const Value& v) {
+    return heap_[v.value].closure.f;
+  }
+
+  void RunFullGC(const Value& ai_state, const Value& step) {
+    data_stack_.clear();
+    control_stack_.clear();
+    RunGC();
+    Visit(ai_state);
+    Visit(step);
+    CleanUp();
+  }
+
+  Value Create2Tuple(const Value& v1, const Value& v2) {
+    return { ValueTag::CONS, AllocCons(v1, v2) };
+  }
+
+  Value Create3Tuple(const Value& v1, const Value& v2, const Value& v3) {
+    return Create2Tuple(v1, Create2Tuple(v2, v3));
+  }
+
+  Value Create4Tuple(const Value& v1, const Value& v2,
+                     const Value& v3, const Value& v4) {
+    return Create2Tuple(v1, Create3Tuple(v2, v3, v4));
+  }
+
+  Value Create5Tuple(const Value& v1, const Value& v2, const Value& v3,
+                     const Value& v4, const Value& v5) {
+    return Create2Tuple(v1, Create4Tuple(v2, v3, v4, v5));
+  }
+
+  void LoadProgram(const std::string& program) {
+    code_.clear();
+    std::stringstream ss(program);
+    std::string line;
+    while (getline(ss, line)) {
+      std::stringstream stream(line);
+      std::string mnemonic;
+      stream >> mnemonic;
+      if (mnemonic == "LDC") {
+        int32_t arg;
+        stream >> arg;
+        code_.push_back(Code { GccMnemonic::LDC, arg });
+        continue;
+      }
+      if (mnemonic == "LD") {
+        int32_t arg1, arg2;
+        stream >> arg1 >> arg2;
+        code_.push_back(Code { GccMnemonic::LD, arg1, arg2 });
+        continue;
+      }
+      if (mnemonic == "ADD") {
+        code_.push_back(Code { GccMnemonic::ADD });
+        continue;
+      }
+      if (mnemonic == "SUB") {
+        code_.push_back(Code { GccMnemonic::SUB });
+        continue;
+      }
+      if (mnemonic == "MUL") {
+        code_.push_back(Code { GccMnemonic::MUL });
+        continue;
+      }
+      if (mnemonic == "DIV") {
+        code_.push_back(Code { GccMnemonic::DIV });
+        continue;
+      }
+      if (mnemonic == "CEQ") {
+        code_.push_back(Code { GccMnemonic::CEQ });
+        continue;
+      }
+      if (mnemonic == "CGT") {
+        code_.push_back(Code { GccMnemonic::CGT });
+        continue;
+      }
+      if (mnemonic == "CGTE") {
+        code_.push_back(Code { GccMnemonic::CGTE });
+        continue;
+      }
+      if (mnemonic == "ATOM") {
+        code_.push_back(Code { GccMnemonic::ATOM });
+        continue;
+      }
+      if (mnemonic == "CONS") {
+        code_.push_back(Code { GccMnemonic::CONS });
+        continue;
+      }
+      if (mnemonic == "CAR") {
+        code_.push_back(Code { GccMnemonic::CAR });
+        continue;
+      }
+      if (mnemonic == "CDR") {
+        code_.push_back(Code { GccMnemonic::CDR });
+        continue;
+      }
+      if (mnemonic == "SEL") {
+        int32_t arg1, arg2;
+        stream >> arg1 >> arg2;
+        code_.push_back(Code { GccMnemonic::SEL, arg1, arg2 });
+        continue;
+      }
+      if (mnemonic == "JOIN") {
+        code_.push_back(Code { GccMnemonic::JOIN });
+        continue;
+      }
+      if (mnemonic == "LDF") {
+        int32_t arg;
+        stream >> arg;
+        code_.push_back(Code { GccMnemonic::LDF, arg });
+        continue;
+      }
+      if (mnemonic == "AP") {
+        int32_t arg;
+        stream >> arg;
+        code_.push_back(Code { GccMnemonic::AP, arg });
+        continue;
+      }
+      if (mnemonic == "RTN") {
+        code_.push_back(Code { GccMnemonic::RTN });
+        continue;
+      }
+      if (mnemonic == "DUM") {
+        int32_t arg;
+        stream >> arg;
+        code_.push_back(Code { GccMnemonic::DUM, arg });
+        continue;
+      }
+      if (mnemonic == "RAP") {
+        int32_t arg;
+        stream >> arg;
+        code_.push_back(Code { GccMnemonic::RAP, arg });
+        continue;
+      }
+      // Skip otherwise.
+    }
   }
 
  private:
@@ -461,7 +633,10 @@ class GCC {
   }
 
   void RunGC() {
-    for (size_t i = 0; i < heap_.size(); ++i) {
+    if (max_heap_pos_ < current_heap_pos_) {
+      max_heap_pos_ = current_heap_pos_;
+    }
+    for (size_t i = 0; i < max_heap_pos_; ++i) {
       heap_[i].visited = false;
     }
 
@@ -547,6 +722,7 @@ class GCC {
 
   std::vector<HeapValue> heap_;
   size_t current_heap_pos_;
+  size_t max_heap_pos_;
 
   DISALLOW_COPY_AND_ASSIGN(GCC);
 };
