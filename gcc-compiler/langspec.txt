@@ -2,9 +2,11 @@ program ::= define*
 define ::= (define (name x1 ... xk) e)
 
 プログラムは
-  (define (main arg1 arg2) e)
-という名前の関数から実行開始されます
-arg1, arg2 には "Lambda-Man AI interface" に書いてある引数が入る。
+  (define (main) e)
+という名前の関数から実行開始されます。
+
+グローバル変数 arg1, arg2 に "Lambda-Man AI interface" に書いてある引数が入っています。
+
 グローバルな define 関数は相互再帰できます
 
 e ::=
