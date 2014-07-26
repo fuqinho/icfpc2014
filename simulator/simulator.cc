@@ -130,7 +130,7 @@ class Simulator {
           ptr->set_initial_position(Position {x, y});
           ptr->set_position(Position {x, y});
           ptr->set_direction(Direction::DOWN);
-          ptr->set_next_ticks(kGhostTicks[ai][0]);
+          ptr->set_next_ticks(kGhostTicks[ptr->index() % 4][0]);
           ghost_list->push_back(std::move(ptr));
         }
       }
@@ -174,6 +174,9 @@ class Simulator {
       MoveIfAvailable(obj, Direction::LEFT, game_state_.game_map());
     } else if (num_walls == 2) {
       // Corrido or bend.
+      (next != GetOppositeDirection(obj->direction()) &&
+       MoveIfAvailable(obj, next, game_state_.game_map())) ||
+      MoveIfAvailable(obj, obj->direction(), game_state_.game_map()) ||
       (obj->direction() != Direction::DOWN &&
        MoveIfAvailable(obj, Direction::UP, game_state_.game_map())) ||
       (obj->direction() != Direction::LEFT &&
@@ -198,7 +201,7 @@ class Simulator {
     }
     obj->set_next_ticks(
         current_ticks +
-        kGhostTicks[obj->ai_id()][static_cast<int>(obj->vitality())]);
+        kGhostTicks[obj->index() % 4][static_cast<int>(obj->vitality())]);
   }
 
   void MoveLambdaMan(LambdaMan* obj, int current_ticks) {
@@ -275,6 +278,7 @@ class Simulator {
         if (ghost->vitality() == GhostVitality::STANDARD) {
           ghost->set_vitality(GhostVitality::FRIGHT);
         }
+
         ghost->set_direction(GetOppositeDirection(ghost->direction()));
       }
     } else if (tile == '%' && game_state_.fruit() > 0) {
