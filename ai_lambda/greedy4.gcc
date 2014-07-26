@@ -1,0 +1,571 @@
+DUM 23
+LDF 26
+LDF 40
+LDF 52
+LDF 76
+LDF 89
+LDF 92
+LDF 96
+LDF 123
+LDF 127
+LDF 133
+LDF 136
+LDF 161
+LDF 205
+LDF 209
+LDF 215
+LDF 379
+LDF 443
+LDF 467
+LDF 490
+LDF 525
+LDF 528
+LDF 564
+LDC 12345678
+LDF 569
+TRAP 23
+LD 0 0		; [26] not
+LDC 0
+CEQ
+RTN
+LD 0 1		; [30] (nth-then)
+CAR
+RTN
+LD 0 0		; [33] (nth-else)
+LDC 1
+SUB
+LD 0 1
+CDR
+LD 1 1
+TAP 2
+LD 0 0		; [40] nth
+LDC 0
+CEQ
+TSEL 30 33
+LD 0 0		; [44] (pos-eq?-then)
+CDR
+LD 0 1
+CDR
+CEQ
+RTN
+LDC 0		; [50] (pos-eq?-else)
+RTN
+LD 0 0		; [52] pos-eq?
+CAR
+LD 0 1
+CAR
+CEQ
+TSEL 44 50
+LDC 0		; [58] (find-then)
+RTN
+LD 0 1		; [60] (find-then)
+CAR
+CDR
+RTN
+LD 0 0		; [64] (find-else)
+LD 0 1
+CDR
+LD 1 3
+TAP 2
+LD 0 0		; [69] (find-else)
+LD 0 1
+CAR
+CAR
+LD 1 2
+AP 2
+TSEL 60 64
+LD 0 1		; [76] find
+ATOM
+TSEL 58 69
+LD 0 1		; [79] (lst-rev-internal-then)
+RTN
+LD 0 0		; [81] (lst-rev-internal-else)
+CDR
+LD 0 0
+CAR
+LD 0 1
+CONS
+LD 1 4
+TAP 2
+LD 0 0		; [89] lst-rev-internal
+ATOM
+TSEL 79 81
+LD 0 0		; [92] lst-rev
+LDC 0
+LD 1 4
+TAP 2
+LD 0 0		; [96] q-push
+LD 0 1
+CAR
+CONS
+LD 0 1
+CDR
+CONS
+RTN
+LDC 0		; [104] (q-pop-then)
+LD 0 0
+CAR
+LD 1 5
+AP 1
+CONS
+LD 1 7
+TAP 1
+LD 0 0		; [112] (q-pop-else)
+CDR
+CAR
+LD 0 0
+CAR
+LD 0 0
+CDR
+CDR
+CONS
+CONS
+RTN
+LD 0 0		; [123] q-pop
+CDR
+ATOM
+TSEL 104 112
+LD 0 0		; [127] lambda-pos
+CDR
+CAR
+CDR
+CAR
+RTN
+LD 0 0		; [133] get-map
+CAR
+RTN
+LD 0 1		; [136] get-tile
+CAR
+LD 0 1
+CDR
+LD 0 0
+LD 1 1
+AP 2
+LD 1 1
+TAP 2
+LDC 2		; [145] (opposite-then)
+RTN
+LDC 3		; [147] (opposite-then)
+RTN
+LDC 0		; [149] (opposite-then)
+RTN
+LDC 1		; [151] (opposite-else)
+RTN
+LD 0 0		; [153] (opposite-else)
+LDC 2
+CEQ
+TSEL 149 151
+LD 0 0		; [157] (opposite-else)
+LDC 1
+CEQ
+TSEL 147 153
+LD 0 0		; [161] opposite
+LDC 0
+CEQ
+TSEL 145 157
+LD 0 0		; [165] (pos-add-then)
+CAR
+LD 0 0
+CDR
+LDC 1
+SUB
+CONS
+RTN
+LD 0 0		; [173] (pos-add-then)
+CAR
+LDC 1
+ADD
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 0		; [181] (pos-add-then)
+CAR
+LD 0 0
+CDR
+LDC 1
+ADD
+CONS
+RTN
+LD 0 0		; [189] (pos-add-else)
+CAR
+LDC 1
+SUB
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 1		; [197] (pos-add-else)
+LDC 2
+CEQ
+TSEL 181 189
+LD 0 1		; [201] (pos-add-else)
+LDC 1
+CEQ
+TSEL 173 197
+LD 0 1		; [205] pos-add
+LDC 0
+CEQ
+TSEL 165 201
+LD 0 0		; [209] pos-sub
+LD 0 1
+LD 1 11
+AP 1
+LD 1 12
+TAP 2
+LD 0 0		; [215] bfs
+LD 0 2
+LD 0 1
+LDC 0
+LDC 0
+CONS
+LD 1 6
+AP 2
+LD 0 1
+LDC 0
+LDC 5
+CONS
+CONS
+LDC 0
+CONS
+LD 1 15
+TAP 4
+LD 0 0		; [232] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [236] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [240] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [244] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 6 0		; [248] (bfs-iter-else)
+LD 6 1
+LD 0 1
+LD 0 2
+LD 7 15
+TAP 4
+LD 0 0		; [254] (bfs-iter-let)
+ATOM
+LD 7 0
+AP 1
+TSEL 244 248
+LD 5 0		; [259] (bfs-iter-else)
+LD 5 1
+LD 0 1
+LD 0 2
+LD 4 0
+LDC 3
+LD 6 12
+AP 2
+LDC 3
+LD 3 0
+LD 6 16
+AP 7
+ST 6 22
+LD 6 22
+CAR
+LD 6 22
+CDR
+ST 6 22
+LD 6 22
+CAR
+LD 6 22
+CDR
+LDF 254
+TAP 3
+LD 0 0		; [283] (bfs-iter-let)
+ATOM
+LD 6 0
+AP 1
+TSEL 240 259
+LD 4 0		; [288] (bfs-iter-else)
+LD 4 1
+LD 0 1
+LD 0 2
+LD 3 0
+LDC 2
+LD 5 12
+AP 2
+LDC 2
+LD 2 0
+LD 5 16
+AP 7
+ST 5 22
+LD 5 22
+CAR
+LD 5 22
+CDR
+ST 5 22
+LD 5 22
+CAR
+LD 5 22
+CDR
+LDF 283
+TAP 3
+LD 0 0		; [312] (bfs-iter-let)
+ATOM
+LD 5 0
+AP 1
+TSEL 236 288
+LD 3 0		; [317] (bfs-iter-else)
+LD 3 1
+LD 0 1
+LD 0 2
+LD 2 0
+LDC 1
+LD 4 12
+AP 2
+LDC 1
+LD 1 0
+LD 4 16
+AP 7
+ST 4 22
+LD 4 22
+CAR
+LD 4 22
+CDR
+ST 4 22
+LD 4 22
+CAR
+LD 4 22
+CDR
+LDF 312
+TAP 3
+LD 0 0		; [341] (bfs-iter-let)
+ATOM
+LD 4 0
+AP 1
+TSEL 232 317
+LD 2 0		; [346] (bfs-iter-let)
+LD 2 1
+LD 1 1
+LD 2 3
+LD 1 0
+LDC 0
+LD 3 12
+AP 2
+LDC 0
+LD 0 0
+LD 3 16
+AP 7
+ST 3 22
+LD 3 22
+CAR
+LD 3 22
+CDR
+ST 3 22
+LD 3 22
+CAR
+LD 3 22
+CDR
+LDF 341
+TAP 3
+LD 0 0		; [370] (bfs-iter-let)
+LD 1 3
+LD 2 3
+AP 2
+CAR
+LDC 1
+ADD
+LDF 346
+TAP 1
+LD 0 2		; [379] bfs-iter
+LD 1 7
+AP 1
+ST 1 22
+LD 1 22
+CAR
+LD 1 22
+CDR
+LDF 370
+TAP 2
+LDC 0		; [389] (bfs-iter2-then)
+LD 1 2
+LD 1 3
+CONS
+CONS
+RTN
+LDC 0		; [395] (bfs-iter2-then)
+LD 1 2
+LD 1 3
+CONS
+CONS
+RTN
+LD 2 4		; [401] (bfs-iter2-then)
+LD 0 0
+LD 0 1
+CONS
+CONS
+RTN
+LDC 0		; [407] (bfs-iter2-else)
+LD 0 0
+LD 0 1
+CONS
+CONS
+RTN
+LD 2 4		; [413] (bfs-iter2-let)
+LD 1 0
+LD 2 1
+AP 2
+TSEL 401 407
+LD 1 4		; [418] (bfs-iter2-else)
+LD 1 2
+LD 2 6
+AP 2
+LD 1 4
+LD 1 6
+LD 1 5
+CONS
+CONS
+LD 1 3
+CONS
+LDF 413
+TAP 2
+LD 1 4		; [431] (bfs-iter2-else)
+LD 1 3
+LD 2 3
+AP 2
+ATOM
+LD 2 0
+AP 1
+TSEL 395 418
+LD 0 0		; [439] (bfs-iter2-let)
+LDC 0
+CEQ
+TSEL 389 431
+LD 0 0		; [443] bfs-iter2
+LD 0 4
+LD 1 10
+AP 2
+LDF 439
+TAP 1
+LD 1 0		; [449] (backtrack-then)
+RTN
+LD 0 0		; [451] (backtrack-else)
+LD 2 1
+LD 2 2
+LD 3 17
+TAP 3
+LD 2 1		; [456] (backtrack-let)
+LD 0 0
+LD 3 2
+AP 2
+TSEL 449 451
+LD 1 0		; [461] (backtrack-let)
+LD 0 0
+LD 2 13
+AP 2
+LDF 456
+TAP 1
+LD 0 0		; [467] backtrack
+LD 0 2
+LD 1 3
+AP 2
+CDR
+LDF 461
+TAP 1
+LD 0 0		; [474] find-nearest-ghostL
+LD 1 2
+LD 2 19
+TAP 2
+LD 0 0		; [478] (find-nearest-ghost-let)
+LD 0 1
+LD 2 3
+AP 2
+CAR
+LD 0 0
+LD 1 1
+LD 0 1
+LD 2 17
+AP 3
+CONS
+RTN
+LD 0 0		; [490] find-nearest-ghost
+LD 0 1
+LDF 474
+LD 1 14
+AP 3
+ST 1 22
+LD 1 22
+CAR
+LD 1 22
+CDR
+LDF 478
+TAP 2
+LDC 0		; [502] (is-ghost-then)
+RTN
+LDC 1		; [504] (is-ghost-then)
+RTN
+LD 1 0		; [506] (is-ghost-else)
+LD 0 1
+LD 2 19
+TAP 2
+LD 1 0		; [510] (is-ghost-let)
+LD 0 0
+CDR
+CAR
+LD 2 2
+AP 2
+TSEL 504 506
+LD 0 1		; [517] (is-ghost-else)
+ST 1 22
+LD 1 22
+CAR
+LD 1 22
+CDR
+LDF 510
+TAP 2
+LD 0 1		; [525] is-ghost
+ATOM
+TSEL 502 517
+LDC 0		; [528] main
+LD 1 21
+CONS
+RTN
+LDC 1		; [532] (get-next-directionL-then)
+RTN
+LD 0 1		; [534] (get-next-directionL-else)
+LDC 3
+CEQ
+RTN
+LD 0 1		; [538] get-next-directionL
+LDC 2
+CEQ
+TSEL 532 534
+LDC 0		; [542] (get-next-direction-let)
+LD 0 0
+LD 1 0
+LD 0 1
+LD 3 17
+AP 3
+CONS
+RTN
+LD 1 1		; [550] (get-next-direction-let)
+LD 2 9
+AP 1
+LD 0 0
+LDF 538
+LD 2 14
+AP 3
+ST 2 22
+LD 2 22
+CAR
+LD 2 22
+CDR
+LDF 542
+TAP 2
+LD 0 1		; [564] get-next-direction
+LD 1 8
+AP 1
+LDF 550
+TAP 1
+LD 0 20		; [569] __dummy_main__
+TAP 0
