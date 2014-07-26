@@ -94,7 +94,6 @@ GHCInstruction ParseGHCInstruction(std::string line) {
 
   std::string str_mnemonic, tmp;
   ss >> str_mnemonic;
-  std::cout << str_mnemonic << std::endl;
 
   if (str_mnemonic == "mov") {
     instruction.mnemonic = MOV;
