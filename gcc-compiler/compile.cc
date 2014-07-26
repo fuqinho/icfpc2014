@@ -40,6 +40,7 @@ struct Context
 {
 	const std::shared_ptr<VarMap> varmap;
 	const std::shared_ptr<std::vector<std::pair<gcc::OperationSequence, std::string>>> codeblocks;
+	const std::string name;
 
 	int AddCodeBlock(const gcc::OperationSequence& ops) const {
 		return AddCodeBlock(ops, "");
@@ -169,10 +170,10 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 					std::vector<std::string> vars = verify_lambda_param_node(ast->list[1]);
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
-					Context neo_ctx = {neo_varmap, ctx.codeblocks};
+					Context neo_ctx = {neo_varmap, ctx.codeblocks, ctx.name+"L"};
 
 					gcc::OperationSequence body_ops = compile(ast->list[2], neo_ctx, TAIL);
-					int id = ctx.AddCodeBlock(body_ops);
+					int id = ctx.AddCodeBlock(body_ops, ctx.name+"L");
 
 					gcc::OperationSequence ops;
 					gcc::Append(&ops, std::make_shared<gcc::OpLDF>(id));
@@ -197,10 +198,10 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 					}
 
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
-					Context neo_ctx = {neo_varmap, ctx.codeblocks};
+					Context neo_ctx = {neo_varmap, ctx.codeblocks, ctx.name};
 
 					gcc::OperationSequence body_ops = compile(ast->list[2], neo_ctx, TAIL);
-					int id = ctx.AddCodeBlock(body_ops);
+					int id = ctx.AddCodeBlock(body_ops, "("+ctx.name+"-let)");
 
 					gcc::OperationSequence ops;
 					for(auto& arg: args)
@@ -221,12 +222,12 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 					gcc::OperationSequence t_ops = compile(ast->list[2], ctx, tail);
 					if(!tail)
 						gcc::Append(&t_ops, std::make_shared<gcc::OpJOIN>());
-					int tid = ctx.AddCodeBlock(t_ops);
+					int tid = ctx.AddCodeBlock(t_ops, "("+ctx.name+"-then)");
 
 					gcc::OperationSequence e_ops = compile(ast->list[3], ctx, tail);
 					if(!tail)
 						gcc::Append(&e_ops, std::make_shared<gcc::OpJOIN>());
-					int eid = ctx.AddCodeBlock(e_ops);
+					int eid = ctx.AddCodeBlock(e_ops, "("+ctx.name+"-else)");
 
 					if(tail)
 						gcc::Append(&ops, std::make_shared<gcc::OpTSEL>(tid, eid));
@@ -255,10 +256,11 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 PreLink compile_program(const std::vector<ast::AST> defines)
 {
-	std::map<std::string, std::pair<
+	typedef std::pair<std::string, std::pair<
 		std::vector<std::string>,
 		ast::AST
-	>> funcs;
+	>> funcdef;
+	std::vector<funcdef> funcs;
 
 	for(auto ast: defines)
 	{
@@ -277,8 +279,10 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 			params.push_back(ast->list[1]->list[i]->symbol);
 		}
 
-		assert(funcs.count(name) == 0);
-		funcs[name] = std::make_pair(params, ast->list[2]);
+		assert(count_if(funcs.begin(), funcs.end(), [&](const funcdef& fd) {
+			return fd.first == name;
+		}) == 0);
+		funcs.emplace_back(name, std::make_pair(params, ast->list[2]));
 	}
 
 	std::shared_ptr<VarMap> nil_varmap;
@@ -299,7 +303,8 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 	{
 		Context ctx = {
 			std::make_shared<VarMap>(global_varmap, kv.second.first),
-			codeblocks
+			codeblocks,
+			kv.first
 		};
 		auto body_ops = compile(kv.second.second, ctx, TAIL);
 		int id = ctx.AddCodeBlock(body_ops, kv.first);
@@ -313,8 +318,8 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 	gcc::OperationSequence dummy_main_ops;
 	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpLD>(0,main_offset));
 	gcc::Append(&dummy_main_ops, std::make_shared<gcc::OpTAP>(0));
-	Context tmp_ctx = {nil_varmap, codeblocks};
-	int dummy_main_id = tmp_ctx.AddCodeBlock(dummy_main_ops);
+	Context tmp_ctx = {nil_varmap, codeblocks, "__dummy_main__"};
+	int dummy_main_id = tmp_ctx.AddCodeBlock(dummy_main_ops, "__dummy_main__");
 
 	gcc::OperationSequence prolog_ops;
 
