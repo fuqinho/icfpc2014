@@ -46,6 +46,8 @@ struct Context
 	}
 };
 
+enum IsTailPos { NOT_TAIL, TAIL };
+
 std::vector<std::string> verify_lambda_param_node(ast::AST ast) {
 	assert(ast->type == ast::LIST);
 
@@ -57,15 +59,15 @@ std::vector<std::string> verify_lambda_param_node(ast::AST ast) {
 	return vars;
 }
 
-gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
+gcc::OperationSequence rec(ast::AST ast, const Context& ctx, IsTailPos tail)
 {
 	auto compile_op2 = [&](std::shared_ptr<gcc::Op> op) {
 		assert(ast->type == ast::LIST);
 		assert(ast->list.size() == 3);
 
 		gcc::OperationSequence ops;
-		gcc::Append(&ops, rec(ast->list[1], ctx));
-		gcc::Append(&ops, rec(ast->list[2], ctx));
+		gcc::Append(&ops, rec(ast->list[1], ctx, NOT_TAIL));
+		gcc::Append(&ops, rec(ast->list[2], ctx, NOT_TAIL));
 		gcc::Append(&ops, op);
 		return ops;
 	};
@@ -74,8 +76,8 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 		assert(ast->list.size() == 3);
 
 		gcc::OperationSequence ops;
-		gcc::Append(&ops, rec(ast->list[2], ctx)); // note: reversed
-		gcc::Append(&ops, rec(ast->list[1], ctx));
+		gcc::Append(&ops, rec(ast->list[2], ctx, NOT_TAIL)); // note: reversed
+		gcc::Append(&ops, rec(ast->list[1], ctx, NOT_TAIL));
 		gcc::Append(&ops, op);
 		return ops;
 	};
@@ -84,7 +86,7 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 		assert(ast->list.size() == 2);
 
 		gcc::OperationSequence ops;
-		gcc::Append(&ops, rec(ast->list[1], ctx));
+		gcc::Append(&ops, rec(ast->list[1], ctx, NOT_TAIL));
 		gcc::Append(&ops, op);
 		return ops;
 	};
@@ -148,7 +150,7 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
 					Context neo_ctx = {neo_varmap, ctx.codeblocks};
 
-					gcc::OperationSequence body_ops = rec(ast->list[2], neo_ctx);
+					gcc::OperationSequence body_ops = rec(ast->list[2], neo_ctx, TAIL);
 					gcc::Append(&body_ops, std::make_shared<gcc::OpRTN>());
 					int id = ctx.AddCodeBlock(body_ops);
 
@@ -175,13 +177,13 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
 					Context neo_ctx = {neo_varmap, ctx.codeblocks};
 
-					gcc::OperationSequence body_ops = rec(ast->list[2], neo_ctx);
+					gcc::OperationSequence body_ops = rec(ast->list[2], neo_ctx, TAIL);
 					gcc::Append(&body_ops, std::make_shared<gcc::OpRTN>());
 					int id = ctx.AddCodeBlock(body_ops);
 
 					gcc::OperationSequence ops;
 					for(auto& arg: args)
-						gcc::Append(&ops, rec(arg, ctx));
+						gcc::Append(&ops, rec(arg, ctx, NOT_TAIL));
 					gcc::Append(&ops, std::make_shared<gcc::OpLDF>(id));
 					gcc::Append(&ops, std::make_shared<gcc::OpAP>(args.size()));
 					return ops;
@@ -191,12 +193,12 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 				if(ast->list.front()->symbol == "if") {
 					assert(ast->list.size() == 4);
 
-					gcc::OperationSequence ops = rec(ast->list[1], ctx);
-					gcc::OperationSequence t_ops = rec(ast->list[2], ctx);
+					gcc::OperationSequence ops = rec(ast->list[1], ctx, NOT_TAIL);
+					gcc::OperationSequence t_ops = rec(ast->list[2], ctx, NOT_TAIL); // TODO
 					gcc::Append(&t_ops, std::make_shared<gcc::OpJOIN>());
 					int tid = ctx.AddCodeBlock(t_ops);
 
-					gcc::OperationSequence e_ops = rec(ast->list[3], ctx);
+					gcc::OperationSequence e_ops = rec(ast->list[3], ctx, NOT_TAIL);
 					gcc::Append(&e_ops, std::make_shared<gcc::OpJOIN>());
 					int eid = ctx.AddCodeBlock(e_ops);
 
@@ -208,9 +210,12 @@ gcc::OperationSequence rec(ast::AST ast, const Context& ctx)
 			// general function applications
 			gcc::OperationSequence ops;
 			for(int i=1; i<ast->list.size(); ++i)
-				gcc::Append(&ops, rec(ast->list[i], ctx));
-			gcc::Append(&ops, rec(ast->list[0], ctx));
-			gcc::Append(&ops, std::make_shared<gcc::OpAP>(ast->list.size() - 1));
+				gcc::Append(&ops, rec(ast->list[i], ctx, NOT_TAIL));
+			gcc::Append(&ops, rec(ast->list[0], ctx, NOT_TAIL));
+			if(tail)
+				gcc::Append(&ops, std::make_shared<gcc::OpTAP>(ast->list.size() - 1));
+			else
+				gcc::Append(&ops, std::make_shared<gcc::OpAP>(ast->list.size() - 1));
 			return ops;
 		}
 	}
@@ -224,7 +229,7 @@ PreLink compile_expression(ast::AST ast)
 	std::shared_ptr<VarMap> nil_varmap;
 	auto codeblocks = std::make_shared<std::vector<gcc::OperationSequence>>();
 	Context ctx = {nil_varmap, codeblocks};
-	auto mainblock = rec(ast, ctx);
+	auto mainblock = rec(ast, ctx, NOT_TAIL);
 	PreLink result = {mainblock, *codeblocks};
 	return result;
 }
@@ -277,7 +282,7 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 			std::make_shared<VarMap>(global_varmap, kv.second.first),
 			codeblocks
 		};
-		auto body_ops = rec(kv.second.second, ctx);
+		auto body_ops = rec(kv.second.second, ctx, TAIL);
 		gcc::Append(&body_ops, std::make_shared<gcc::OpRTN>());
 		int id = ctx.AddCodeBlock(body_ops);
 		if(kv.first == "main")

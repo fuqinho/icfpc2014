@@ -68,20 +68,43 @@ DefineOpZ(CDR);
 DefineOpZ(RTN);
 DefineOpZ(JOIN);
 
-// LDC
-class OpLDC : public Op {
+// Op with single int modifier.
+class OpI : public Op {
 public:
-	explicit OpLDC(int value) : value(value) {}
+	OpI(const std::string& name, int n) : name(name), n(n) {}
 	virtual std::ostream& to_stream(std::ostream& os) const {
-		return os << "LDC " << value;
+		return os << name << " " << n;
 	}
-	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
-		return std::make_shared<OpLDC>(value);
+protected:
+	std::string name;
+	int n;
+};
+
+#define DefineOpI(name)                           \
+	class PP_CAT(Op,name) : public OpI {          \
+	public:                                       \
+		PP_CAT(Op,name)(int n) : OpI(#name, n) {} \
+		virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const { \
+			return std::make_shared<PP_CAT(Op,name)>(n); \
+		} \
 	}
 
-private:
-	int value;
-};
+#define DefineOpI_Resolve(name)                   \
+	class PP_CAT(Op,name) : public OpI {          \
+	public:                                       \
+		PP_CAT(Op,name)(int n) : OpI(#name, n) {} \
+		virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const { \
+			return std::make_shared<PP_CAT(Op,name)>(codeid_offset[n]); \
+		} \
+	}
+
+DefineOpI(LDC);
+DefineOpI(DUM);
+DefineOpI(AP);
+DefineOpI(RAP);
+DefineOpI(TAP);
+DefineOpI(TRAP);
+DefineOpI_Resolve(LDF);
 
 // LD
 class OpLD : public Op {
@@ -99,65 +122,6 @@ private:
 	int index;
 };
 
-// LDF
-class OpLDF : public Op {
-public:
-	explicit OpLDF(int id) : id(id) {}
-	virtual std::ostream& to_stream(std::ostream& os) const {
-		return os << "LDF " << id;
-	}
-	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
-		return std::make_shared<OpLDF>(codeid_offset[id]);
-	}
-
-private:
-	int id;
-};
-
-// AP
-class OpAP : public Op {
-public:
-	explicit OpAP(int n) : n(n) {}
-	virtual std::ostream& to_stream(std::ostream& os) const {
-		return os << "AP " << n;
-	}
-	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
-		return std::make_shared<OpAP>(n);
-	}
-
-private:
-	int n;
-};
-
-// RAP
-class OpRAP : public Op {
-public:
-	explicit OpRAP(int n) : n(n) {}
-	virtual std::ostream& to_stream(std::ostream& os) const {
-		return os << "RAP " << n;
-	}
-	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
-		return std::make_shared<OpRAP>(n);
-	}
-
-private:
-	int n;
-};
-
-// DUM
-class OpDUM : public Op {
-public:
-	explicit OpDUM(int n) : n(n) {}
-	virtual std::ostream& to_stream(std::ostream& os) const {
-		return os << "DUM " << n;
-	}
-	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
-		return std::make_shared<OpDUM>(n);
-	}
-
-private:
-	int n;
-};
 // SEL
 class OpSEL : public Op {
 public:
@@ -173,4 +137,19 @@ private:
 	int tid, eid;
 };
 
+
+// TSEL
+class OpTSEL : public Op {
+public:
+	explicit OpTSEL(int tid, int eid) : tid(tid), eid(eid) {}
+	virtual std::ostream& to_stream(std::ostream& os) const {
+		return os << "TSEL " << tid << " " << eid;
+	}
+	virtual std::shared_ptr<Op> resolve(const std::vector<int>& codeid_offset) const {
+		return std::make_shared<OpTSEL>(codeid_offset[tid], codeid_offset[eid]);
+	}
+
+private:
+	int tid, eid;
+};
 }  // namespace gcc
