@@ -187,10 +187,14 @@ class Simulator {
       (next != GetOppositeDirection(obj->direction()) &&
        MoveIfAvailable(obj, next, game_state_.game_map())) ||
       MoveIfAvailable(obj, obj->direction(), game_state_.game_map()) ||
-      MoveIfAvailable(obj, Direction::UP, game_state_.game_map()) ||
-      MoveIfAvailable(obj, Direction::RIGHT, game_state_.game_map()) ||
-      MoveIfAvailable(obj, Direction::DOWN, game_state_.game_map()) ||
-      MoveIfAvailable(obj, Direction::LEFT, game_state_.game_map());
+      (GetOppositeDirection(obj->direction()) != Direction::UP &&
+       MoveIfAvailable(obj, Direction::UP, game_state_.game_map())) ||
+      (GetOppositeDirection(obj->direction()) != Direction::RIGHT &&
+       MoveIfAvailable(obj, Direction::RIGHT, game_state_.game_map())) ||
+      (GetOppositeDirection(obj->direction()) != Direction::DOWN &&
+       MoveIfAvailable(obj, Direction::DOWN, game_state_.game_map())) ||
+      (GetOppositeDirection(obj->direction()) != Direction::LEFT &&
+       MoveIfAvailable(obj, Direction::LEFT, game_state_.game_map()));
     }
     obj->set_next_ticks(
         current_ticks +
