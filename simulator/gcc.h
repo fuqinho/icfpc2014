@@ -93,7 +93,15 @@ class GCC {
   GCC() {
   }
 
-  void Run() {
+  bool Run() {
+    int max_step = 3072 * 1000;
+    for (int step = 0; step < max_step; ++step) {
+      if (RunStep())
+        break;
+    }
+  }
+
+  bool RunStep() {
     switch(code_[reg_c_].mnemonic) {
       case GccMnemonic::LDC:
         return Ldc(code_[reg_c_].arg1);
@@ -134,15 +142,18 @@ class GCC {
       case GccMnemonic::RAP:
         return Rap(code_[reg_c_].arg1);
     }
+    assert(false);
+    return true;
   }
 
  private:
-  void Ldc(int32_t n) {
+  bool Ldc(int32_t n) {
     data_stack_.push_back(Value { ValueTag::INT, n });
     ++reg_c_;
+    return false;
   }
 
-  void Ld(int32_t n, int32_t i) {
+  bool Ld(int32_t n, int32_t i) {
     int32_t fp = reg_e_;
     while (n > 0) {
       fp = heap_[fp].frame.parent;
@@ -152,9 +163,10 @@ class GCC {
       return OnError(ErrorType::FRAME_MISMATCH);
     data_stack_.push_back(heap_[fp].frame.values[i]);
     ++reg_c_;
+    return false;
   }
 
-  void Add() {
+  bool Add() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -163,9 +175,10 @@ class GCC {
       return OnError(ErrorType::TAG_MISMATCH);
     data_stack_.push_back(Value { ValueTag::INT, x.value + y.value});
     ++reg_c_;
+    return false;
   }
 
-  void Sub() {
+  bool Sub() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -174,9 +187,10 @@ class GCC {
       return OnError(ErrorType::TAG_MISMATCH);
     data_stack_.push_back(Value { ValueTag::INT, x.value - y.value });
     ++reg_c_;
+    return false;
   }
 
-  void Mul() {
+  bool Mul() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -185,9 +199,10 @@ class GCC {
       return OnError(ErrorType::TAG_MISMATCH);
     data_stack_.push_back(Value { ValueTag::INT, x.value * y.value });
     ++reg_c_;
+    return false;
   }
 
-  void Div() {
+  bool Div() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -196,9 +211,10 @@ class GCC {
       return OnError(ErrorType::TAG_MISMATCH);
     data_stack_.push_back(Value { ValueTag::INT, x.value / y.value });
     ++reg_c_;
+    return false;
   }
 
-  void Ceq() {
+  bool Ceq() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -208,9 +224,10 @@ class GCC {
     data_stack_.push_back(
         Value {ValueTag::INT, static_cast<int32_t>(x.value == y.value)});
     ++reg_c_;
+    return false;
   }
 
-  void Cgt() {
+  bool Cgt() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -220,9 +237,10 @@ class GCC {
     data_stack_.push_back(
         Value { ValueTag::INT, static_cast<int32_t>(x.value > y.value) });
     ++reg_c_;
+    return false;
   }
 
-  void Cgte() {
+  bool Cgte() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -232,17 +250,19 @@ class GCC {
     data_stack_.push_back(
         Value {ValueTag::INT, static_cast<int32_t>(x.value >= y.value)});
     ++reg_c_;
+    return false;
   }
 
-  void Atom() {
+  bool Atom() {
     Value x = data_stack_.back();
     data_stack_.pop_back();
     data_stack_.push_back(
         Value { ValueTag::INT, static_cast<int32_t>(x.tag == ValueTag::INT) });
     ++reg_c_;
+    return false;
   }
 
-  void Cons() {
+  bool Cons() {
     Value y = data_stack_.back();
     data_stack_.pop_back();
     Value x = data_stack_.back();
@@ -251,50 +271,56 @@ class GCC {
     int32_t z = AllocCons(x, y);
     data_stack_.push_back(Value {ValueTag::CONS, z});
     ++reg_c_;
+    return false;
   }
 
-  void Car() {
+  bool Car() {
     Value x = data_stack_.back();
     data_stack_.pop_back();
     if (x.tag != ValueTag::CONS)
       return OnError(ErrorType::TAG_MISMATCH);
     data_stack_.push_back(heap_[x.value].cons.car);
     ++reg_c_;
+    return false;
   }
 
-  void Cdr() {
+  bool Cdr() {
     Value x = data_stack_.back();
     data_stack_.pop_back();
     if (x.tag !=ValueTag::CONS)
       return OnError(ErrorType::TAG_MISMATCH);
     data_stack_.push_back(heap_[x.value].cons.cdr);
     ++reg_c_;
+    return false;
   }
 
-  void Sel(int32_t t, int32_t f) {
+  bool Sel(int32_t t, int32_t f) {
     Value x = data_stack_.back();
     data_stack_.pop_back();
     if (x.tag != ValueTag::INT)
       return OnError(ErrorType::TAG_MISMATCH);
     control_stack_.push_back(ControlValue {ControlTag::JOIN, reg_c_ + 1});
     reg_c_ = (x.value == 0) ? f : t;
+    return false;
   }
 
-  void Join() {
+  bool Join() {
     ControlValue x = control_stack_.back();
     control_stack_.pop_back();
     if (x.tag != ControlTag::JOIN)
       return OnError(ErrorType::CONTROL_MISMATCH);
     reg_c_ = x.value;
+    return false;
   }
 
-  void Ldf(int32_t f) {
+  bool Ldf(int32_t f) {
     int32_t x = AllocClosure(f, reg_e_);
     data_stack_.push_back(Value {ValueTag::CLOSURE, x});
     ++reg_c_;
+    return false;
   }
 
-  void Ap(int32_t n) {
+  bool Ap(int32_t n) {
     Value x = data_stack_.back();
     data_stack_.pop_back();
     if (x.tag != ValueTag::CLOSURE)
@@ -311,13 +337,14 @@ class GCC {
     control_stack_.push_back(ControlValue {ControlTag::RET, reg_c_ + 1});
     reg_e_ = frame;
     reg_c_ = f;
+    return false;
   }
 
-  void Rtn() {
+  bool Rtn() {
     ControlValue x = control_stack_.back();
     control_stack_.pop_back();
     if (x.tag == ControlTag::STOP)
-      return;  // TODO
+      return true;
     if (x.tag != ControlTag::RET)
       return OnError(ErrorType::CONTROL_MISMATCH);
     ControlValue y = control_stack_.back();
@@ -325,9 +352,10 @@ class GCC {
     assert(y.tag == ControlTag::ENV);
     reg_e_ = y.value;
     reg_c_ = x.value;
+    return false;
   }
 
-  void Dum(int32_t n) {
+  bool Dum(int32_t n) {
     int32_t fp = AllocFrame(n, -1);
     for (size_t i = 0; i < n; ++i) {
       heap_[fp].frame.values[i] = Value { ValueTag::INT, 0 };
@@ -336,9 +364,10 @@ class GCC {
     heap_[fp].frame.is_dum = true;
     reg_e_ = fp;
     ++reg_c_;
+    return false;
   }
 
-  void Rap(int32_t n) {
+  bool Rap(int32_t n) {
     Value x = data_stack_.back();
     data_stack_.pop_back();
     if (x.tag != ValueTag::CLOSURE)
@@ -361,6 +390,7 @@ class GCC {
     heap_[fp].frame.is_dum = false;
     reg_e_ = fp;
     reg_c_ = f;
+    return false;
   }
 
   int32_t AllocCons(const Value& x, const Value& y) {
@@ -503,8 +533,9 @@ class GCC {
     }
   }
 
-  void OnError(ErrorType e) {
-    // TODO
+  bool OnError(ErrorType e) {
+    // TODO error debug log?
+    return true;
   }
 
   int32_t reg_c_;
@@ -519,6 +550,5 @@ class GCC {
 
   DISALLOW_COPY_AND_ASSIGN(GCC);
 };
-
 
 #endif
