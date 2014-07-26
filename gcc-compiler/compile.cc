@@ -8,6 +8,12 @@
 #include <vector>
 #include <iostream>
 
+#define compiler_assert(cond, ast, msg) \
+	do { \
+		if(!(cond)) {std::cerr << "ERROR [" << ast->pos() << "]: " << msg << std::endl << std::endl; } \
+		assert(cond); \
+	} while(0)
+
 namespace {
 
 class VarMap
@@ -62,11 +68,11 @@ struct Context
 enum IsTailPos { NOT_TAIL, TAIL };
 
 std::vector<std::string> verify_lambda_param_node(ast::AST ast) {
-	assert(ast->type == ast::LIST);
+	compiler_assert(ast->type == ast::LIST, ast, "lambda param is not a list");
 
 	std::vector<std::string> vars;
 	for(size_t i=0; i<ast->list.size(); ++i) {
-		assert(ast->list[i]->type == ast::SYMBOL);
+		compiler_assert(ast->list[i]->type == ast::SYMBOL, ast, "lambda param not a symbol");
 		vars.push_back(ast->list[i]->symbol);
 	}
 	return vars;
@@ -83,6 +89,8 @@ ast::AST substitute(ast::AST orig, std::map<std::string, ast::AST>& sub)
 		break;
 	case ast::LIST: {
 		ast::AST after = std::make_shared<ast::Impl>();
+		after->line = orig->line;
+		after->column = orig->column;
 		after->type = ast::LIST;
 		for(auto& e: orig->list)
 			after->list.push_back(substitute(e, sub));
@@ -95,8 +103,8 @@ ast::AST substitute(ast::AST orig, std::map<std::string, ast::AST>& sub)
 gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 {
 	auto compile_op2 = [&](std::shared_ptr<gcc::Op> op) {
-		assert(ast->type == ast::LIST);
-		assert(ast->list.size() >= 3);
+		compiler_assert(ast->type == ast::LIST, ast, "ICE1");
+		compiler_assert(ast->list.size() >= 3, ast, "too few arguments");
 
 		gcc::OperationSequence ops;
 		gcc::Append(&ops, compile(ast->list[1], ctx, NOT_TAIL));
@@ -116,8 +124,8 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 		return ops;
 	};
 	auto compile_op2_rev = [&](std::shared_ptr<gcc::Op> op) {
-		assert(ast->type == ast::LIST);
-		assert(ast->list.size() == 3);
+		compiler_assert(ast->type == ast::LIST, ast, "ICE2");
+		compiler_assert(ast->list.size() == 3, ast, "argument count mismatch");
 
 		gcc::OperationSequence ops;
 		gcc::Append(&ops, compile(ast->list[2], ctx, NOT_TAIL)); // reversed
@@ -128,8 +136,8 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 		return ops;
 	};
 	auto compile_op1 = [&](std::shared_ptr<gcc::Op> op) {
-		assert(ast->type == ast::LIST);
-		assert(ast->list.size() == 2);
+		compiler_assert(ast->type == ast::LIST, ast, "ICE3");
+		compiler_assert(ast->list.size() == 2, ast, "argument count mismatch");
 
 		gcc::OperationSequence ops;
 		gcc::Append(&ops, compile(ast->list[1], ctx, NOT_TAIL));
@@ -151,11 +159,8 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 		case ast::SYMBOL: {
 			// variable
 			int depth, index;
-			if(!ctx.varmap->resolve(ast->symbol, &depth, &index)) {
-				// TODO: better error logging.
-				std::cerr << "!!! VARIABLE " << ast->symbol << " NOT FOUND !!!" << std::endl;
-				assert(false);
-			}
+			if(!ctx.varmap->resolve(ast->symbol, &depth, &index))
+				compiler_assert(false, ast, "variable not found: " << ast->symbol);
 			gcc::OperationSequence ops;
 			gcc::Append(&ops, std::make_shared<gcc::OpLD>(depth, index));
 			if(tail)
@@ -201,7 +206,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 				// (dbg! e kont)
 				if(ast->list.front()->symbol == "dbg!") {
-					assert(ast->list.size() == 3);
+					compiler_assert(ast->list.size() == 3, ast, "dbg! takes 2 args");
 
 					gcc::OperationSequence ops;
 					gcc::Append(&ops, compile(ast->list[1], ctx, NOT_TAIL));
@@ -212,15 +217,12 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 				// (set! x e kont)
 				if(ast->list.front()->symbol == "set!") {
-					assert(ast->list.size() == 4);
-					assert(ast->list[1]->type == ast::SYMBOL);
+					compiler_assert(ast->list.size() == 4, ast, "set! takes 3 args");
+					compiler_assert(ast->list[1]->type == ast::SYMBOL, ast->list[1], "set! to non-variable");
 
 					int depth, index;
-					if(!ctx.varmap->resolve(ast->list[1]->symbol, &depth, &index)) {
-						// TODO: better error logging.
-						std::cerr << "!!! VARIABLE " << ast->symbol << " NOT FOUND !!!" << std::endl;
-						assert(false);
-					}
+					if(!ctx.varmap->resolve(ast->list[1]->symbol, &depth, &index))
+						compiler_assert(false, ast->list[1], "variable not found: " << ast->list[1]->symbol);
 
 					gcc::OperationSequence ops;
 					gcc::Append(&ops, compile(ast->list[2], ctx, NOT_TAIL));
@@ -231,7 +233,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 				// (lambda (vars...) e)
 				if(ast->list.front()->symbol == "lambda") {
-					assert(ast->list.size() == 3);
+					compiler_assert(ast->list.size() == 3, ast, "lambda takes 2 args");
 
 					std::vector<std::string> vars = verify_lambda_param_node(ast->list[1]);
 					std::shared_ptr<VarMap> neo_varmap = std::make_shared<VarMap>(ctx.varmap, vars);
@@ -249,17 +251,17 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 				// (let ((x e) (x e)) e)
 				if(ast->list.front()->symbol == "let") {
-					assert(ast->list.size() == 3);
-					assert(ast->list[1]->type == ast::LIST);
+					compiler_assert(ast->list.size() == 3, ast, "let takes 2 args");
+					compiler_assert(ast->list[1]->type == ast::LIST, ast->list[1], "let takes binding LIST");
 
 					gcc::OperationSequence ops;
 
 					std::vector<std::string> vars;
 					for(auto& kv: ast->list[1]->list) {
-						assert(kv->type == ast::LIST);
-						assert(kv->list.size() >= 2);
+						compiler_assert(kv->type == ast::LIST, kv, "let binding not a list");
+						compiler_assert(kv->list.size() >= 2, kv, "let binding too short");
 						for(size_t i=0; i+1<kv->list.size(); ++i) {
-							assert(kv->list[i]->type == ast::SYMBOL);
+							compiler_assert(kv->list[i]->type == ast::SYMBOL, kv->list[i], "let bind to non-variable");
 							vars.push_back(kv->list[i]->symbol);
 						}
 						gcc::Append(&ops, compile(kv->list.back(), ctx, NOT_TAIL));
@@ -267,7 +269,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 						// tuple decomposition
 						int depth, index;
 						if(!ctx.varmap->resolve("__compiler_dummy__", &depth, &index))
-							assert(false);
+							compiler_assert(false, ast, "ICE4");
 						for(int tuple=kv->list.size()-1; tuple>=2; --tuple) {
 							gcc::Append(&ops, std::make_shared<gcc::OpST>(depth, index));
 							gcc::Append(&ops, std::make_shared<gcc::OpLD>(depth, index));
@@ -293,7 +295,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 
 				// (if c t e)
 				if(ast->list.front()->symbol == "if") {
-					assert(ast->list.size() == 4);
+					compiler_assert(ast->list.size() == 4, ast, "if takes 3 args");
 
 					gcc::OperationSequence ops = compile(ast->list[1], ctx, NOT_TAIL);
 					gcc::OperationSequence t_ops = compile(ast->list[2], ctx, tail);
@@ -317,7 +319,8 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 				if(ctx.macros->count(ast->list.front()->symbol)) {
 					std::vector<std::string> params = ctx.macros->at(ast->list.front()->symbol).first;
 					ast::AST mbody = ctx.macros->at(ast->list.front()->symbol).second;
-					assert(params.size() == ast->list.size()-1);
+					compiler_assert(params.size() == ast->list.size()-1, ast, "macro argnum mismatch: "
+						<< ast->list.front()->symbol);
 
 					std::map<std::string, ast::AST> sub;
 					for(size_t i=0; i<params.size(); ++i)
@@ -339,7 +342,7 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 			return ops;
 		}
 	}
-	assert(false);
+	compiler_assert(false, ast, "ICE5");
 	return gcc::OperationSequence();
 }
 
@@ -359,13 +362,15 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 
 	for(auto ast: defines)
 	{
-		assert(ast->type == ast::LIST);
-		assert(ast->list.size() == 3);
-		assert(ast->list[0]->type == ast::SYMBOL);
-		assert(ast->list[0]->symbol == "define" || ast->list[0]->symbol == "defmacro");
-		assert(ast->list[1]->type == ast::LIST);
-		assert(ast->list[1]->list.size() >= 1);
-		assert(ast->list[1]->list[0]->type == ast::SYMBOL);
+		compiler_assert(ast->type == ast::LIST, ast, "top-level must be define or defmacro");
+		compiler_assert(ast->list.size() == 3, ast, "top-level must be define or defmacro");
+		compiler_assert(ast->list[0]->type == ast::SYMBOL, ast, "top-level must be define or defmacro");
+		compiler_assert(ast->list[0]->symbol == "define" || ast->list[0]->symbol == "defmacro",
+			ast, "top-level must be define or defmacro");
+		compiler_assert(ast->list[1]->type == ast::LIST, ast, "top-level must be define or defmacro");
+		compiler_assert(ast->list[1]->list.size() >= 1, ast, "top-level must be define or defmacro");
+		compiler_assert(ast->list[1]->list[0]->type == ast::SYMBOL, ast,
+			"top-level must be define or defmacro");
 
 		std::string name = ast->list[1]->list[0]->symbol;
 		std::vector<std::string> params;
@@ -427,7 +432,7 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 	gcc::Append(&prolog_ops, std::make_shared<gcc::OpDUM>(func_ids.size()+1));
 	for(int id: func_ids)
 		gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDF>(id));
-	gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDC>(12345678));  // dummy variable "_"
+	gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDC>(12345678));  // dummy variable "__compiler_dummy__"
 	gcc::Append(&prolog_ops, std::make_shared<gcc::OpLDF>(dummy_main_id));
 	gcc::Append(&prolog_ops, std::make_shared<gcc::OpTRAP>(func_ids.size()+1));
 

@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <ostream>
+#include <sstream>
 
 namespace ast {
 
@@ -25,7 +26,14 @@ struct Impl
 	std::string      symbol;
 	std::vector<AST> list;
 
-	// For debug
+	int line, column;
+
+	std::string pos() const {
+		std::stringstream ss;
+		ss << "Line " << line << " Column " << column;
+		return ss.str();
+	}
+
 	friend std::ostream& operator<<(std::ostream& os, const Impl& me) {
 		switch(me.type){
 		case VALUE:  os<<me.value; break;

@@ -6,7 +6,28 @@
 
 namespace {
 
-void skip_spaces(const char*& p)
+class Cursor
+{
+public:
+	Cursor(const char* p, int line=1, int column=1) : p_(p), line_(line), column_(column) {}
+
+	char operator*() const { return *p_; }
+	Cursor& operator++() { incr(); return *this; }
+	Cursor operator++(int) { Cursor prev(p_, line_, column_); incr(); return prev; }
+
+	int line() const { return line_; }
+	int column() const { return column_; }
+
+private:
+	void incr() {
+		if(*p_=='\n') { line_++; column_=1; } else { column_++; }
+		p_++;
+	}
+	const char* p_;
+	int line_, column_;
+};
+
+void skip_spaces(Cursor& p)
 {
 	while(*p==' '|| *p=='\t' || *p=='\n')
 		++p;
@@ -22,7 +43,7 @@ bool is_close_paren(char c)
 	return c==')' || c==']' || c=='}';
 }
 
-std::string parse_token(const char*& p)
+std::string parse_token(Cursor& p)
 {
 	std::string token;
 	while(*p!=' ' && *p!='\t' && *p!='\n' && !is_close_paren(*p))
@@ -53,12 +74,13 @@ char paren_match(char op, char cl)
 	return op==cl;
 }
 
-ast::AST parse_expression(const char*& p)
+ast::AST parse_expression(Cursor& p)
 {
-	ast::AST ast(new ast::Impl);
-
 	skip_spaces(p);
 
+	ast::AST ast(new ast::Impl);
+	ast->line = p.line();
+	ast->column = p.column();
 	if(is_open_paren(*p)) {
 		char op = *p;
 		++p; // ')'
@@ -103,7 +125,7 @@ std::string read_skipping_comments(std::istream& in)
 std::vector<ast::AST> parse_program(std::istream& in)
 {
 	std::string str = read_skipping_comments(in);
-	const char* p = str.c_str();
+	Cursor p(str.c_str());
 
 	std::vector<ast::AST> asts;
 	while(skip_spaces(p), *p)
