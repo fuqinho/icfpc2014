@@ -44,9 +44,13 @@ class Simulator {
     fflush(stdout);
     PrintGame(0);
     for (int ticks = 1; ticks < end_of_ticks; ++ticks) {
+      someone_moved_ = false;
       if (RunStep(ticks))
         break;
-      PrintGame(ticks);
+      if (someone_moved_) {
+        PrintGame(ticks);
+        std::cin.ignore();
+      }
     }
     PrintGame(end_of_ticks);
   }
@@ -153,6 +157,7 @@ class Simulator {
     if (obj->next_ticks() > current_ticks) {
       return;
     }
+    someone_moved_ = true;
 
     Direction next = obj->GetNextDirection(game_state_);
     Position position = obj->position();
@@ -196,6 +201,7 @@ class Simulator {
     if (obj->next_ticks() > current_ticks) {
       return;
     }
+    someone_moved_ = true;
 
     Direction d = obj->GetNextDirection(game_state_);
     MoveIfAvailable(obj, d, game_state_.game_map());
@@ -341,6 +347,7 @@ class Simulator {
   std::string map_file_;
   std::string lambdaman_file_;
   std::vector<std::string> ai_file_list_;
+  bool someone_moved_;
 
   GameState game_state_;
 
