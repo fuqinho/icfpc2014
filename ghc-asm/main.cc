@@ -24,10 +24,10 @@ int main()
 {
 	std::map<std::string, size_t> defs = {
 	// direction
-		{"UP", 1},
-		{"RIGHT", 2},
-		{"DOWN", 3},
-		{"LEFT", 4},
+		{"UP", 0},
+		{"RIGHT", 1},
+		{"DOWN", 2},
+		{"LEFT", 3},
 	// vitality
 		{"STANDARD", 0},
 		{"FRIGHT", 1},
