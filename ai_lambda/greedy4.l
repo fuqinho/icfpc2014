@@ -11,6 +11,9 @@
 ;; Returns smaller one.
 (define (min a b) (if (< a b) a b))
 
+;; Returns an abs value of the given value.
+(define (abs a) (if (< a 0) (- 0 a) a))
+
 ;; Position operations.
 
 ;; Compares two positions. Returns true if equals.
@@ -22,6 +25,9 @@
   (or (< (car p1) (car p2))
       (and (= (car p1) (car p2)) (< (cdr p1) (cdr p2)))))
 
+;; Returns manhattan distance between p1 and p2.
+(define (pos-distance p1 p2)
+  (+ (abs (- (car p1) (car p2))) (abs (- (cdr p1) (cdr p2)))))
 
 ;; List operations.
 
@@ -35,6 +41,13 @@
   (if (int? lst1)
       lst2
       (lst-rev-internal (cdr lst1) (cons (car lst1) lst2))))
+
+;; Filters the list element by the given function.
+(define (lst-filter fun lst)
+  (if (int? lst) 0
+  (if (fun (car lst))
+      (cons (car lst) (lst-filter fun (cdr lst)))
+      (lst-filter fun (cdr lst)))))
 
 ;; Queue operations.
 ;; Queue is represented by a pair of lists.
@@ -211,19 +224,31 @@
 ;; Backtracking. Returns the initial direction from |origin|.
 ;; Must be |pos| != |origin|.
 (define (backtrack pos origin avl)
+  (backtrack-iter pos origin avl 0))
+
+(define (backtrack-iter pos origin avl result)
   (let ((dir (cdr (avl-find pos avl))))
-  (let ((prev-pos (pos-sub pos dir)))
-  (if (pos-eq? origin prev-pos) dir
-    (backtrack prev-pos origin avl)))))
+  (let ((prev-pos (pos-sub pos dir))
+        (result (cons dir result)))
+  (if (pos-eq? origin prev-pos) result
+    (backtrack-iter prev-pos origin avl result)))))
+
+
 
 ;; Returns the distance.
 (define (find-nearest-ghost map start ghost-lst threashold extra-block)
+  (let ((filtered-ghost-lst
+         (lst-filter
+            (lambda (ghost)
+              (<= (pos-distance (car (cdr ghost)) start) threashold))
+            ghost-lst)))
+  (if (int? filtered-ghost-lst) 100000000
   (let ((bfs-result
          (bfs map start threashold extra-block
               (lambda (pos _) (is-ghost pos ghost-lst)))))
   (if (int? bfs-result) 1000000
   (let ((pos avl bfs-result))
-  (car (avl-find pos avl))))))
+  (car (avl-find pos avl))))))))
 
 ;; Returns 1 if there is a ghost at |pos|.
 (define (is-ghost pos ghost-lst)
@@ -244,13 +269,15 @@
   (if (and (< (lambda-vitality state) (* 127 3))
            (<= (find-nearest-ghost map origin ghost-lst 3 0) 3))
       (cons 0 (find-farthest-ghost-direction map origin ghost-lst))
+      (if (not (int? ai_state)) (cons (cdr ai_state) (car ai_state))
       (let ((pos avl
                  (bfs map
                       origin
                       1000000000
                       0
                       (lambda (_ tile) (if (= tile 2) 1 (= tile 3))))))
-      (cons 0 (backtrack pos origin avl))))))
+      (let ((trace (backtrack pos origin avl)))
+        (cons (cdr trace) (car trace))))))))
 
 (define (find-farthest-ghost-direction map origin ghost-lst)
   (let ((up (pos-add origin 0))
