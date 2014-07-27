@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <signal.h>
 
 #include "common.h"
 #include "gamestate.h"
@@ -363,6 +364,8 @@ class Simulator {
     std::stringstream buffer;
     buffer << "\x1b[H";
     buffer << "ticks: " << current_ticks
+           << ", lives: " << game_state_.lambda_man().life()
+           << ", vital: " << game_state_.lambda_man().vitality()
            << ", score: " << game_state_.score() << "\n";
     for (size_t y = 0; y < game_state_.map_height(); ++y) {
       for (size_t x = 0; x < game_state_.map_width(); ++x) {
@@ -409,6 +412,20 @@ class Simulator {
   DISALLOW_COPY_AND_ASSIGN(Simulator);
 };
 
+void inthandler(int s) {
+  printf("\e[?25h");
+  exit(1);
+}
+
+// Set sigint handler to restore cursor.
+void sethandler() {
+  struct sigaction sig_int_handler;
+  sig_int_handler.sa_handler = inthandler;
+  sigemptyset(&sig_int_handler.sa_mask);
+  sig_int_handler.sa_flags = 0;
+  sigaction(SIGINT, &sig_int_handler, NULL);
+}
+
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
@@ -416,7 +433,8 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "Usage: %s MAP LAMBDA AI1 [AI2 [AI3 [AI4]]]\n", argv[0]);
     return 2;
   }
-
+  sethandler();
+  
   Simulator sim;
   sim.set_map_file(argv[1]);
   sim.set_lambdaman_file(argv[2]);
