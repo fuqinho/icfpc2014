@@ -9,6 +9,7 @@
 #include "gamestate.h"
 #include "ghost.h"
 #include "lambdaman.h"
+#include "map_generator.h"
 
 #include "glog/logging.h"
 
@@ -72,10 +73,17 @@ class Simulator {
   }
 
   static void LoadMap(GameMap* game_map, const std::string& map_file) {
-    std::ifstream in(map_file);
-    std::string line;
-    while (std::getline(in, line)) {
-      game_map->push_back(line);
+    if (map_file == "random") {
+      std::vector<std::string> random_map = GenerateMap(3);
+      for (auto line : random_map) {
+        game_map->push_back(line);
+      }
+    } else {
+      std::ifstream in(map_file);
+      std::string line;
+      while (std::getline(in, line)) {
+        game_map->push_back(line);
+      }
     }
   }
 
