@@ -1,16 +1,126 @@
+;; Boolean operation with short circuit.
 (defmacro (or x y) (if x 1 y))
 (defmacro (and x y) (if x y 0))
 
 ;; Returns not of boolean value.
 (define (not a) (= a 0))
 
+;; Returns bigger one.
+(define (max a b) (if (> a b) a b))
+
+;; Returns smaller one.
+(define (min a b) (if (< a b) a b))
+
+;; Position operations.
+
+;; Compares two positions. Returns true if equals.
+(define (pos-eq? p1 p2)
+  (and (= (car p1) (car p2)) (= (cdr p1) (cdr p2))))
+
+;; Compares two positions. Returns true if p1 < p2 in lexicographical order.
+(define (pos-lt? p1 p2)
+  (or (< (car p1) (car p2))
+      (and (= (car p1) (car p2)) (< (cdr p1) (cdr p2)))))
+
+
+;; List operations.
+
 ;; Returns n-th element of a list.
 (define (nth n lst)
   (if (= n 0) (car lst) (nth (- n 1) (cdr lst))))
 
-;; Compares two positions. Returns true if equals.
-(define (pos-eq? p1 p2)
-  (if (= (car p1) (car p2)) (= (cdr p1) (cdr p2)) 0))
+;; Reverses the list.
+(define (lst-rev lst) (lst-rev-internal lst 0))
+(define (lst-rev-internal lst1 lst2)
+  (if (int? lst1)
+      lst2
+      (lst-rev-internal (cdr lst1) (cons (car lst1) lst2))))
+
+;; Queue operations.
+;; Queue is represented by a pair of lists.
+;; Empty queue is (cons 0 0) (meaning (cons nil nil)).
+
+;; Pushes an element into a queue. Returns a new queue.
+(define (q-push e q) (cons (cons e (car q)) (cdr q)))
+
+;; Pops an element from a queue. Returns a pair of element and a new queue.
+;; Must not be empty.
+(define (q-pop q)
+  (if (int? (cdr q))
+      (q-pop (cons 0 (lst-rev (car q))))
+      (cons (car (cdr q)) (cons (car q) (cdr (cdr q))))))
+
+;; Returns true if queue is empty.
+(define (q-empty? q)
+  (and (int? (car q)) (int? (cdr q))))
+
+;; Map operations. Here Map is implemented by AVL tree.
+;; An AVL node is represeneted (((k v) h) (l r)) where
+;; k: key (position)
+;; v: value
+;; h: height
+;; l: left child tree, and
+;; r: right child tree
+;; To represent an empty node, 0 is used.
+
+;; Returns true if the tree is empty.
+(define (avl-empty? tree) (int? tree))
+
+;; Returns the height of the tree.
+(define (avl-height tree)
+  (if (int? tree) 0 (cdr (car tree))))
+
+(define (avl-create kv l r)
+  (let ((hl (avl-height l))
+        (hr (avl-height r)))
+    (cons (cons kv (+ (max hl hr) 1)) (cons l r))))
+
+(define (avl-bal kv l r)
+  (let ((hl (avl-height l))
+        (hr (avl-height r)))
+    (if (> hl (+ hr 2))
+        (let ((lkv (car (car l)))
+              (ll (car (cdr l)))
+              (lr (cdr (cdr l))))
+          (if (>= (avl-height ll) (avl-height lr))
+              (avl-create lkv ll (avl-create kv lr r))
+              (let ((lrkv (car (car lr)))
+                    (lrl (car (cdr lr)))
+                    (lrr (cdr (cdr lr))))
+                (avl-create lrkv (avl-create lkv ll lrl)
+                                 (avl-create kv lrr r)))))
+    (if (> hr (+ hl 2))
+        (let ((rkv (car (car r)))
+              (rl (car (cdr r)))
+              (rr (cdr (cdr r))))
+          (if (>= (avl-height rr) (avl-height rl))
+              (avl-create rkv (avl-create kv l rl) rr)
+              (let ((rlkv (car (car rl)))
+                    (rll (car (cdr rl)))
+                    (rlr (cdr (cdr rl))))
+                (avl-create rlkv (avl-create kv l rll)
+                                 (avl-create rkv rlr rr)))))
+    (cons (cons kv (+ (max hl hr) 1)) (cons l r))))))
+
+(define (avl-add k v tree)
+  (if (int? tree)
+      (cons (cons (cons k v) 1) (cons 0 0))
+      (let ((tkv (car (car tree)))
+            (l (car (cdr tree)))
+            (r (cdr (cdr tree))))
+        (if (pos-eq? k (car tkv)) tree
+        (if (pos-lt? k (car tkv))
+            (avl-bal tkv (avl-add k v l) r)
+            (avl-bal tkv l (avl-add k v r)))))))
+
+(define (avl-find k tree)
+  (if (int? tree)
+      0
+      (let ((tkv (car (car tree))))
+        (if (pos-eq? k (car tkv)) (cdr tkv)
+        (if (pos-lt? k (car tkv))
+            (avl-find k (car (cdr tree)))
+            (avl-find k (cdr (cdr tree))))))))
 
 ;; Finds a value from assoc list, whose key is position.
 ;; If not found '0' is returned.
@@ -21,26 +131,6 @@
           (cdr (car assoc-lst))
           (find key-pos (cdr assoc-lst)))))
 
-;; Reverses the list.
-(define (lst-rev lst) (lst-rev-internal lst 0))
-
-(define (lst-rev-internal lst1 lst2)
-  (if (int? lst1)
-      lst2
-      (lst-rev-internal (cdr lst1) (cons (car lst1) lst2))))
-
-;; Pushes an element into a queue. Returns a new queue.
-(define (q-push e q) (cons (cons e (car q)) (cdr q)))
-
-;; Pops an element from a queue. Returns a pair of element and a new queue.
-(define (q-pop q)
-  (if (int? (cdr q))
-      (q-pop (cons 0 (lst-rev (car q))))
-      (cons (car (cdr q)) (cons (car q) (cdr (cdr q))))))
-
-;; Returns true if queue is empty.
-(define (q-empty? q)
-  (and (int? (car q)) (int? (cdr q))))
 
 ;; Returns the lambda-man's position.
 (define (lambda-pos state)
@@ -80,58 +170,60 @@
 
 ;; BFS. Takes map, starting position, and condition-function.
 ;; Condition will take pos and tile.
-(define (bfs map start threashold cond)
+(define (bfs map start threashold extra-block cond)
   (bfs-iter
    map
    threashold
    cond
    (q-push start (cons 0 0))
-   (cons (cons start (cons 0 5)) 0)))
+   (avl-add start (cons 0 5)
+            (if (int? extra-block)
+                0
+                (avl-add extra-block (cons 0 5) 0)))))
 
-(define (bfs-iter map threashold cond q assoc-lst)
+(define (bfs-iter map threashold cond q avl)
   (if (q-empty? q) 0
   (let ((pos0 q (q-pop q)))
-  (let ((nextdist (+ (car (find pos0 assoc-lst)) 1)))
-  (if (> nextdist threashold) (bfs-iter map threashold cond q assoc-lst)
-  (let ((pos q assoc-lst
-         (bfs-iter2 map cond q assoc-lst (pos-add pos0 0) 0 nextdist)))
-  (if (not (int? pos)) (cons pos assoc-lst)
-  (let ((pos q assoc-lst
-         (bfs-iter2 map cond q assoc-lst (pos-add pos0 1) 1 nextdist)))
-  (if (not (int? pos)) (cons pos assoc-lst)
-  (let ((pos q assoc-lst
-         (bfs-iter2 map cond q assoc-lst (pos-add pos0 2) 2 nextdist)))
-  (if (not (int? pos)) (cons pos assoc-lst)
-  (let ((pos q assoc-lst
-         (bfs-iter2 map cond q assoc-lst (pos-add pos0 3) 3 nextdist)))
-  (if (not (int? pos)) (cons pos assoc-lst)
-    (bfs-iter map threashold cond q assoc-lst))))))))))))))
+  (let ((nextdist (+ (car (avl-find pos0 avl)) 1)))
+  (if (> nextdist threashold) (bfs-iter map threashold cond q avl)
+  (let ((pos q avl
+         (bfs-iter2 map cond q avl (pos-add pos0 0) 0 nextdist)))
+  (if (not (int? pos)) (cons pos avl)
+  (let ((pos q avl
+         (bfs-iter2 map cond q avl (pos-add pos0 1) 1 nextdist)))
+  (if (not (int? pos)) (cons pos avl)
+  (let ((pos q avl
+         (bfs-iter2 map cond q avl (pos-add pos0 2) 2 nextdist)))
+  (if (not (int? pos)) (cons pos avl)
+  (let ((pos q avl
+         (bfs-iter2 map cond q avl (pos-add pos0 3) 3 nextdist)))
+  (if (not (int? pos)) (cons pos avl)
+    (bfs-iter map threashold cond q avl))))))))))))))
 
-(define (bfs-iter2 map cond q assoc-lst pos dir dist)
+(define (bfs-iter2 map cond q avl pos dir dist)
   (let ((tile (get-tile map pos)))
-  (if (= tile 0) (cons 0 q assoc-lst)
-  (if (not (int? (find pos assoc-lst))) (cons 0 q assoc-lst)
+  (if (or (= tile 0) (not (int? (avl-find pos avl)))) (cons 0 q avl)
   (let ((q (q-push pos q))
-        (assoc-lst (cons (cons pos (cons dist dir)) assoc-lst)))
-  (if (cond pos tile) (cons pos q assoc-lst)
-    (cons 0 q assoc-lst)))))))
+        (avl (avl-add pos (cons dist dir) avl)))
+  (if (cond pos tile) (cons pos q avl)
+    (cons 0 q avl))))))
 
 ;; Backtracking. Returns the initial direction from |origin|.
 ;; Must be |pos| != |origin|.
-(define (backtrack pos origin assoc-lst)
-  (let ((dir (cdr (find pos assoc-lst))))
+(define (backtrack pos origin avl)
+  (let ((dir (cdr (avl-find pos avl))))
   (let ((prev-pos (pos-sub pos dir)))
   (if (pos-eq? origin prev-pos) dir
-    (backtrack prev-pos origin assoc-lst)))))
+    (backtrack prev-pos origin avl)))))
 
 ;; Returns the distance.
-(define (find-nearest-ghost map start ghost-lst threashold)
+(define (find-nearest-ghost map start ghost-lst threashold extra-block)
   (let ((bfs-result
-         (bfs map start threashold
+         (bfs map start threashold extra-block
               (lambda (pos _) (is-ghost pos ghost-lst)))))
   (if (int? bfs-result) 1000000
-  (let ((pos assoc-lst bfs-result))
-  (car (find pos assoc-lst))))))
+  (let ((pos avl bfs-result))
+  (car (avl-find pos avl))))))
 
 ;; Returns 1 if there is a ghost at |pos|.
 (define (is-ghost pos ghost-lst)
@@ -149,15 +241,16 @@
   (let ((origin (lambda-pos state))
         (map (get-map state))
         (ghost-lst (get-ghost-list state)))
-  (if (and (= (lambda-vitality state) 0)
-           (<= (find-nearest-ghost map origin ghost-lst 3) 3))
+  (if (and (< (lambda-vitality state) (* 127 3))
+           (<= (find-nearest-ghost map origin ghost-lst 3 0) 3))
       (cons 0 (find-farthest-ghost-direction map origin ghost-lst))
-      (let ((pos assoc-lst
+      (let ((pos avl
                  (bfs map
                       origin
                       1000000000
+                      0
                       (lambda (_ tile) (if (= tile 2) 1 (= tile 3))))))
-      (cons 0 (backtrack pos origin assoc-lst))))))
+      (cons 0 (backtrack pos origin avl))))))
 
 (define (find-farthest-ghost-direction map origin ghost-lst)
   (let ((up (pos-add origin 0))
@@ -167,19 +260,19 @@
   (let ((up-distance
          (if (= (get-tile map up) 0)
              0
-             (find-nearest-ghost map up ghost-lst 15)))
+             (find-nearest-ghost map up ghost-lst 10 origin)))
         (right-distance
          (if (= (get-tile map right) 0)
              0
-             (find-nearest-ghost map right ghost-lst 15)))
+             (find-nearest-ghost map right ghost-lst 10 origin)))
         (down-distance
          (if (= (get-tile map down) 0)
              0
-             (find-nearest-ghost map down ghost-lst 15)))
+             (find-nearest-ghost map down ghost-lst 10 origin)))
         (left-distance
          (if (= (get-tile map left) 0)
              0
-             (find-nearest-ghost map left ghost-lst 15))))
+             (find-nearest-ghost map left ghost-lst 10 origin))))
   (let ((farthest-distance up-distance)
         (farthest-direction 0))
   (let ((farthest-distance farthest-direction
