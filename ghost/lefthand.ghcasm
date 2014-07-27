@@ -1,0 +1,6 @@
+int GetGhostIndex
+int GetGhostState
+dec B
+and B,3
+mov A,B
+int SetGhostDirection
