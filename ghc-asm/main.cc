@@ -46,7 +46,7 @@ int main()
 		{"Get2ndLambdaXy", 2},
 		{"GetGhostIndex", 3},
 		{"GetGhostStartXy", 4},
-		{"GetGhostCurrenyXy", 5},
+		{"GetGhostCurrentXy", 5},
 		{"GetGhostState", 6},
 		{"GetMap", 7},
 		{"Debug", 8},
