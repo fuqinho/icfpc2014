@@ -1,0 +1,795 @@
+DUM 27
+LDF 30
+LDF 44
+LDF 56
+LDF 80
+LDF 83
+LDF 97
+LDF 100
+LDF 127
+LDF 137
+LDF 141
+LDF 147
+LDF 152
+LDF 155
+LDF 160
+LDF 185
+LDF 229
+LDF 233
+LDF 239
+LDF 428
+LDF 486
+LDF 510
+LDF 540
+LDF 571
+LDF 574
+LDF 635
+LDF 775
+LDC 12345678
+LDF 793
+TRAP 27
+LD 0 0		; [30] not
+LDC 0
+CEQ
+RTN
+LD 0 1		; [34] (nth-then)
+CAR
+RTN
+LD 0 0		; [37] (nth-else)
+LDC 1
+SUB
+LD 0 1
+CDR
+LD 1 1
+TAP 2
+LD 0 0		; [44] nth
+LDC 0
+CEQ
+TSEL 34 37
+LD 0 0		; [48] (pos-eq?-then)
+CDR
+LD 0 1
+CDR
+CEQ
+RTN
+LDC 0		; [54] (pos-eq?-else)
+RTN
+LD 0 0		; [56] pos-eq?
+CAR
+LD 0 1
+CAR
+CEQ
+TSEL 48 54
+LDC 0		; [62] (find-then)
+RTN
+LD 0 1		; [64] (find-then)
+CAR
+CDR
+RTN
+LD 0 0		; [68] (find-else)
+LD 0 1
+CDR
+LD 1 3
+TAP 2
+LD 0 0		; [73] (find-else)
+LD 0 1
+CAR
+CAR
+LD 1 2
+AP 2
+TSEL 64 68
+LD 0 1		; [80] find
+ATOM
+TSEL 62 73
+LD 0 0		; [83] lst-rev
+LDC 0
+LD 1 5
+TAP 2
+LD 0 1		; [87] (lst-rev-internal-then)
+RTN
+LD 0 0		; [89] (lst-rev-internal-else)
+CDR
+LD 0 0
+CAR
+LD 0 1
+CONS
+LD 1 5
+TAP 2
+LD 0 0		; [97] lst-rev-internal
+ATOM
+TSEL 87 89
+LD 0 0		; [100] q-push
+LD 0 1
+CAR
+CONS
+LD 0 1
+CDR
+CONS
+RTN
+LDC 0		; [108] (q-pop-then)
+LD 0 0
+CAR
+LD 1 4
+AP 1
+CONS
+LD 1 7
+TAP 1
+LD 0 0		; [116] (q-pop-else)
+CDR
+CAR
+LD 0 0
+CAR
+LD 0 0
+CDR
+CDR
+CONS
+CONS
+RTN
+LD 0 0		; [127] q-pop
+CDR
+ATOM
+TSEL 108 116
+LD 0 0		; [131] (q-empty?-then)
+CDR
+ATOM
+RTN
+LDC 0		; [135] (q-empty?-else)
+RTN
+LD 0 0		; [137] q-empty?
+CAR
+ATOM
+TSEL 131 135
+LD 0 0		; [141] lambda-pos
+CDR
+CAR
+CDR
+CAR
+RTN
+LD 0 0		; [147] lambda-vitality
+CDR
+CAR
+CAR
+RTN
+LD 0 0		; [152] get-map
+CAR
+RTN
+LD 0 0		; [155] get-ghost-list
+CDR
+CDR
+CAR
+RTN
+LD 0 1		; [160] get-tile
+CAR
+LD 0 1
+CDR
+LD 0 0
+LD 1 1
+AP 2
+LD 1 1
+TAP 2
+LDC 2		; [169] (opposite-then)
+RTN
+LDC 3		; [171] (opposite-then)
+RTN
+LDC 0		; [173] (opposite-then)
+RTN
+LDC 1		; [175] (opposite-else)
+RTN
+LD 0 0		; [177] (opposite-else)
+LDC 2
+CEQ
+TSEL 173 175
+LD 0 0		; [181] (opposite-else)
+LDC 1
+CEQ
+TSEL 171 177
+LD 0 0		; [185] opposite
+LDC 0
+CEQ
+TSEL 169 181
+LD 0 0		; [189] (pos-add-then)
+CAR
+LD 0 0
+CDR
+LDC 1
+SUB
+CONS
+RTN
+LD 0 0		; [197] (pos-add-then)
+CAR
+LDC 1
+ADD
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 0		; [205] (pos-add-then)
+CAR
+LD 0 0
+CDR
+LDC 1
+ADD
+CONS
+RTN
+LD 0 0		; [213] (pos-add-else)
+CAR
+LDC 1
+SUB
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 1		; [221] (pos-add-else)
+LDC 2
+CEQ
+TSEL 205 213
+LD 0 1		; [225] (pos-add-else)
+LDC 1
+CEQ
+TSEL 197 221
+LD 0 1		; [229] pos-add
+LDC 0
+CEQ
+TSEL 189 225
+LD 0 0		; [233] pos-sub
+LD 0 1
+LD 1 14
+AP 1
+LD 1 15
+TAP 2
+LD 0 0		; [239] bfs
+LD 0 2
+LD 0 3
+LD 0 1
+LDC 0
+LDC 0
+CONS
+LD 1 6
+AP 2
+LD 0 1
+LDC 0
+LDC 5
+CONS
+CONS
+LDC 0
+CONS
+LD 1 18
+TAP 5
+LDC 0		; [257] (bfs-iter-then)
+RTN
+LD 2 0		; [259] (bfs-iter-then)
+LD 2 1
+LD 2 2
+LD 1 1
+LD 2 4
+LD 3 18
+TAP 5
+LD 0 0		; [266] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [270] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [274] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [278] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 6 0		; [282] (bfs-iter-else)
+LD 6 1
+LD 6 2
+LD 0 1
+LD 0 2
+LD 7 18
+TAP 5
+LD 0 0		; [289] (bfs-iter-let)
+ATOM
+LD 7 0
+AP 1
+TSEL 278 282
+LD 5 0		; [294] (bfs-iter-else)
+LD 5 2
+LD 0 1
+LD 0 2
+LD 4 0
+LDC 3
+LD 6 15
+AP 2
+LDC 3
+LD 3 0
+LD 6 19
+AP 7
+ST 6 26
+LD 6 26
+CAR
+LD 6 26
+CDR
+ST 6 26
+LD 6 26
+CAR
+LD 6 26
+CDR
+LDF 289
+TAP 3
+LD 0 0		; [318] (bfs-iter-let)
+ATOM
+LD 6 0
+AP 1
+TSEL 274 294
+LD 4 0		; [323] (bfs-iter-else)
+LD 4 2
+LD 0 1
+LD 0 2
+LD 3 0
+LDC 2
+LD 5 15
+AP 2
+LDC 2
+LD 2 0
+LD 5 19
+AP 7
+ST 5 26
+LD 5 26
+CAR
+LD 5 26
+CDR
+ST 5 26
+LD 5 26
+CAR
+LD 5 26
+CDR
+LDF 318
+TAP 3
+LD 0 0		; [347] (bfs-iter-let)
+ATOM
+LD 5 0
+AP 1
+TSEL 270 323
+LD 3 0		; [352] (bfs-iter-else)
+LD 3 2
+LD 0 1
+LD 0 2
+LD 2 0
+LDC 1
+LD 4 15
+AP 2
+LDC 1
+LD 1 0
+LD 4 19
+AP 7
+ST 4 26
+LD 4 26
+CAR
+LD 4 26
+CDR
+ST 4 26
+LD 4 26
+CAR
+LD 4 26
+CDR
+LDF 347
+TAP 3
+LD 0 0		; [376] (bfs-iter-let)
+ATOM
+LD 4 0
+AP 1
+TSEL 266 352
+LD 2 0		; [381] (bfs-iter-else)
+LD 2 2
+LD 1 1
+LD 2 4
+LD 1 0
+LDC 0
+LD 3 15
+AP 2
+LDC 0
+LD 0 0
+LD 3 19
+AP 7
+ST 3 26
+LD 3 26
+CAR
+LD 3 26
+CDR
+ST 3 26
+LD 3 26
+CAR
+LD 3 26
+CDR
+LDF 376
+TAP 3
+LD 0 0		; [405] (bfs-iter-let)
+LD 2 1
+CGT
+TSEL 259 381
+LD 0 0		; [409] (bfs-iter-let)
+LD 1 4
+LD 2 3
+AP 2
+CAR
+LDC 1
+ADD
+LDF 405
+TAP 1
+LD 0 3		; [418] (bfs-iter-else)
+LD 1 7
+AP 1
+ST 1 26
+LD 1 26
+CAR
+LD 1 26
+CDR
+LDF 409
+TAP 2
+LD 0 3		; [428] bfs-iter
+LD 1 8
+AP 1
+TSEL 257 418
+LDC 0		; [432] (bfs-iter2-then)
+LD 1 2
+LD 1 3
+CONS
+CONS
+RTN
+LDC 0		; [438] (bfs-iter2-then)
+LD 1 2
+LD 1 3
+CONS
+CONS
+RTN
+LD 2 4		; [444] (bfs-iter2-then)
+LD 0 0
+LD 0 1
+CONS
+CONS
+RTN
+LDC 0		; [450] (bfs-iter2-else)
+LD 0 0
+LD 0 1
+CONS
+CONS
+RTN
+LD 2 4		; [456] (bfs-iter2-let)
+LD 1 0
+LD 2 1
+AP 2
+TSEL 444 450
+LD 1 4		; [461] (bfs-iter2-else)
+LD 1 2
+LD 2 6
+AP 2
+LD 1 4
+LD 1 6
+LD 1 5
+CONS
+CONS
+LD 1 3
+CONS
+LDF 456
+TAP 2
+LD 1 4		; [474] (bfs-iter2-else)
+LD 1 3
+LD 2 3
+AP 2
+ATOM
+LD 2 0
+AP 1
+TSEL 438 461
+LD 0 0		; [482] (bfs-iter2-let)
+LDC 0
+CEQ
+TSEL 432 474
+LD 0 0		; [486] bfs-iter2
+LD 0 4
+LD 1 13
+AP 2
+LDF 482
+TAP 1
+LD 1 0		; [492] (backtrack-then)
+RTN
+LD 0 0		; [494] (backtrack-else)
+LD 2 1
+LD 2 2
+LD 3 20
+TAP 3
+LD 2 1		; [499] (backtrack-let)
+LD 0 0
+LD 3 2
+AP 2
+TSEL 492 494
+LD 1 0		; [504] (backtrack-let)
+LD 0 0
+LD 2 16
+AP 2
+LDF 499
+TAP 1
+LD 0 0		; [510] backtrack
+LD 0 2
+LD 1 3
+AP 2
+CDR
+LDF 504
+TAP 1
+LD 0 0		; [517] find-nearest-ghostL
+LD 1 2
+LD 2 22
+TAP 2
+LDC 1000000		; [521] (find-nearest-ghost-then)
+RTN
+LD 0 0		; [523] (find-nearest-ghost-let)
+LD 0 1
+LD 3 3
+AP 2
+CAR
+RTN
+LD 0 0		; [529] (find-nearest-ghost-else)
+ST 2 26
+LD 2 26
+CAR
+LD 2 26
+CDR
+LDF 523
+TAP 2
+LD 0 0		; [537] (find-nearest-ghost-let)
+ATOM
+TSEL 521 529
+LD 0 0		; [540] find-nearest-ghost
+LD 0 1
+LD 0 3
+LDF 517
+LD 1 17
+AP 4
+LDF 537
+TAP 1
+LDC 0		; [548] (is-ghost-then)
+RTN
+LDC 1		; [550] (is-ghost-then)
+RTN
+LD 1 0		; [552] (is-ghost-else)
+LD 0 1
+LD 2 22
+TAP 2
+LD 1 0		; [556] (is-ghost-let)
+LD 0 0
+CDR
+CAR
+LD 2 2
+AP 2
+TSEL 550 552
+LD 0 1		; [563] (is-ghost-else)
+ST 1 26
+LD 1 26
+CAR
+LD 1 26
+CDR
+LDF 556
+TAP 2
+LD 0 1		; [571] is-ghost
+ATOM
+TSEL 548 563
+LDC 0		; [574] main
+LD 1 24
+CONS
+RTN
+LDC 3		; [578] (get-next-direction-then)
+LD 0 1
+LD 0 0
+LD 0 2
+LDC 3
+LD 2 21
+AP 4
+CGTE
+JOIN
+LDC 0		; [587] (get-next-direction-else)
+JOIN
+LDC 0		; [589] (get-next-direction-then)
+LD 0 1
+LD 0 0
+LD 0 2
+LD 2 25
+AP 3
+CONS
+RTN
+LDC 1		; [597] (get-next-directionL-then)
+RTN
+LD 0 1		; [599] (get-next-directionL-else)
+LDC 3
+CEQ
+RTN
+LD 0 1		; [603] get-next-directionL
+LDC 2
+CEQ
+TSEL 597 599
+LDC 0		; [607] (get-next-direction-let)
+LD 0 0
+LD 1 0
+LD 0 1
+LD 3 20
+AP 3
+CONS
+RTN
+LD 0 1		; [615] (get-next-direction-else)
+LD 0 0
+LDC 1000000000
+LDF 603
+LD 2 17
+AP 4
+ST 2 26
+LD 2 26
+CAR
+LD 2 26
+CDR
+LDF 607
+TAP 2
+LD 1 1		; [628] (get-next-direction-let)
+LD 2 10
+AP 1
+LDC 0
+CEQ
+SEL 578 587
+TSEL 589 615
+LD 0 1		; [635] get-next-direction
+LD 1 9
+AP 1
+LD 0 1
+LD 1 11
+AP 1
+LD 0 1
+LD 1 12
+AP 1
+LDF 628
+TAP 3
+LDC 0		; [646] (find-farthest-ghost-direction-then)
+JOIN
+LD 1 0		; [648] (find-farthest-ghost-direction-else)
+LD 0 0
+LD 1 2
+LDC 20
+LD 2 21
+AP 4
+JOIN
+LDC 0		; [655] (find-farthest-ghost-direction-then)
+JOIN
+LD 1 0		; [657] (find-farthest-ghost-direction-else)
+LD 0 1
+LD 1 2
+LDC 20
+LD 2 21
+AP 4
+JOIN
+LDC 0		; [664] (find-farthest-ghost-direction-then)
+JOIN
+LD 1 0		; [666] (find-farthest-ghost-direction-else)
+LD 0 2
+LD 1 2
+LDC 20
+LD 2 21
+AP 4
+JOIN
+LDC 0		; [673] (find-farthest-ghost-direction-then)
+JOIN
+LD 1 0		; [675] (find-farthest-ghost-direction-else)
+LD 0 3
+LD 1 2
+LDC 20
+LD 2 21
+AP 4
+JOIN
+LD 1 1		; [682] (find-farthest-ghost-direction-then)
+LDC 1
+CONS
+JOIN
+LD 0 0		; [686] (find-farthest-ghost-direction-else)
+LD 0 1
+CONS
+JOIN
+LD 2 2		; [690] (find-farthest-ghost-direction-then)
+LDC 2
+CONS
+JOIN
+LD 0 0		; [694] (find-farthest-ghost-direction-else)
+LD 0 1
+CONS
+JOIN
+LD 3 3		; [698] (find-farthest-ghost-direction-then)
+LDC 3
+CONS
+JOIN
+LD 0 0		; [702] (find-farthest-ghost-direction-else)
+LD 0 1
+CONS
+JOIN
+LD 0 1		; [706] (find-farthest-ghost-direction-let)
+RTN
+LD 3 3		; [708] (find-farthest-ghost-direction-let)
+LD 0 0
+CGT
+SEL 698 702
+ST 6 26
+LD 6 26
+CAR
+LD 6 26
+CDR
+LDF 706
+TAP 2
+LD 2 2		; [719] (find-farthest-ghost-direction-let)
+LD 0 0
+CGT
+SEL 690 694
+ST 5 26
+LD 5 26
+CAR
+LD 5 26
+CDR
+LDF 708
+TAP 2
+LD 1 1		; [730] (find-farthest-ghost-direction-let)
+LD 0 0
+CGT
+SEL 682 686
+ST 4 26
+LD 4 26
+CAR
+LD 4 26
+CDR
+LDF 719
+TAP 2
+LD 0 0		; [741] (find-farthest-ghost-direction-let)
+LDC 0
+LDF 730
+TAP 2
+LD 1 0		; [745] (find-farthest-ghost-direction-let)
+LD 0 0
+LD 2 13
+AP 2
+LDC 0
+CEQ
+SEL 646 648
+LD 1 0
+LD 0 1
+LD 2 13
+AP 2
+LDC 0
+CEQ
+SEL 655 657
+LD 1 0
+LD 0 2
+LD 2 13
+AP 2
+LDC 0
+CEQ
+SEL 664 666
+LD 1 0
+LD 0 3
+LD 2 13
+AP 2
+LDC 0
+CEQ
+SEL 673 675
+LDF 741
+TAP 4
+LD 0 1		; [775] find-farthest-ghost-direction
+LDC 0
+LD 1 15
+AP 2
+LD 0 1
+LDC 1
+LD 1 15
+AP 2
+LD 0 1
+LDC 2
+LD 1 15
+AP 2
+LD 0 1
+LDC 3
+LD 1 15
+AP 2
+LDF 745
+TAP 4
+LD 0 23		; [793] __dummy_main__
+TAP 0

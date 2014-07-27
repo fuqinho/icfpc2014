@@ -3,4 +3,4 @@
 #include "gcc.h"
 #include <ostream>
 
-void link_and_emit(std::ostream& os, const PreLink& pl);
+void link_and_emit(std::ostream& os, const PreLink& pl, bool show_label);

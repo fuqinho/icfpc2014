@@ -1,28 +1,68 @@
-Program starts from the function defined as:
-  (define (main) e).
+* Program Startup
 
-The global variables |arg1| and |arg2| hold the arugments as written in
-the "Lambda-Man AI interface" section of the spec.
+    Program starts from the function defined as:
+      (define (main) e).
 
-Top-level |define|'ed functions can be mutually recursively called.
+    The global variables |arg1| and |arg2| hold the arugments as written in
+    the "Lambda-Man AI interface" section of the spec.
 
-program ::= define*
-define ::= (define (name x1 ... xk) e)
+* Readability Features
 
-e ::=
- | (+ e e)
- | (- e e)
- | (* e e)
- | (/ e e)
- | (= e e)      # compare. returns 0/1
- | (< e e)
- | (> e e)
- | (<= e e)
- | (>= e e)
- | (int? e)     # ATOM
- | (cons e e)
- | (car e)
- | (cdr e)
- | (if e1 e2 e3)    # e1!=0 ? e2 : e3
- | (lambda (x1 ... xk) e)
- | (let ((x1 e1) ... (xk ek)) e)
+    Line-comments start with semicolon (;)
+    Parentheses can either be () or [] or {}.
+
+       ; example
+       (let [(x 1) (y 2)] {+ x y})
+
+* Variable Scope
+
+    Top-level |define|'ed functions can be mutually recursively called.
+    (let (...) ...) is let. Not let* nor letrec.
+
+* Side Effects
+
+    (set! x e1 e2)   :: set |e1| to |x|, and evaluate |e2|
+    (dbg! e1 e2)     :: debug output |e1|, and evaluate |e2|.
+
+* Tuple decomposition
+
+    (let ((x y z tup)) e)  ::  x=car tup, y=car cdr tup, z=car cdr cdr tup, then e.
+
+* Auto extension of Binary Operators
+
+   (- x y z)  ==>  (- (- x y) z)            associates to the left
+   (cons x y z)  ==>  (cons x (cons y z))   associates to the right (cons only)
+
+* Macro
+
+   (defmacro (or x y) (if x 1 y))
+   (defmacro (and x y) (if x y 0))
+   etc.
+
+* Syntax
+
+    program ::= (define|defmacro)*
+    define ::= (define (name x1 ... xk) e)
+    defmacro ::= (defmacro (name x1 ... xk) e)
+    e ::=
+     | variable     # [^0-9][any]*
+     | integer      # [0-9]+  (natural number?)
+     | (+ e e)
+     | (- e e)
+     | (* e e)
+     | (/ e e)
+     | (= e e)      # compare. returns 0/1
+     | (< e e)
+     | (> e e)
+     | (<= e e)
+     | (>= e e)
+     | (int? e)     # ATOM
+     | (cons e e)
+     | (car e)
+     | (cdr e)
+     | (if e1 e2 e3)    # e1!=0 ? e2 : e3
+     | (lambda (x1 ... xk) e)
+     | (let ((x1 e1) ... (xk ek)) e)
+     | (set! x e e)
+     | (dbg! e e)
+     | (e e1 ... ek)    # when |e| is none of above : function application
