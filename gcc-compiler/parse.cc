@@ -51,13 +51,18 @@ std::string parse_token(Cursor& p)
 // TODO(kinaba) hex?
 bool parse_int(const std::string& s, int* value)
 {
+	const char *p = s.c_str();
+	int sign = +1;
+	while(*p=='-') sign*=-1, ++p;
+	while(*p=='+') ++p;
+
 	int v = 0;
-	for(char c: s)
-		if('0'<=c && c<='9')
-			v = v*10 + (c-'0');
+	for(; *p; ++p)
+		if('0'<=*p && *p<='9')
+			v = v*10 + (*p-'0');
 		else
 			return false;
-	*value = v;
+	*value = sign * v;
 	return true;
 }
 
