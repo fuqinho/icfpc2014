@@ -14,17 +14,25 @@ class VarMap
 public:
 	VarMap(std::shared_ptr<VarMap> parent, const std::vector<std::string>& vars)
 		: parent(parent), vars(vars) {}
+	VarMap(std::shared_ptr<VarMap> parent, const std::vector<std::string>& vars,
+	       const std::vector<int>& param_nums)
+		: parent(parent), vars(vars), param_nums(param_nums) {}
 
 	bool resolve(const std::string& var, int* depth, int* index) const {
+		return resolve(var, depth, index, 0);
+	}
+	bool resolve(const std::string& var, int* depth, int* index, int* param_num) const {
 		auto it = std::find(vars.begin(), vars.end(), var);
 		if(it != vars.end()) {
 			*depth = 0;
 			*index = it - vars.begin();
+			if(param_num)
+				*param_num = *index < int(param_nums.size()) ? param_nums[*index] : -1;
 			return true;
 		}
 		if(!parent)
 			return false;
-		bool b = parent->resolve(var, depth, index);
+		bool b = parent->resolve(var, depth, index, param_num);
 		if(b)
 			++*depth;
 		return b;
@@ -33,6 +41,7 @@ public:
 private:
 	const std::shared_ptr<VarMap> parent;
 	std::vector<std::string> vars;
+	std::vector<int> param_nums;
 };
 
 typedef std::map<std::string, std::pair<
@@ -328,6 +337,16 @@ gcc::OperationSequence compile(ast::AST ast, const Context& ctx, IsTailPos tail)
 			for(size_t i=1; i<ast->list.size(); ++i)
 				gcc::Append(&ops, compile(ast->list[i], ctx, NOT_TAIL));
 			gcc::Append(&ops, compile(ast->list[0], ctx, NOT_TAIL));
+			{
+				// simple arg num check for global functions.
+				int de,in,pn;
+				if(ast->list[0]->type == ast::SYMBOL &&
+				   ctx.varmap->resolve(ast->list[0]->symbol, &de, &in, &pn) &&
+				   pn >= 0) {
+					compiler_assert(pn+1 == int(ast->list.size()), ast,
+						"Argument number mismatch: " << ast->list[0]->symbol);
+				}
+			}
 			if(tail)
 				gcc::Append(&ops, std::make_shared<gcc::OpTAP>(ast->list.size() - 1));
 			else
@@ -388,10 +407,14 @@ PreLink compile_program(const std::vector<ast::AST> defines)
 	std::shared_ptr<VarMap> init_varmap = std::make_shared<VarMap>(nil_varmap, init_vars);
 
 	std::vector<std::string> global_vars;
-	for(auto& kv: funcs)
+	std::vector<int> global_var_param_nums;
+	for(auto& kv: funcs) {
 		global_vars.push_back(kv.first);
+		global_var_param_nums.push_back(kv.second.first.size());
+	}
 	global_vars.push_back("__compiler_dummy__");
-	std::shared_ptr<VarMap> global_varmap = std::make_shared<VarMap>(init_varmap, global_vars);
+	std::shared_ptr<VarMap> global_varmap = std::make_shared<VarMap>(
+		init_varmap, global_vars, global_var_param_nums);
 
 	auto codeblocks = std::make_shared<std::vector<std::pair<gcc::OperationSequence,std::string>>>();
 
