@@ -26,7 +26,7 @@
 
 * Tuple decomposition
 
-    (let ((x y z tup)) e)  ::  x=car tup, y=car cdr tup, z=car cdr cdr tup, then e.
+    (let ((x y z tup)) e)  ::  x=car tup, y=car cdr tup, z=cdr cdr tup, then e.
 
 * Auto extension of Binary Operators
 
