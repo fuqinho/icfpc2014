@@ -55,7 +55,8 @@ bool parse_int(const std::string& s, int* value)
 	int sign = +1;
 	while(*p=='-') sign*=-1, ++p;
 	while(*p=='+') ++p;
-
+	if(!*p)
+		return false;
 	int v = 0;
 	for(; *p; ++p)
 		if('0'<=*p && *p<='9')
