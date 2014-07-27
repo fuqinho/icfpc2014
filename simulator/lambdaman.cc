@@ -3,6 +3,12 @@
 #include "ghost.h"
 #include "gamestate.h"
 
+#define USE_TEST_AI 0
+
+#if USE_TEST_AI
+#include "testai.h"
+#endif
+
 LambdaMan::LambdaMan() {
 }
 
@@ -22,6 +28,7 @@ void LambdaMan::Init(const GameState& game_state) {
 }
 
 Direction LambdaMan::GetNextDirection(const GameState& state) {
+#if !USE_TEST_AI
   Value result =
       gcc_.Run(gcc_.GetIp(step_function_),
                gcc_.GetEnv(step_function_),
@@ -31,6 +38,9 @@ Direction LambdaMan::GetNextDirection(const GameState& state) {
   ai_state_ = gcc_.ConsCar(result);
   Value direction = gcc_.ConsCdr(result);
   return static_cast<Direction>(direction.value);
+#else
+  return GetNextDirectionGreedy(state);
+#endif
 }
 
 Value LambdaMan::BuildWorld(const GameState& game_state) {
