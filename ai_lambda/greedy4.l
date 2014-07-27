@@ -1,3 +1,10 @@
+;; RAND
+(define (seed) 0)
+(define (rand) (set! seed (+ seed 1) seed))
+
+(define (tick) 0)
+(defmacro (set-tick! t e) (set! tick t e))
+
 ;; Boolean operation with short circuit.
 (defmacro (or x y) (if x 1 y))
 (defmacro (and x y) (if x y 0))
@@ -13,6 +20,9 @@
 
 ;; Returns an abs value of the given value.
 (define (abs a) (if (< a 0) (- 0 a) a))
+
+;; Returns modulo. Must be a > 0, b > 0.
+(define (mod a b) (- a (* (/ a b) b)))
 
 ;; Position operations.
 
@@ -160,9 +170,27 @@
 (define (get-ghost-list state)
   (car (cdr (cdr state))))
 
+;; Returns the fruit's vitality
+(define (get-fruit state)
+  (cdr (cdr (cdr state))))
+
 ;; Returns a tile in the map at the |pos|.
 (define (get-tile map pos)
   (nth (car pos) (nth (cdr pos) map)))
+
+;; Returns the number of remaining pills.
+(define (get-num-pills map)
+  (get-num-pills-iter map 0))
+
+(define (get-num-pills-iter map cnt)
+  (if (int? map) cnt
+    (get-num-pills-iter (cdr map) (get-num-pills-row (car map) cnt))))
+
+(define (get-num-pills-row row cnt)
+  (if (int? row)
+      cnt
+      (get-num-pills-row (cdr row)
+                         (if (= (car row) 2) (+ cnt 1) cnt))))
 
 ;; Returns opposite direction.
 (define (opposite dir)
@@ -189,29 +217,31 @@
    threashold
    cond
    (q-push start (cons 0 0))
-   (avl-add start (cons 0 5)
-            (if (int? extra-block)
-                0
-                (avl-add extra-block (cons 0 5) 0)))))
+   (avl-add start (cons 0 5) extra-block)))
 
 (define (bfs-iter map threashold cond q avl)
   (if (q-empty? q) 0
   (let ((pos0 q (q-pop q)))
   (let ((nextdist (+ (car (avl-find pos0 avl)) 1)))
   (if (> nextdist threashold) (bfs-iter map threashold cond q avl)
+  (let ((dir-seed (rand)))
+  (let ((dir0 (mod dir-seed 4))
+        (dir1 (mod (+ dir-seed 1) 4))
+        (dir2 (mod (+ dir-seed 2) 4))
+        (dir3 (mod (+ dir-seed 3) 4)))
   (let ((pos q avl
-         (bfs-iter2 map cond q avl (pos-add pos0 0) 0 nextdist)))
+         (bfs-iter2 map cond q avl (pos-add pos0 dir0) dir0 nextdist)))
   (if (not (int? pos)) (cons pos avl)
   (let ((pos q avl
-         (bfs-iter2 map cond q avl (pos-add pos0 1) 1 nextdist)))
+         (bfs-iter2 map cond q avl (pos-add pos0 dir1) dir1 nextdist)))
   (if (not (int? pos)) (cons pos avl)
   (let ((pos q avl
-         (bfs-iter2 map cond q avl (pos-add pos0 2) 2 nextdist)))
+         (bfs-iter2 map cond q avl (pos-add pos0 dir2) dir2 nextdist)))
   (if (not (int? pos)) (cons pos avl)
   (let ((pos q avl
-         (bfs-iter2 map cond q avl (pos-add pos0 3) 3 nextdist)))
+         (bfs-iter2 map cond q avl (pos-add pos0 dir3) dir3 nextdist)))
   (if (not (int? pos)) (cons pos avl)
-    (bfs-iter map threashold cond q avl))))))))))))))
+    (bfs-iter map threashold cond q avl))))))))))))))))
 
 (define (bfs-iter2 map cond q avl pos dir dist)
   (let ((tile (get-tile map pos)))
@@ -233,22 +263,25 @@
   (if (pos-eq? origin prev-pos) result
     (backtrack-iter prev-pos origin avl result)))))
 
-
-
 ;; Returns the distance.
-(define (find-nearest-ghost map start ghost-lst threashold extra-block)
+(define (find-nearest-ghost map start ghost-lst threashold)
+  (let ((bfs-result
+         (find-nearest-ghost-internal map start ghost-lst threashold)))
+  (if (int? bfs-result) 1000000
+  (let ((pos avl bfs-result))
+  (car (avl-find pos avl))))))
+
+;;
+(define (find-nearest-ghost-internal map start ghost-lst threashold)
   (let ((filtered-ghost-lst
          (lst-filter
             (lambda (ghost)
               (<= (pos-distance (car (cdr ghost)) start) threashold))
             ghost-lst)))
-  (if (int? filtered-ghost-lst) 100000000
-  (let ((bfs-result
-         (bfs map start threashold extra-block
-              (lambda (pos _) (is-ghost pos ghost-lst)))))
-  (if (int? bfs-result) 1000000
-  (let ((pos avl bfs-result))
-  (car (avl-find pos avl))))))))
+  (if (int? filtered-ghost-lst)
+    0
+    (bfs map start threashold 0
+         (lambda (pos _) (is-ghost pos ghost-lst))))))
 
 ;; Returns 1 if there is a ghost at |pos|.
 (define (is-ghost pos ghost-lst)
@@ -258,60 +291,140 @@
           1
           (is-ghost pos tl)))))
 
+;;
+(define (find-nearest-ghost-dir map start ghost-lst threashold)
+  (let ((ghost-lst
+         (lst-filter (lambda (ghost) (= (car ghost) 1)) ghost-lst)))
+  (let ((bfs-result
+         (find-nearest-ghost-internal map start ghost-lst threashold)))
+  (if (int? bfs-result) 5
+  (let ((pos avl bfs-result))
+  (car (backtrack pos start avl)))))))
+
+;; Look for the escape direction.
+(define (find-safe-direction map start ghost-lst)
+  (let ((danger-zone (build-danger-zone map ghost-lst 3))
+        (ghost-block (build-ghost-block ghost-lst 0)))
+  (let ((bfs-result
+         (bfs map start 10 ghost-block
+              (lambda (pos _) (int? (avl-find pos danger-zone))))))
+  (if (int? bfs-result) 0 ;; give-up to escape.
+  (let ((pos avl bfs-result))
+  (car (backtrack pos start avl)))))))
+
+(define (build-danger-zone map ghost-lst steps)
+  (build-danger-zone-iter map ghost-lst steps 0))
+
+(define (build-danger-zone-iter map ghost-lst steps result)
+  (if (int? ghost-lst) result
+  (let ((ghost ghost-lst ghost-lst))
+  (build-danger-zone-iter
+     map
+     ghost-lst
+     steps
+     (build-danger-zone-ghost
+          map (car (cdr ghost)) (cdr (cdr ghost)) steps result)))))
+
+(define (build-danger-zone-ghost map pos dir steps result)
+  (if (= (get-tile map pos) 0) result
+  (let ((result (avl-add pos (cons 1 steps) result))
+        (steps (- steps 1)))
+  (if (< steps 0) result
+  (let ((result
+         (if (= dir 2)
+             result
+             (build-danger-zone-ghost map (pos-add pos 0) 0 steps result))))
+  (let ((result
+         (if (= dir 3)
+             result
+             (build-danger-zone-ghost map (pos-add pos 1) 1 steps result))))
+  (let ((result
+         (if (= dir 0)
+             result
+             (build-danger-zone-ghost map (pos-add pos 2) 2 steps result))))
+  (let ((result
+         (if (= dir 1)
+             result
+             (build-danger-zone-ghost map (pos-add pos 3) 3 steps result))))
+  result))))))))
+
+(define (build-ghost-block ghost-lst result)
+  (if (int? ghost-lst) result
+      (build-ghost-block
+           (cdr ghost-lst)
+           (avl-add (car (cdr (car ghost-lst))) (cons 1000000 5) result))))
+
+;; Returns the direction toward a wall block.
+(define (find-wall-dir map pos)
+  (if (= (get-tile map (pos-add pos 0)) 0) 0
+  (if (= (get-tile map (pos-add pos 1)) 0) 1
+  (if (= (get-tile map (pos-add pos 2)) 0) 2
+  (if (= (get-tile map (pos-add pos 3)) 0) 3
+  ;; Not found. Retuns random dir.
+  (mod tick 4))))))
+
 ;; Main
-(define (main) (cons 0 get-next-direction))
+(define (main)
+  (set! seed 0 (set-tick! 127 (cons (cons 0 0) step-function))))
 
 ;; Step function.
+(define (step-function ai_state state)
+  (let ((result (get-next-direction ai_state state)))
+  (let ((next-pos (pos-add (lambda-pos state) (cdr result))))
+  (let ((tile (get-tile (get-map state) next-pos)))
+  (set-tick!
+     (+ tick
+        (if (or (= tile 2)
+                (or (= tile 3)
+                    (and (= tile 4) (> (get-fruit state) 0))))
+            137
+            127))
+     result)))))
+
 (define (get-next-direction ai_state state)
   (let ((origin (lambda-pos state))
         (map (get-map state))
-        (ghost-lst (get-ghost-list state)))
+        (ghost-lst (get-ghost-list state))
+        (fruit (get-fruit state)))
+  ;; Check if dangerous.
   (if (and (< (lambda-vitality state) (* 127 3))
-           (<= (find-nearest-ghost map origin ghost-lst 3 0) 3))
-      (cons 0 (find-farthest-ghost-direction map origin ghost-lst))
-      (if (not (int? ai_state)) (cons (cdr ai_state) (car ai_state))
-      (let ((pos avl
-                 (bfs map
-                      origin
-                      1000000000
-                      0
-                      (lambda (_ tile) (if (= tile 2) 1 (= tile 3))))))
-      (let ((trace (backtrack pos origin avl)))
-        (cons (cdr trace) (car trace))))))))
+           (<= (find-nearest-ghost map origin ghost-lst 3) 3))
+      ;; (cons 0 (find-farthest-ghost-direction map origin ghost-lst))
+      (let ((safe-direction (find-safe-direction map origin ghost-lst)))
+          (cons (cons 0 0) safe-direction))
 
-(define (find-farthest-ghost-direction map origin ghost-lst)
-  (let ((up (pos-add origin 0))
-        (right (pos-add origin 1))
-        (down (pos-add origin 2))
-        (left (pos-add origin 3)))
-  (let ((up-distance
-         (if (= (get-tile map up) 0)
-             0
-             (find-nearest-ghost map up ghost-lst 10 origin)))
-        (right-distance
-         (if (= (get-tile map right) 0)
-             0
-             (find-nearest-ghost map right ghost-lst 10 origin)))
-        (down-distance
-         (if (= (get-tile map down) 0)
-             0
-             (find-nearest-ghost map down ghost-lst 10 origin)))
-        (left-distance
-         (if (= (get-tile map left) 0)
-             0
-             (find-nearest-ghost map left ghost-lst 10 origin))))
-  (let ((farthest-distance up-distance)
-        (farthest-direction 0))
-  (let ((farthest-distance farthest-direction
-        (if (> right-distance farthest-distance)
-            (cons right-distance 1)
-            (cons farthest-distance farthest-direction))))
-  (let ((farthest-distance farthest-direction
-        (if (> down-distance farthest-distance)
-            (cons down-distance 2)
-            (cons farthest-distance farthest-direction))))
-  (let ((farthest-distance farthest-direction
-        (if (> left-distance farthest-distance)
-            (cons left-distance 3)
-            (cons farthest-distance farthest-direction))))
-  farthest-direction)))))))
+  ;; Power mode.
+  (let ((plan
+         (if (< (lambda-vitality state) (* 127 3)) 5
+         (find-nearest-ghost-dir map origin ghost-lst 7))))
+  (if (< plan 4) (cons (cons 0 0) plan)
+
+  ;; Look up cache.
+  (if (and (= (> fruit 0) (car ai_state))
+           (not (int? (cdr ai_state))))
+      (cons (cons (car ai_state) (cdr (cdr ai_state)))
+            (car (cdr ai_state)))
+
+  ;; Look for fruit.
+  (if (or (> fruit 0)
+          (and (= (get-num-pills map) 1) (< tick 50800)))  ;; = 400 * 127
+      (if (= (get-tile map origin) 4)  ;; If lambda is at fruit position.
+          (cons (cons (> fruit 0) 0) (find-wall-dir map origin))
+          (let ((pos avl
+                     (bfs map
+                          origin
+                          100000000
+                          (build-ghost-block ghost-lst 0)
+                          (lambda (_ tile) (= tile 4)))))
+          (let ((trace (backtrack pos origin avl)))
+          (cons (cons (> fruit 0) (cdr trace)) (car trace)))))
+
+  ;; Find nearest Pill.
+  (let ((pos avl
+             (bfs map
+                  origin
+                  1000000000
+                  0
+                  (lambda (_ tile) (if (= tile 2) 1 (= tile 3))))))
+  (let ((trace (backtrack pos origin avl)))
+    (cons (cons (> fruit 0) (cdr trace)) (car trace)))))))))))

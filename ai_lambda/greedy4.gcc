@@ -1,184 +1,218 @@
-DUM 40
-LDF 43
-LDF 51
+DUM 56
 LDF 59
+LDF 61
+LDF 67
 LDF 69
-LDF 81
-LDF 103
-LDF 109
-LDF 135
-LDF 139
-LDF 153
-LDF 177
-LDF 180
-LDF 207
-LDF 217
-LDF 221
-LDF 230
-LDF 246
-LDF 383
-LDF 444
-LDF 481
-LDF 502
-LDF 505
-LDF 511
-LDF 516
-LDF 519
-LDF 524
-LDF 549
-LDF 593
-LDF 597
-LDF 613
-LDF 804
-LDF 859
-LDF 865
-LDF 893
-LDF 946
-LDF 975
-LDF 978
-LDF 1059
-LDF 1203
+LDF 77
+LDF 85
+LDF 95
+LDF 99
+LDF 115
+LDF 137
+LDF 143
+LDF 169
+LDF 173
+LDF 187
+LDF 211
+LDF 214
+LDF 241
+LDF 251
+LDF 255
+LDF 264
+LDF 280
+LDF 417
+LDF 478
+LDF 515
+LDF 536
+LDF 539
+LDF 545
+LDF 550
+LDF 553
+LDF 558
+LDF 563
+LDF 572
+LDF 587
+LDF 607
+LDF 626
+LDF 670
+LDF 674
+LDF 680
+LDF 897
+LDF 952
+LDF 958
+LDF 986
+LDF 1012
+LDF 1045
+LDF 1074
+LDF 1110
+LDF 1151
+LDF 1162
+LDF 1194
+LDF 1295
+LDF 1318
+LDF 1363
+LDF 1373
+LDF 1436
+LDF 1648
 LDC 12345678
-LDF 1221
-TRAP 40
-LD 0 0		; [43] not
+LDF 1662
+TRAP 56
+LDC 0		; [59] seed
+RTN
+LD 1 0		; [61] rand
+LDC 1
+ADD
+ST 1 0
+LD 1 0
+RTN
+LDC 0		; [67] tick
+RTN
+LD 0 0		; [69] not
 LDC 0
 CEQ
 RTN
-LD 0 0		; [47] (max-then)
+LD 0 0		; [73] (max-then)
 RTN
-LD 0 1		; [49] (max-else)
+LD 0 1		; [75] (max-else)
 RTN
-LD 0 0		; [51] max
+LD 0 0		; [77] max
 LD 0 1
 CGT
-TSEL 47 49
-LD 0 0		; [55] (min-then)
+TSEL 73 75
+LD 0 0		; [81] (min-then)
 RTN
-LD 0 1		; [57] (min-else)
+LD 0 1		; [83] (min-else)
 RTN
-LD 0 1		; [59] min
+LD 0 1		; [85] min
 LD 0 0
 CGT
-TSEL 55 57
-LDC 0		; [63] (abs-then)
+TSEL 81 83
+LDC 0		; [89] (abs-then)
 LD 0 0
 SUB
 RTN
-LD 0 0		; [67] (abs-else)
+LD 0 0		; [93] (abs-else)
 RTN
-LDC 0		; [69] abs
+LDC 0		; [95] abs
 LD 0 0
 CGT
-TSEL 63 67
-LD 0 0		; [73] (pos-eq?-then)
+TSEL 89 93
+LD 0 0		; [99] mod
+LD 0 0
+LD 0 1
+DIV
+LD 0 1
+MUL
+SUB
+RTN
+LD 0 0		; [107] (pos-eq?-then)
 CDR
 LD 0 1
 CDR
 CEQ
 RTN
-LDC 0		; [79] (pos-eq?-else)
+LDC 0		; [113] (pos-eq?-else)
 RTN
-LD 0 0		; [81] pos-eq?
+LD 0 0		; [115] pos-eq?
 CAR
 LD 0 1
 CAR
 CEQ
-TSEL 73 79
-LDC 1		; [87] (pos-lt?-then)
+TSEL 107 113
+LDC 1		; [121] (pos-lt?-then)
 RTN
-LD 0 1		; [89] (pos-lt?-then)
+LD 0 1		; [123] (pos-lt?-then)
 CDR
 LD 0 0
 CDR
 CGT
 RTN
-LDC 0		; [95] (pos-lt?-else)
+LDC 0		; [129] (pos-lt?-else)
 RTN
-LD 0 0		; [97] (pos-lt?-else)
+LD 0 0		; [131] (pos-lt?-else)
 CAR
 LD 0 1
 CAR
 CEQ
-TSEL 89 95
-LD 0 1		; [103] pos-lt?
+TSEL 123 129
+LD 0 1		; [137] pos-lt?
 CAR
 LD 0 0
 CAR
 CGT
-TSEL 87 97
-LD 0 0		; [109] pos-distance
+TSEL 121 131
+LD 0 0		; [143] pos-distance
 CAR
 LD 0 1
 CAR
 SUB
-LD 1 3
+LD 1 6
 AP 1
 LD 0 0
 CDR
 LD 0 1
 CDR
 SUB
-LD 1 3
+LD 1 6
 AP 1
 ADD
 RTN
-LD 0 1		; [125] (nth-then)
+LD 0 1		; [159] (nth-then)
 CAR
 RTN
-LD 0 0		; [128] (nth-else)
+LD 0 0		; [162] (nth-else)
 LDC 1
 SUB
 LD 0 1
 CDR
-LD 1 7
+LD 1 11
 TAP 2
-LD 0 0		; [135] nth
+LD 0 0		; [169] nth
 LDC 0
 CEQ
-TSEL 125 128
-LD 0 0		; [139] lst-rev
+TSEL 159 162
+LD 0 0		; [173] lst-rev
 LDC 0
-LD 1 9
+LD 1 13
 TAP 2
-LD 0 1		; [143] (lst-rev-internal-then)
+LD 0 1		; [177] (lst-rev-internal-then)
 RTN
-LD 0 0		; [145] (lst-rev-internal-else)
+LD 0 0		; [179] (lst-rev-internal-else)
 CDR
 LD 0 0
 CAR
 LD 0 1
 CONS
-LD 1 9
+LD 1 13
 TAP 2
-LD 0 0		; [153] lst-rev-internal
+LD 0 0		; [187] lst-rev-internal
 ATOM
-TSEL 143 145
-LDC 0		; [156] (lst-filter-then)
+TSEL 177 179
+LDC 0		; [190] (lst-filter-then)
 RTN
-LD 0 1		; [158] (lst-filter-then)
+LD 0 1		; [192] (lst-filter-then)
 CAR
 LD 0 0
 LD 0 1
 CDR
-LD 1 10
+LD 1 14
 AP 2
 CONS
 RTN
-LD 0 0		; [167] (lst-filter-else)
+LD 0 0		; [201] (lst-filter-else)
 LD 0 1
 CDR
-LD 1 10
+LD 1 14
 TAP 2
-LD 0 1		; [172] (lst-filter-else)
+LD 0 1		; [206] (lst-filter-else)
 CAR
 LD 0 0
 AP 1
-TSEL 158 167
-LD 0 1		; [177] lst-filter
+TSEL 192 201
+LD 0 1		; [211] lst-filter
 ATOM
-TSEL 156 172
-LD 0 0		; [180] q-push
+TSEL 190 206
+LD 0 0		; [214] q-push
 LD 0 1
 CAR
 CONS
@@ -186,15 +220,15 @@ LD 0 1
 CDR
 CONS
 RTN
-LDC 0		; [188] (q-pop-then)
+LDC 0		; [222] (q-pop-then)
 LD 0 0
 CAR
-LD 1 8
-AP 1
-CONS
 LD 1 12
+AP 1
+CONS
+LD 1 16
 TAP 1
-LD 0 0		; [196] (q-pop-else)
+LD 0 0		; [230] (q-pop-else)
 CDR
 CAR
 LD 0 0
@@ -205,36 +239,36 @@ CDR
 CONS
 CONS
 RTN
-LD 0 0		; [207] q-pop
+LD 0 0		; [241] q-pop
 CDR
 ATOM
-TSEL 188 196
-LD 0 0		; [211] (q-empty?-then)
+TSEL 222 230
+LD 0 0		; [245] (q-empty?-then)
 CDR
 ATOM
 RTN
-LDC 0		; [215] (q-empty?-else)
+LDC 0		; [249] (q-empty?-else)
 RTN
-LD 0 0		; [217] q-empty?
+LD 0 0		; [251] q-empty?
 CAR
 ATOM
-TSEL 211 215
-LD 0 0		; [221] avl-empty?
+TSEL 245 249
+LD 0 0		; [255] avl-empty?
 ATOM
 RTN
-LDC 0		; [224] (avl-height-then)
+LDC 0		; [258] (avl-height-then)
 RTN
-LD 0 0		; [226] (avl-height-else)
+LD 0 0		; [260] (avl-height-else)
 CAR
 CDR
 RTN
-LD 0 0		; [230] avl-height
+LD 0 0		; [264] avl-height
 ATOM
-TSEL 224 226
-LD 1 0		; [233] (avl-create-let)
+TSEL 258 260
+LD 1 0		; [267] (avl-create-let)
 LD 0 0
 LD 0 1
-LD 2 1
+LD 2 4
 AP 2
 LDC 1
 ADD
@@ -244,37 +278,37 @@ LD 1 2
 CONS
 CONS
 RTN
-LD 0 1		; [246] avl-create
-LD 1 15
+LD 0 1		; [280] avl-create
+LD 1 19
 AP 1
 LD 0 2
-LD 1 15
+LD 1 19
 AP 1
-LDF 233
+LDF 267
 TAP 2
-LD 0 0		; [254] (avl-bal-then)
+LD 0 0		; [288] (avl-bal-then)
 LD 0 1
 LD 2 0
 LD 0 2
 LD 2 2
-LD 3 16
+LD 3 20
 AP 3
-LD 3 16
+LD 3 20
 TAP 3
-LD 0 0		; [263] (avl-bal-let)
+LD 0 0		; [297] (avl-bal-let)
 LD 1 0
 LD 1 1
 LD 0 1
-LD 4 16
+LD 4 20
 AP 3
 LD 3 0
 LD 0 2
 LD 3 2
-LD 4 16
+LD 4 20
 AP 3
-LD 4 16
+LD 4 20
 TAP 3
-LD 0 2		; [276] (avl-bal-else)
+LD 0 2		; [310] (avl-bal-else)
 CAR
 CAR
 LD 0 2
@@ -283,17 +317,17 @@ CAR
 LD 0 2
 CDR
 CDR
-LDF 263
+LDF 297
 TAP 3
-LD 0 1		; [287] (avl-bal-let)
-LD 3 15
+LD 0 1		; [321] (avl-bal-let)
+LD 3 19
 AP 1
 LD 0 2
-LD 3 15
+LD 3 19
 AP 1
 CGTE
-TSEL 254 276
-LD 1 1		; [295] (avl-bal-then)
+TSEL 288 310
+LD 1 1		; [329] (avl-bal-then)
 CAR
 CAR
 LD 1 1
@@ -302,31 +336,31 @@ CAR
 LD 1 1
 CDR
 CDR
-LDF 287
+LDF 321
 TAP 3
-LD 0 0		; [306] (avl-bal-then)
+LD 0 0		; [340] (avl-bal-then)
 LD 2 0
 LD 2 1
 LD 0 1
-LD 3 16
+LD 3 20
 AP 3
 LD 0 2
-LD 3 16
+LD 3 20
 TAP 3
-LD 0 0		; [315] (avl-bal-let)
+LD 0 0		; [349] (avl-bal-let)
 LD 3 0
 LD 3 1
 LD 0 1
-LD 4 16
+LD 4 20
 AP 3
 LD 1 0
 LD 0 2
 LD 1 2
-LD 4 16
+LD 4 20
 AP 3
-LD 4 16
+LD 4 20
 TAP 3
-LD 0 1		; [328] (avl-bal-else)
+LD 0 1		; [362] (avl-bal-else)
 CAR
 CAR
 LD 0 1
@@ -335,17 +369,17 @@ CAR
 LD 0 1
 CDR
 CDR
-LDF 315
+LDF 349
 TAP 3
-LD 0 2		; [339] (avl-bal-let)
-LD 3 15
+LD 0 2		; [373] (avl-bal-let)
+LD 3 19
 AP 1
 LD 0 1
-LD 3 15
+LD 3 19
 AP 1
 CGTE
-TSEL 306 328
-LD 1 2		; [347] (avl-bal-then)
+TSEL 340 362
+LD 1 2		; [381] (avl-bal-then)
 CAR
 CAR
 LD 1 2
@@ -354,204 +388,247 @@ CAR
 LD 1 2
 CDR
 CDR
-LDF 339
+LDF 373
 TAP 3
-LD 1 0		; [358] (avl-bal-else)
+LD 1 0		; [392] (avl-bal-else)
 LD 0 0
 LD 0 1
-LD 2 1
-AP 2
-LDC 1
-ADD
-CONS
-LD 1 1
-LD 1 2
-CONS
-CONS
-RTN
-LD 0 1		; [371] (avl-bal-else)
-LD 0 0
-LDC 2
-ADD
-CGT
-TSEL 347 358
-LD 0 0		; [377] (avl-bal-let)
-LD 0 1
-LDC 2
-ADD
-CGT
-TSEL 295 371
-LD 0 1		; [383] avl-bal
-LD 1 15
-AP 1
-LD 0 2
-LD 1 15
-AP 1
-LDF 377
-TAP 2
-LD 0 0		; [391] (avl-add-then)
-LD 0 1
-CONS
-LDC 1
-CONS
-LDC 0
-LDC 0
-CONS
-CONS
-RTN
-LD 1 2		; [401] (avl-add-then)
-RTN
-LD 0 0		; [403] (avl-add-then)
-LD 1 0
-LD 1 1
-LD 0 1
-LD 2 18
-AP 3
-LD 0 2
-LD 2 17
-TAP 3
-LD 0 0		; [412] (avl-add-else)
-LD 0 1
-LD 1 0
-LD 1 1
-LD 0 2
-LD 2 18
-AP 3
-LD 2 17
-TAP 3
-LD 1 0		; [421] (avl-add-else)
-LD 0 0
-CAR
-LD 2 5
-AP 2
-TSEL 403 412
-LD 1 0		; [427] (avl-add-let)
-LD 0 0
-CAR
 LD 2 4
 AP 2
-TSEL 401 421
-LD 0 2		; [433] (avl-add-else)
-CAR
-CAR
+LDC 1
+ADD
+CONS
+LD 1 1
+LD 1 2
+CONS
+CONS
+RTN
+LD 0 1		; [405] (avl-bal-else)
+LD 0 0
+LDC 2
+ADD
+CGT
+TSEL 381 392
+LD 0 0		; [411] (avl-bal-let)
+LD 0 1
+LDC 2
+ADD
+CGT
+TSEL 329 405
+LD 0 1		; [417] avl-bal
+LD 1 19
+AP 1
 LD 0 2
-CDR
-CAR
+LD 1 19
+AP 1
+LDF 411
+TAP 2
+LD 0 0		; [425] (avl-add-then)
+LD 0 1
+CONS
+LDC 1
+CONS
+LDC 0
+LDC 0
+CONS
+CONS
+RTN
+LD 1 2		; [435] (avl-add-then)
+RTN
+LD 0 0		; [437] (avl-add-then)
+LD 1 0
+LD 1 1
+LD 0 1
+LD 2 22
+AP 3
 LD 0 2
-CDR
-CDR
-LDF 427
+LD 2 21
 TAP 3
-LD 0 2		; [444] avl-add
+LD 0 0		; [446] (avl-add-else)
+LD 0 1
+LD 1 0
+LD 1 1
+LD 0 2
+LD 2 22
+AP 3
+LD 2 21
+TAP 3
+LD 1 0		; [455] (avl-add-else)
+LD 0 0
+CAR
+LD 2 9
+AP 2
+TSEL 437 446
+LD 1 0		; [461] (avl-add-let)
+LD 0 0
+CAR
+LD 2 8
+AP 2
+TSEL 435 455
+LD 0 2		; [467] (avl-add-else)
+CAR
+CAR
+LD 0 2
+CDR
+CAR
+LD 0 2
+CDR
+CDR
+LDF 461
+TAP 3
+LD 0 2		; [478] avl-add
 ATOM
-TSEL 391 433
-LDC 0		; [447] (avl-find-then)
+TSEL 425 467
+LDC 0		; [481] (avl-find-then)
 RTN
-LD 0 0		; [449] (avl-find-then)
+LD 0 0		; [483] (avl-find-then)
 CDR
 RTN
-LD 1 0		; [452] (avl-find-then)
+LD 1 0		; [486] (avl-find-then)
 LD 1 1
 CDR
 CAR
-LD 2 19
+LD 2 23
 TAP 2
-LD 1 0		; [458] (avl-find-else)
+LD 1 0		; [492] (avl-find-else)
 LD 1 1
 CDR
 CDR
-LD 2 19
+LD 2 23
 TAP 2
-LD 1 0		; [464] (avl-find-else)
+LD 1 0		; [498] (avl-find-else)
 LD 0 0
 CAR
-LD 2 5
+LD 2 9
 AP 2
-TSEL 452 458
-LD 1 0		; [470] (avl-find-let)
+TSEL 486 492
+LD 1 0		; [504] (avl-find-let)
 LD 0 0
 CAR
-LD 2 4
+LD 2 8
 AP 2
-TSEL 449 464
-LD 0 1		; [476] (avl-find-else)
+TSEL 483 498
+LD 0 1		; [510] (avl-find-else)
 CAR
 CAR
-LDF 470
+LDF 504
 TAP 1
-LD 0 1		; [481] avl-find
+LD 0 1		; [515] avl-find
 ATOM
-TSEL 447 476
-LDC 0		; [484] (find-then)
+TSEL 481 510
+LDC 0		; [518] (find-then)
 RTN
-LD 0 1		; [486] (find-then)
+LD 0 1		; [520] (find-then)
 CAR
 CDR
 RTN
-LD 0 0		; [490] (find-else)
+LD 0 0		; [524] (find-else)
 LD 0 1
 CDR
-LD 1 20
+LD 1 24
 TAP 2
-LD 0 0		; [495] (find-else)
+LD 0 0		; [529] (find-else)
 LD 0 1
 CAR
 CAR
-LD 1 4
+LD 1 8
 AP 2
-TSEL 486 490
-LD 0 1		; [502] find
+TSEL 520 524
+LD 0 1		; [536] find
 ATOM
-TSEL 484 495
-LD 0 0		; [505] lambda-pos
+TSEL 518 529
+LD 0 0		; [539] lambda-pos
 CDR
 CAR
 CDR
 CAR
 RTN
-LD 0 0		; [511] lambda-vitality
+LD 0 0		; [545] lambda-vitality
 CDR
 CAR
 CAR
 RTN
-LD 0 0		; [516] get-map
+LD 0 0		; [550] get-map
 CAR
 RTN
-LD 0 0		; [519] get-ghost-list
+LD 0 0		; [553] get-ghost-list
 CDR
 CDR
 CAR
 RTN
-LD 0 1		; [524] get-tile
+LD 0 0		; [558] get-fruit
+CDR
+CDR
+CDR
+RTN
+LD 0 1		; [563] get-tile
 CAR
 LD 0 1
 CDR
 LD 0 0
-LD 1 7
+LD 1 11
 AP 2
-LD 1 7
+LD 1 11
 TAP 2
-LDC 2		; [533] (opposite-then)
+LD 0 0		; [572] get-num-pills
+LDC 0
+LD 1 32
+TAP 2
+LD 0 1		; [576] (get-num-pills-iter-then)
 RTN
-LDC 3		; [535] (opposite-then)
+LD 0 0		; [578] (get-num-pills-iter-else)
+CDR
+LD 0 0
+CAR
+LD 0 1
+LD 1 33
+AP 2
+LD 1 32
+TAP 2
+LD 0 0		; [587] get-num-pills-iter
+ATOM
+TSEL 576 578
+LD 0 1		; [590] (get-num-pills-row-then)
 RTN
-LDC 0		; [537] (opposite-then)
-RTN
-LDC 1		; [539] (opposite-else)
-RTN
-LD 0 0		; [541] (opposite-else)
+LD 0 1		; [592] (get-num-pills-row-then)
+LDC 1
+ADD
+JOIN
+LD 0 1		; [596] (get-num-pills-row-else)
+JOIN
+LD 0 0		; [598] (get-num-pills-row-else)
+CDR
+LD 0 0
+CAR
 LDC 2
 CEQ
-TSEL 537 539
-LD 0 0		; [545] (opposite-else)
+SEL 592 596
+LD 1 33
+TAP 2
+LD 0 0		; [607] get-num-pills-row
+ATOM
+TSEL 590 598
+LDC 2		; [610] (opposite-then)
+RTN
+LDC 3		; [612] (opposite-then)
+RTN
+LDC 0		; [614] (opposite-then)
+RTN
+LDC 1		; [616] (opposite-else)
+RTN
+LD 0 0		; [618] (opposite-else)
+LDC 2
+CEQ
+TSEL 614 616
+LD 0 0		; [622] (opposite-else)
 LDC 1
 CEQ
-TSEL 535 541
-LD 0 0		; [549] opposite
+TSEL 612 618
+LD 0 0		; [626] opposite
 LDC 0
 CEQ
-TSEL 533 545
-LD 0 0		; [553] (pos-add-then)
+TSEL 610 622
+LD 0 0		; [630] (pos-add-then)
 CAR
 LD 0 0
 CDR
@@ -559,7 +636,7 @@ LDC 1
 SUB
 CONS
 RTN
-LD 0 0		; [561] (pos-add-then)
+LD 0 0		; [638] (pos-add-then)
 CAR
 LDC 1
 ADD
@@ -567,7 +644,7 @@ LD 0 0
 CDR
 CONS
 RTN
-LD 0 0		; [569] (pos-add-then)
+LD 0 0		; [646] (pos-add-then)
 CAR
 LD 0 0
 CDR
@@ -575,7 +652,7 @@ LDC 1
 ADD
 CONS
 RTN
-LD 0 0		; [577] (pos-add-else)
+LD 0 0		; [654] (pos-add-else)
 CAR
 LDC 1
 SUB
@@ -583,641 +660,1005 @@ LD 0 0
 CDR
 CONS
 RTN
-LD 0 1		; [585] (pos-add-else)
+LD 0 1		; [662] (pos-add-else)
 LDC 2
 CEQ
-TSEL 569 577
-LD 0 1		; [589] (pos-add-else)
+TSEL 646 654
+LD 0 1		; [666] (pos-add-else)
 LDC 1
 CEQ
-TSEL 561 585
-LD 0 1		; [593] pos-add
+TSEL 638 662
+LD 0 1		; [670] pos-add
 LDC 0
 CEQ
-TSEL 553 589
-LD 0 0		; [597] pos-sub
+TSEL 630 666
+LD 0 0		; [674] pos-sub
 LD 0 1
-LD 1 26
+LD 1 34
 AP 1
-LD 1 27
+LD 1 35
 TAP 2
-LDC 0		; [603] (bfs-then)
-JOIN
-LD 0 3		; [605] (bfs-else)
-LDC 0
-LDC 5
-CONS
-LDC 0
-LD 1 18
-AP 3
-JOIN
-LD 0 0		; [613] bfs
+LD 0 0		; [680] bfs
 LD 0 2
 LD 0 4
 LD 0 1
 LDC 0
 LDC 0
 CONS
-LD 1 11
+LD 1 15
 AP 2
 LD 0 1
 LDC 0
 LDC 5
 CONS
 LD 0 3
-ATOM
-SEL 603 605
-LD 1 18
+LD 1 22
 AP 3
-LD 1 30
+LD 1 38
 TAP 5
-LDC 0		; [633] (bfs-iter-then)
+LDC 0		; [698] (bfs-iter-then)
 RTN
-LD 2 0		; [635] (bfs-iter-then)
+LD 2 0		; [700] (bfs-iter-then)
 LD 2 1
 LD 2 2
 LD 1 1
 LD 2 4
-LD 3 30
+LD 3 38
 TAP 5
-LD 0 0		; [642] (bfs-iter-then)
+LD 0 0		; [707] (bfs-iter-then)
 LD 0 2
 CONS
 RTN
-LD 0 0		; [646] (bfs-iter-then)
+LD 0 0		; [711] (bfs-iter-then)
 LD 0 2
 CONS
 RTN
-LD 0 0		; [650] (bfs-iter-then)
+LD 0 0		; [715] (bfs-iter-then)
 LD 0 2
 CONS
 RTN
-LD 0 0		; [654] (bfs-iter-then)
+LD 0 0		; [719] (bfs-iter-then)
 LD 0 2
 CONS
 RTN
-LD 6 0		; [658] (bfs-iter-else)
-LD 6 1
+LD 8 0		; [723] (bfs-iter-else)
+LD 8 1
+LD 8 2
+LD 0 1
+LD 0 2
+LD 9 38
+TAP 5
+LD 0 0		; [730] (bfs-iter-let)
+ATOM
+LD 9 3
+AP 1
+TSEL 719 723
+LD 7 0		; [735] (bfs-iter-else)
+LD 7 2
+LD 0 1
+LD 0 2
+LD 6 0
+LD 3 3
+LD 8 35
+AP 2
+LD 3 3
+LD 5 0
+LD 8 39
+AP 7
+ST 8 55
+LD 8 55
+CAR
+LD 8 55
+CDR
+ST 8 55
+LD 8 55
+CAR
+LD 8 55
+CDR
+LDF 730
+TAP 3
+LD 0 0		; [759] (bfs-iter-let)
+ATOM
+LD 8 3
+AP 1
+TSEL 715 735
+LD 6 0		; [764] (bfs-iter-else)
 LD 6 2
 LD 0 1
 LD 0 2
-LD 7 30
-TAP 5
-LD 0 0		; [665] (bfs-iter-let)
+LD 5 0
+LD 2 2
+LD 7 35
+AP 2
+LD 2 2
+LD 4 0
+LD 7 39
+AP 7
+ST 7 55
+LD 7 55
+CAR
+LD 7 55
+CDR
+ST 7 55
+LD 7 55
+CAR
+LD 7 55
+CDR
+LDF 759
+TAP 3
+LD 0 0		; [788] (bfs-iter-let)
 ATOM
-LD 7 0
+LD 7 3
 AP 1
-TSEL 654 658
-LD 5 0		; [670] (bfs-iter-else)
+TSEL 711 764
+LD 5 0		; [793] (bfs-iter-else)
 LD 5 2
 LD 0 1
 LD 0 2
 LD 4 0
-LDC 3
-LD 6 27
-AP 2
-LDC 3
-LD 3 0
-LD 6 31
-AP 7
-ST 6 39
-LD 6 39
-CAR
-LD 6 39
-CDR
-ST 6 39
-LD 6 39
-CAR
-LD 6 39
-CDR
-LDF 665
-TAP 3
-LD 0 0		; [694] (bfs-iter-let)
-ATOM
-LD 6 0
-AP 1
-TSEL 650 670
-LD 4 0		; [699] (bfs-iter-else)
-LD 4 2
-LD 0 1
-LD 0 2
-LD 3 0
-LDC 2
-LD 5 27
-AP 2
-LDC 2
-LD 2 0
-LD 5 31
-AP 7
-ST 5 39
-LD 5 39
-CAR
-LD 5 39
-CDR
-ST 5 39
-LD 5 39
-CAR
-LD 5 39
-CDR
-LDF 694
-TAP 3
-LD 0 0		; [723] (bfs-iter-let)
-ATOM
-LD 5 0
-AP 1
-TSEL 646 699
-LD 3 0		; [728] (bfs-iter-else)
-LD 3 2
-LD 0 1
-LD 0 2
-LD 2 0
-LDC 1
-LD 4 27
-AP 2
-LDC 1
-LD 1 0
-LD 4 31
-AP 7
-ST 4 39
-LD 4 39
-CAR
-LD 4 39
-CDR
-ST 4 39
-LD 4 39
-CAR
-LD 4 39
-CDR
-LDF 723
-TAP 3
-LD 0 0		; [752] (bfs-iter-let)
-ATOM
-LD 4 0
-AP 1
-TSEL 642 728
-LD 2 0		; [757] (bfs-iter-else)
-LD 2 2
 LD 1 1
-LD 2 4
-LD 1 0
-LDC 0
-LD 3 27
+LD 6 35
 AP 2
-LDC 0
-LD 0 0
-LD 3 31
+LD 1 1
+LD 3 0
+LD 6 39
 AP 7
-ST 3 39
-LD 3 39
+ST 6 55
+LD 6 55
 CAR
-LD 3 39
+LD 6 55
 CDR
-ST 3 39
-LD 3 39
+ST 6 55
+LD 6 55
 CAR
-LD 3 39
+LD 6 55
 CDR
-LDF 752
+LDF 788
 TAP 3
-LD 0 0		; [781] (bfs-iter-let)
+LD 0 0		; [817] (bfs-iter-let)
+ATOM
+LD 6 3
+AP 1
+TSEL 707 793
+LD 4 0		; [822] (bfs-iter-let)
+LD 4 2
+LD 3 1
+LD 4 4
+LD 3 0
+LD 0 0
+LD 5 35
+AP 2
+LD 0 0
+LD 2 0
+LD 5 39
+AP 7
+ST 5 55
+LD 5 55
+CAR
+LD 5 55
+CDR
+ST 5 55
+LD 5 55
+CAR
+LD 5 55
+CDR
+LDF 817
+TAP 3
+LD 0 0		; [846] (bfs-iter-let)
+LDC 4
+LD 4 7
+AP 2
+LD 0 0
+LDC 1
+ADD
+LDC 4
+LD 4 7
+AP 2
+LD 0 0
+LDC 2
+ADD
+LDC 4
+LD 4 7
+AP 2
+LD 0 0
+LDC 3
+ADD
+LDC 4
+LD 4 7
+AP 2
+LDF 822
+TAP 4
+LD 3 1		; [870] (bfs-iter-else)
+AP 0
+LDF 846
+TAP 1
+LD 0 0		; [874] (bfs-iter-let)
 LD 2 1
 CGT
-TSEL 635 757
-LD 0 0		; [785] (bfs-iter-let)
+TSEL 700 870
+LD 0 0		; [878] (bfs-iter-let)
 LD 1 4
-LD 2 19
+LD 2 23
 AP 2
 CAR
 LDC 1
 ADD
-LDF 781
+LDF 874
 TAP 1
-LD 0 3		; [794] (bfs-iter-else)
-LD 1 12
+LD 0 3		; [887] (bfs-iter-else)
+LD 1 16
 AP 1
-ST 1 39
-LD 1 39
+ST 1 55
+LD 1 55
 CAR
-LD 1 39
+LD 1 55
 CDR
-LDF 785
+LDF 878
 TAP 2
-LD 0 3		; [804] bfs-iter
-LD 1 13
+LD 0 3		; [897] bfs-iter
+LD 1 17
 AP 1
-TSEL 633 794
-LDC 1		; [808] (bfs-iter2-then)
+TSEL 698 887
+LDC 1		; [901] (bfs-iter2-then)
 JOIN
-LD 1 4		; [810] (bfs-iter2-else)
+LD 1 4		; [903] (bfs-iter2-else)
 LD 1 3
-LD 2 19
+LD 2 23
 AP 2
 ATOM
-LD 2 0
+LD 2 3
 AP 1
 JOIN
-LDC 0		; [818] (bfs-iter2-then)
+LDC 0		; [911] (bfs-iter2-then)
 LD 1 2
 LD 1 3
 CONS
 CONS
 RTN
-LD 2 4		; [824] (bfs-iter2-then)
+LD 2 4		; [917] (bfs-iter2-then)
 LD 0 0
 LD 0 1
 CONS
 CONS
 RTN
-LDC 0		; [830] (bfs-iter2-else)
+LDC 0		; [923] (bfs-iter2-else)
 LD 0 0
 LD 0 1
 CONS
 CONS
 RTN
-LD 2 4		; [836] (bfs-iter2-let)
+LD 2 4		; [929] (bfs-iter2-let)
 LD 1 0
 LD 2 1
 AP 2
-TSEL 824 830
-LD 1 4		; [841] (bfs-iter2-else)
+TSEL 917 923
+LD 1 4		; [934] (bfs-iter2-else)
 LD 1 2
-LD 2 11
+LD 2 15
 AP 2
 LD 1 4
 LD 1 6
 LD 1 5
 CONS
 LD 1 3
-LD 2 18
+LD 2 22
 AP 3
-LDF 836
+LDF 929
 TAP 2
-LD 0 0		; [854] (bfs-iter2-let)
+LD 0 0		; [947] (bfs-iter2-let)
 LDC 0
 CEQ
-SEL 808 810
-TSEL 818 841
-LD 0 0		; [859] bfs-iter2
+SEL 901 903
+TSEL 911 934
+LD 0 0		; [952] bfs-iter2
 LD 0 4
-LD 1 25
+LD 1 30
 AP 2
-LDF 854
+LDF 947
 TAP 1
-LD 0 0		; [865] backtrack
+LD 0 0		; [958] backtrack
 LD 0 1
 LD 0 2
 LDC 0
-LD 1 33
+LD 1 41
 TAP 4
-LD 0 1		; [871] (backtrack-iter-then)
+LD 0 1		; [964] (backtrack-iter-then)
 RTN
-LD 0 0		; [873] (backtrack-iter-else)
+LD 0 0		; [966] (backtrack-iter-else)
 LD 2 1
 LD 2 2
 LD 0 1
-LD 3 33
+LD 3 41
 TAP 4
-LD 2 1		; [879] (backtrack-iter-let)
+LD 2 1		; [972] (backtrack-iter-let)
 LD 0 0
-LD 3 4
+LD 3 8
 AP 2
-TSEL 871 873
-LD 1 0		; [884] (backtrack-iter-let)
+TSEL 964 966
+LD 1 0		; [977] (backtrack-iter-let)
 LD 0 0
-LD 2 28
+LD 2 36
 AP 2
 LD 0 0
 LD 1 3
 CONS
-LDF 879
+LDF 972
 TAP 2
-LD 0 0		; [893] backtrack-iter
+LD 0 0		; [986] backtrack-iter
 LD 0 2
-LD 1 19
+LD 1 23
 AP 2
 CDR
-LDF 884
+LDF 977
 TAP 1
-LD 1 3		; [900] find-nearest-ghostL
+LDC 1000000		; [993] (find-nearest-ghost-then)
+RTN
+LD 0 0		; [995] (find-nearest-ghost-let)
+LD 0 1
+LD 3 23
+AP 2
+CAR
+RTN
+LD 0 0		; [1001] (find-nearest-ghost-else)
+ST 2 55
+LD 2 55
+CAR
+LD 2 55
+CDR
+LDF 995
+TAP 2
+LD 0 0		; [1009] (find-nearest-ghost-let)
+ATOM
+TSEL 993 1001
+LD 0 0		; [1012] find-nearest-ghost
+LD 0 1
+LD 0 2
+LD 0 3
+LD 1 43
+AP 4
+LDF 1009
+TAP 1
+LD 1 3		; [1020] find-nearest-ghost-internalL
 LD 0 0
 CDR
 CAR
 LD 1 1
-LD 2 6
+LD 2 10
 AP 2
 CGTE
 RTN
-LDC 100000000		; [909] (find-nearest-ghost-then)
+LDC 0		; [1029] (find-nearest-ghost-internal-then)
 RTN
-LD 0 0		; [911] find-nearest-ghostL
+LD 0 0		; [1031] find-nearest-ghost-internalL
 LD 2 2
-LD 3 35
+LD 3 44
 TAP 2
-LDC 1000000		; [915] (find-nearest-ghost-then)
-RTN
-LD 0 0		; [917] (find-nearest-ghost-let)
-LD 0 1
-LD 4 19
-AP 2
-CAR
-RTN
-LD 0 0		; [923] (find-nearest-ghost-else)
-ST 3 39
-LD 3 39
-CAR
-LD 3 39
-CDR
-LDF 917
-TAP 2
-LD 0 0		; [931] (find-nearest-ghost-let)
-ATOM
-TSEL 915 923
-LD 1 0		; [934] (find-nearest-ghost-else)
+LD 1 0		; [1035] (find-nearest-ghost-internal-else)
 LD 1 1
 LD 1 3
-LD 1 4
-LDF 911
-LD 2 29
-AP 5
-LDF 931
-TAP 1
-LD 0 0		; [943] (find-nearest-ghost-let)
-ATOM
-TSEL 909 934
-LDF 900		; [946] find-nearest-ghost
-LD 0 2
-LD 1 10
-AP 2
-LDF 943
-TAP 1
-LDC 0		; [952] (is-ghost-then)
-RTN
-LDC 1		; [954] (is-ghost-then)
-RTN
-LD 1 0		; [956] (is-ghost-else)
-LD 0 1
-LD 2 35
-TAP 2
-LD 1 0		; [960] (is-ghost-let)
-LD 0 0
-CDR
-CAR
-LD 2 4
-AP 2
-TSEL 954 956
-LD 0 1		; [967] (is-ghost-else)
-ST 1 39
-LD 1 39
-CAR
-LD 1 39
-CDR
-LDF 960
-TAP 2
-LD 0 1		; [975] is-ghost
-ATOM
-TSEL 952 967
-LDC 0		; [978] main
-LD 1 37
-CONS
-RTN
-LDC 3		; [982] (get-next-direction-then)
-LD 0 1
-LD 0 0
-LD 0 2
-LDC 3
 LDC 0
-LD 2 34
-AP 5
-CGTE
-JOIN
-LDC 0		; [992] (get-next-direction-else)
-JOIN
-LDC 0		; [994] (get-next-direction-then)
-LD 0 1
-LD 0 0
+LDF 1031
+LD 2 37
+TAP 5
+LD 0 0		; [1042] (find-nearest-ghost-internal-let)
+ATOM
+TSEL 1029 1035
+LDF 1020		; [1045] find-nearest-ghost-internal
 LD 0 2
-LD 2 38
-AP 3
-CONS
+LD 1 14
+AP 2
+LDF 1042
+TAP 1
+LDC 0		; [1051] (is-ghost-then)
 RTN
-LD 1 0		; [1002] (get-next-direction-then)
+LDC 1		; [1053] (is-ghost-then)
+RTN
+LD 1 0		; [1055] (is-ghost-else)
+LD 0 1
+LD 2 44
+TAP 2
+LD 1 0		; [1059] (is-ghost-let)
+LD 0 0
 CDR
-LD 1 0
 CAR
-CONS
-RTN
-LDC 1		; [1008] (get-next-directionL-then)
-RTN
-LD 0 1		; [1010] (get-next-directionL-else)
-LDC 3
+LD 2 8
+AP 2
+TSEL 1053 1055
+LD 0 1		; [1066] (is-ghost-else)
+ST 1 55
+LD 1 55
+CAR
+LD 1 55
+CDR
+LDF 1059
+TAP 2
+LD 0 1		; [1074] is-ghost
+ATOM
+TSEL 1051 1066
+LD 0 0		; [1077] find-nearest-ghost-dirL
+CAR
+LDC 1
 CEQ
 RTN
-LD 0 1		; [1014] get-next-directionL
+LDC 5		; [1082] (find-nearest-ghost-dir-then)
+RTN
+LD 0 0		; [1084] (find-nearest-ghost-dir-let)
+LD 3 1
+LD 0 1
+LD 4 40
+AP 3
+CAR
+RTN
+LD 0 0		; [1091] (find-nearest-ghost-dir-else)
+ST 3 55
+LD 3 55
+CAR
+LD 3 55
+CDR
+LDF 1084
+TAP 2
+LD 0 0		; [1099] (find-nearest-ghost-dir-let)
+ATOM
+TSEL 1082 1091
+LD 1 0		; [1102] (find-nearest-ghost-dir-let)
+LD 1 1
+LD 0 0
+LD 1 3
+LD 2 43
+AP 4
+LDF 1099
+TAP 1
+LDF 1077		; [1110] find-nearest-ghost-dir
+LD 0 2
+LD 1 14
+AP 2
+LDF 1102
+TAP 1
+LD 0 0		; [1116] find-safe-directionL
+LD 1 0
+LD 3 23
+AP 2
+ATOM
+RTN
+LDC 0		; [1122] (find-safe-direction-then)
+RTN
+LD 0 0		; [1124] (find-safe-direction-let)
+LD 3 1
+LD 0 1
+LD 4 40
+AP 3
+CAR
+RTN
+LD 0 0		; [1131] (find-safe-direction-else)
+ST 3 55
+LD 3 55
+CAR
+LD 3 55
+CDR
+LDF 1124
+TAP 2
+LD 0 0		; [1139] (find-safe-direction-let)
+ATOM
+TSEL 1122 1131
+LD 1 0		; [1142] (find-safe-direction-let)
+LD 1 1
+LDC 10
+LD 0 1
+LDF 1116
+LD 2 37
+AP 5
+LDF 1139
+TAP 1
+LD 0 0		; [1151] find-safe-direction
+LD 0 2
+LDC 3
+LD 1 47
+AP 3
+LD 0 2
+LDC 0
+LD 1 50
+AP 2
+LDF 1142
+TAP 2
+LD 0 0		; [1162] build-danger-zone
+LD 0 1
+LD 0 2
+LDC 0
+LD 1 48
+TAP 4
+LD 0 3		; [1168] (build-danger-zone-iter-then)
+RTN
+LD 1 0		; [1170] (build-danger-zone-iter-let)
+LD 0 1
+LD 1 2
+LD 1 0
+LD 0 0
+CDR
+CAR
+LD 0 0
+CDR
+CDR
+LD 1 2
+LD 1 3
+LD 2 49
+AP 5
+LD 2 48
+TAP 4
+LD 0 1		; [1186] (build-danger-zone-iter-else)
+ST 1 55
+LD 1 55
+CAR
+LD 1 55
+CDR
+LDF 1170
+TAP 2
+LD 0 1		; [1194] build-danger-zone-iter
+ATOM
+TSEL 1168 1186
+LD 0 4		; [1197] (build-danger-zone-ghost-then)
+RTN
+LD 0 0		; [1199] (build-danger-zone-ghost-then)
+RTN
+LD 0 0		; [1201] (build-danger-zone-ghost-then)
+JOIN
+LD 1 0		; [1203] (build-danger-zone-ghost-else)
+LD 1 1
+LDC 0
+LD 2 35
+AP 2
+LDC 0
+LD 0 1
+LD 0 0
+LD 2 49
+AP 5
+JOIN
+LD 0 0		; [1214] (build-danger-zone-ghost-then)
+JOIN
+LD 2 0		; [1216] (build-danger-zone-ghost-else)
+LD 2 1
+LDC 1
+LD 3 35
+AP 2
+LDC 1
+LD 1 1
+LD 0 0
+LD 3 49
+AP 5
+JOIN
+LD 0 0		; [1227] (build-danger-zone-ghost-then)
+JOIN
+LD 3 0		; [1229] (build-danger-zone-ghost-else)
+LD 3 1
+LDC 2
+LD 4 35
+AP 2
+LDC 2
+LD 2 1
+LD 0 0
+LD 4 49
+AP 5
+JOIN
+LD 0 0		; [1240] (build-danger-zone-ghost-then)
+JOIN
+LD 4 0		; [1242] (build-danger-zone-ghost-else)
+LD 4 1
+LDC 3
+LD 5 35
+AP 2
+LDC 3
+LD 3 1
+LD 0 0
+LD 5 49
+AP 5
+JOIN
+LD 0 0		; [1253] (build-danger-zone-ghost-let)
+RTN
+LD 4 2		; [1255] (build-danger-zone-ghost-let)
+LDC 1
+CEQ
+SEL 1240 1242
+LDF 1253
+TAP 1
+LD 3 2		; [1261] (build-danger-zone-ghost-let)
+LDC 0
+CEQ
+SEL 1227 1229
+LDF 1255
+TAP 1
+LD 2 2		; [1267] (build-danger-zone-ghost-let)
+LDC 3
+CEQ
+SEL 1214 1216
+LDF 1261
+TAP 1
+LD 1 2		; [1273] (build-danger-zone-ghost-else)
 LDC 2
 CEQ
-TSEL 1008 1010
-LD 0 0		; [1018] (get-next-direction-let)
+SEL 1201 1203
+LDF 1267
+TAP 1
+LDC 0		; [1279] (build-danger-zone-ghost-let)
+LD 0 1
+CGT
+TSEL 1199 1273
+LD 0 1		; [1283] (build-danger-zone-ghost-else)
+LDC 1
+LD 0 3
+CONS
+LD 0 4
+LD 1 22
+AP 3
+LD 0 3
+LDC 1
+SUB
+LDF 1279
+TAP 2
+LD 0 0		; [1295] build-danger-zone-ghost
+LD 0 1
+LD 1 30
+AP 2
+LDC 0
+CEQ
+TSEL 1197 1283
+LD 0 1		; [1302] (build-ghost-block-then)
+RTN
+LD 0 0		; [1304] (build-ghost-block-else)
 CDR
+LD 0 0
+CAR
+CDR
+CAR
+LDC 1000000
+LDC 5
+CONS
+LD 0 1
+LD 1 22
+AP 3
+LD 1 50
+TAP 2
+LD 0 0		; [1318] build-ghost-block
+ATOM
+TSEL 1302 1304
+LDC 0		; [1321] (find-wall-dir-then)
+RTN
+LDC 1		; [1323] (find-wall-dir-then)
+RTN
+LDC 2		; [1325] (find-wall-dir-then)
+RTN
+LDC 3		; [1327] (find-wall-dir-then)
+RTN
+LD 1 2		; [1329] (find-wall-dir-else)
+LDC 4
+LD 1 7
+TAP 2
+LD 0 0		; [1333] (find-wall-dir-else)
+LD 0 1
+LDC 3
+LD 1 35
+AP 2
+LD 1 30
+AP 2
+LDC 0
+CEQ
+TSEL 1327 1329
+LD 0 0		; [1343] (find-wall-dir-else)
+LD 0 1
+LDC 2
+LD 1 35
+AP 2
+LD 1 30
+AP 2
+LDC 0
+CEQ
+TSEL 1325 1333
+LD 0 0		; [1353] (find-wall-dir-else)
+LD 0 1
+LDC 1
+LD 1 35
+AP 2
+LD 1 30
+AP 2
+LDC 0
+CEQ
+TSEL 1323 1343
+LD 0 0		; [1363] find-wall-dir
+LD 0 1
+LDC 0
+LD 1 35
+AP 2
+LD 1 30
+AP 2
+LDC 0
+CEQ
+TSEL 1321 1353
+LDC 0		; [1373] main
+ST 1 0
+LDC 127
+ST 1 2
+LDC 0
+LDC 0
+CONS
+LD 1 53
+CONS
+RTN
+LDC 1		; [1383] (step-function-then)
+JOIN
+LDC 1		; [1385] (step-function-then)
+JOIN
+LD 3 1		; [1387] (step-function-then)
+LD 4 29
+AP 1
+LDC 0
+CGT
+JOIN
+LDC 0		; [1393] (step-function-else)
+JOIN
+LD 0 0		; [1395] (step-function-else)
+LDC 4
+CEQ
+SEL 1387 1393
+JOIN
+LD 0 0		; [1400] (step-function-else)
+LDC 3
+CEQ
+SEL 1385 1395
+JOIN
+LDC 137		; [1405] (step-function-then)
+JOIN
+LDC 127		; [1407] (step-function-else)
+JOIN
+LD 4 2		; [1409] (step-function-let)
+LD 0 0
+LDC 2
+CEQ
+SEL 1383 1400
+SEL 1405 1407
+ADD
+ST 4 2
+LD 2 0
+RTN
+LD 2 1		; [1419] (step-function-let)
+LD 3 27
+AP 1
+LD 0 0
+LD 3 30
+AP 2
+LDF 1409
+TAP 1
+LD 1 1		; [1427] (step-function-let)
+LD 2 25
+AP 1
+LD 0 0
+CDR
+LD 2 35
+AP 2
+LDF 1419
+TAP 1
+LD 0 0		; [1436] step-function
+LD 0 1
+LD 1 54
+AP 2
+LDF 1427
+TAP 1
+LDC 3		; [1442] (get-next-direction-then)
+LD 0 1
+LD 0 0
+LD 0 2
+LDC 3
+LD 2 42
+AP 4
+CGTE
+JOIN
+LDC 0		; [1451] (get-next-direction-else)
+JOIN
+LDC 0		; [1453] (get-next-direction-let)
+LDC 0
+CONS
+LD 0 0
+CONS
+RTN
+LD 0 1		; [1459] (get-next-direction-then)
+LD 0 0
+LD 0 2
+LD 2 46
+AP 3
+LDF 1453
+TAP 1
+LDC 5		; [1466] (get-next-direction-then)
+JOIN
+LD 0 1		; [1468] (get-next-direction-else)
+LD 0 0
+LD 0 2
+LDC 7
+LD 2 45
+AP 4
+JOIN
+LDC 0		; [1475] (get-next-direction-then)
+LDC 0
+CONS
+LD 0 0
+CONS
+RTN
+LD 2 0		; [1481] (get-next-direction-then)
+CDR
+ATOM
+LD 3 3
+AP 1
+JOIN
+LDC 0		; [1487] (get-next-direction-else)
+JOIN
+LD 2 0		; [1489] (get-next-direction-then)
+CAR
+LD 2 0
+CDR
+CDR
+CONS
+LD 2 0
+CDR
+CAR
+CONS
+RTN
+LDC 1		; [1500] (get-next-direction-then)
+JOIN
+LDC 50800		; [1502] (get-next-direction-then)
+LD 3 2
+CGT
+JOIN
+LDC 0		; [1506] (get-next-direction-else)
+JOIN
+LD 1 1		; [1508] (get-next-direction-else)
+LD 3 31
+AP 1
+LDC 1
+CEQ
+SEL 1502 1506
+JOIN
+LD 1 3		; [1515] (get-next-direction-then)
+LDC 0
+CGT
+LDC 0
+CONS
+LD 1 1
+LD 1 0
+LD 3 51
+AP 2
+CONS
+RTN
+LD 0 1		; [1526] get-next-directionL
+LDC 4
+CEQ
+RTN
+LD 3 3		; [1530] (get-next-direction-let)
+LDC 0
+CGT
+LD 0 0
+CDR
+CONS
 LD 0 0
 CAR
 CONS
 RTN
-LD 0 0		; [1024] (get-next-direction-let)
-LD 1 0
+LD 0 0		; [1540] (get-next-direction-let)
+LD 2 0
 LD 0 1
-LD 3 32
+LD 4 40
 AP 3
-LDF 1018
+LDF 1530
 TAP 1
-LD 0 1		; [1031] (get-next-direction-else)
+LD 1 1		; [1547] (get-next-direction-else)
+LD 1 0
+LDC 100000000
+LD 1 2
+LDC 0
+LD 3 50
+AP 2
+LDF 1526
+LD 3 37
+AP 5
+ST 3 55
+LD 3 55
+CAR
+LD 3 55
+CDR
+LDF 1540
+TAP 2
+LD 1 1		; [1564] (get-next-direction-then)
+LD 1 0
+LD 3 30
+AP 2
+LDC 4
+CEQ
+TSEL 1515 1547
+LDC 1		; [1571] (get-next-directionL-then)
+RTN
+LD 0 1		; [1573] (get-next-directionL-else)
+LDC 3
+CEQ
+RTN
+LD 0 1		; [1577] get-next-directionL
+LDC 2
+CEQ
+TSEL 1571 1573
+LD 3 3		; [1581] (get-next-direction-let)
+LDC 0
+CGT
 LD 0 0
+CDR
+CONS
+LD 0 0
+CAR
+CONS
+RTN
+LD 0 0		; [1591] (get-next-direction-let)
+LD 2 0
+LD 0 1
+LD 4 40
+AP 3
+LDF 1581
+TAP 1
+LD 1 1		; [1598] (get-next-direction-else)
+LD 1 0
 LDC 1000000000
 LDC 0
-LDF 1014
-LD 2 29
+LDF 1577
+LD 3 37
 AP 5
-ST 2 39
-LD 2 39
+ST 3 55
+LD 3 55
 CAR
-LD 2 39
+LD 3 55
 CDR
-LDF 1024
+LDF 1591
 TAP 2
-LD 1 0		; [1045] (get-next-direction-else)
-ATOM
+LD 1 3		; [1612] (get-next-direction-else)
+LDC 0
+CGT
+SEL 1500 1508
+TSEL 1564 1598
+LD 1 3		; [1617] (get-next-direction-else)
+LDC 0
+CGT
 LD 2 0
-AP 1
-TSEL 1002 1031
-LDC 127		; [1050] (get-next-direction-let)
+CAR
+CEQ
+SEL 1481 1487
+TSEL 1489 1612
+LDC 4		; [1625] (get-next-direction-let)
+LD 0 0
+CGT
+TSEL 1475 1617
+LDC 127		; [1629] (get-next-direction-else)
 LDC 3
 MUL
 LD 1 1
-LD 2 22
+LD 2 26
 AP 1
 CGT
-SEL 982 992
-TSEL 994 1045
-LD 0 1		; [1059] get-next-direction
-LD 1 21
-AP 1
-LD 0 1
-LD 1 23
-AP 1
-LD 0 1
-LD 1 24
-AP 1
-LDF 1050
-TAP 3
-LDC 0		; [1070] (find-farthest-ghost-direction-then)
-JOIN
-LD 1 0		; [1072] (find-farthest-ghost-direction-else)
-LD 0 0
-LD 1 2
-LDC 10
-LD 1 1
-LD 2 34
-AP 5
-JOIN
-LDC 0		; [1080] (find-farthest-ghost-direction-then)
-JOIN
-LD 1 0		; [1082] (find-farthest-ghost-direction-else)
-LD 0 1
-LD 1 2
-LDC 10
-LD 1 1
-LD 2 34
-AP 5
-JOIN
-LDC 0		; [1090] (find-farthest-ghost-direction-then)
-JOIN
-LD 1 0		; [1092] (find-farthest-ghost-direction-else)
-LD 0 2
-LD 1 2
-LDC 10
-LD 1 1
-LD 2 34
-AP 5
-JOIN
-LDC 0		; [1100] (find-farthest-ghost-direction-then)
-JOIN
-LD 1 0		; [1102] (find-farthest-ghost-direction-else)
-LD 0 3
-LD 1 2
-LDC 10
-LD 1 1
-LD 2 34
-AP 5
-JOIN
-LD 1 1		; [1110] (find-farthest-ghost-direction-then)
-LDC 1
-CONS
-JOIN
-LD 0 0		; [1114] (find-farthest-ghost-direction-else)
-LD 0 1
-CONS
-JOIN
-LD 2 2		; [1118] (find-farthest-ghost-direction-then)
-LDC 2
-CONS
-JOIN
-LD 0 0		; [1122] (find-farthest-ghost-direction-else)
-LD 0 1
-CONS
-JOIN
-LD 3 3		; [1126] (find-farthest-ghost-direction-then)
+SEL 1466 1468
+LDF 1625
+TAP 1
+LDC 127		; [1639] (get-next-direction-let)
 LDC 3
-CONS
-JOIN
-LD 0 0		; [1130] (find-farthest-ghost-direction-else)
+MUL
+LD 1 1
+LD 2 26
+AP 1
+CGT
+SEL 1442 1451
+TSEL 1459 1629
+LD 0 1		; [1648] get-next-direction
+LD 1 25
+AP 1
 LD 0 1
-CONS
-JOIN
-LD 0 1		; [1134] (find-farthest-ghost-direction-let)
-RTN
-LD 3 3		; [1136] (find-farthest-ghost-direction-let)
-LD 0 0
-CGT
-SEL 1126 1130
-ST 6 39
-LD 6 39
-CAR
-LD 6 39
-CDR
-LDF 1134
-TAP 2
-LD 2 2		; [1147] (find-farthest-ghost-direction-let)
-LD 0 0
-CGT
-SEL 1118 1122
-ST 5 39
-LD 5 39
-CAR
-LD 5 39
-CDR
-LDF 1136
-TAP 2
-LD 1 1		; [1158] (find-farthest-ghost-direction-let)
-LD 0 0
-CGT
-SEL 1110 1114
-ST 4 39
-LD 4 39
-CAR
-LD 4 39
-CDR
-LDF 1147
-TAP 2
-LD 0 0		; [1169] (find-farthest-ghost-direction-let)
-LDC 0
-LDF 1158
-TAP 2
-LD 1 0		; [1173] (find-farthest-ghost-direction-let)
-LD 0 0
-LD 2 25
-AP 2
-LDC 0
-CEQ
-SEL 1070 1072
-LD 1 0
+LD 1 27
+AP 1
 LD 0 1
-LD 2 25
-AP 2
-LDC 0
-CEQ
-SEL 1080 1082
-LD 1 0
-LD 0 2
-LD 2 25
-AP 2
-LDC 0
-CEQ
-SEL 1090 1092
-LD 1 0
-LD 0 3
-LD 2 25
-AP 2
-LDC 0
-CEQ
-SEL 1100 1102
-LDF 1169
+LD 1 28
+AP 1
+LD 0 1
+LD 1 29
+AP 1
+LDF 1639
 TAP 4
-LD 0 1		; [1203] find-farthest-ghost-direction
-LDC 0
-LD 1 27
-AP 2
-LD 0 1
-LDC 1
-LD 1 27
-AP 2
-LD 0 1
-LDC 2
-LD 1 27
-AP 2
-LD 0 1
-LDC 3
-LD 1 27
-AP 2
-LDF 1173
-TAP 4
-LD 0 36		; [1221] __dummy_main__
+LD 0 52		; [1662] __dummy_main__
 TAP 0

@@ -6,6 +6,8 @@
 #include <string>
 #include <sstream>
 
+#include <glog/logging.h>
+
 #include "common.h"
 
 enum class GccMnemonic : uint32_t {
@@ -33,6 +35,7 @@ enum class GccMnemonic : uint32_t {
   TAP,
   TRAP,
   ST,
+  DBUG,
 };
 
 struct Code {
@@ -186,6 +189,8 @@ class GCC {
         return Trap(code_[reg_c_].arg1);
       case GccMnemonic::ST:
         return St(code_[reg_c_].arg1, code_[reg_c_].arg2);
+      case GccMnemonic::DBUG:
+        return Dbug();
     }
     assert(false);
     return true;
@@ -360,6 +365,11 @@ class GCC {
         code_.push_back(Code { GccMnemonic::ST, arg1, arg2 });
         continue;
       }
+      if (mnemonic == "DBUG") {
+        code_.push_back(Code { GccMnemonic::DBUG });
+        continue;
+      }
+
       std::cerr << line << std::endl;
       abort();
       // Skip otherwise.
@@ -684,6 +694,13 @@ class GCC {
     return false;
   }
 
+  bool Dbug() {
+    Value x = data_stack_.back();
+    data_stack_.pop_back();
+    ++reg_c_;
+    return false;
+  }
+
   int32_t AllocCons(const Value& x, const Value& y) {
     if (current_heap_pos_ >= heap_.size()) {
       RunGC();
@@ -827,8 +844,33 @@ class GCC {
     }
   }
 
+  void PrintValue(const Value& x) {
+    std::stringstream s;
+    PrintValueInternal(x, &s);
+    LOG(ERROR) << s.str();
+  }
+
+  void PrintValueInternal(const Value& x, std::ostream* os) {
+    switch (x.tag) {
+      case ValueTag::INT:
+        *os << x.value;
+        break;
+      case ValueTag::CONS:
+        *os << "(";
+        PrintValueInternal(heap_[x.value].cons.car, os);
+        *os << " ";
+        PrintValueInternal(heap_[x.value].cons.cdr, os);
+        *os << ")";
+        break;
+      case ValueTag::CLOSURE:
+        *os << "[" << heap_[x.value].closure.f << "]";
+        break;
+    }
+  }
+
   bool OnError(ErrorType e) {
-    // TODO error debug log?
+    LOG(ERROR) << "Error: " << static_cast<int>(e) << ", " << reg_c_;
+    // TODO error debug logi?
     return true;
   }
 
