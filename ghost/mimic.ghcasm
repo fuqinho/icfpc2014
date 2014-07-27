@@ -1,0 +1,30 @@
+  int GetLambdaXy
+  mov C,A
+  mov D,B
+  jlt GoUp,D,F
+  jlt GoDown,F,D
+  jlt GoLeft,C,E
+  jlt GoRight,E,C
+GoUp:
+  mov A,UP
+  jeq Done,1,1
+GoDown:
+  mov A,DOWN
+  jeq Done,1,1
+GoLeft:
+  mov A,LEFT
+  jeq Done,1,1
+GoRight:
+  mov A,RIGHT
+  jeq Done,1,1
+Done:
+  mov H,A
+  int GetGhostIndex
+  int GetGhostState
+  jeq NonFlip,A,STANDARD
+  xor H,1
+NonFlip:
+  mov A,H
+  int SetGhostDirection
+  mov E,C
+  mov F,D

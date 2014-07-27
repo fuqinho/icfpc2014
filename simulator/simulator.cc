@@ -9,6 +9,7 @@
 #include "gamestate.h"
 #include "ghost.h"
 #include "lambdaman.h"
+#include "map_generator.h"
 
 #include "glog/logging.h"
 
@@ -58,40 +59,37 @@ class Simulator {
 
  private:
   void Init() {
-    LoadMap(game_state_.mutable_game_map(), map_file_);
     game_state_.set_lambda_man(std::unique_ptr<LambdaMan>(new LambdaMan));
-    InitLambdaMan(game_state_.mutable_lambda_man(),
-                  lambdaman_file_, game_state_.game_map());
+    LoadLambdaMan(game_state_.mutable_lambda_man(), lambdaman_file_);
+    InitLevel(1);
+  }
+  
+  void InitLevel(int level) {
+    game_state_.set_game_level(level);
+    LoadMap(game_state_.mutable_game_map(), map_file_);
+    InitLambdaMan(game_state_.mutable_lambda_man(),  game_state_.game_map());
     InitGhostList(game_state_.mutable_ghost_list(),
                   ai_file_list_,
                   game_state_.game_map());
     game_state_.set_fruit(0);
     game_state_.set_score(0);
-
     game_state_.mutable_lambda_man()->Init(game_state_);
   }
-
-  static void LoadMap(GameMap* game_map, const std::string& map_file) {
-    std::ifstream in(map_file);
-    std::string line;
-    while (std::getline(in, line)) {
-      game_map->push_back(line);
-    }
+  
+  static void LoadLambdaMan(LambdaMan* lambda_man,
+                            const std::string& lambdaman_file) {
+    std::ifstream ifs(lambdaman_file);
+    ifs.seekg(0, std::ios::end);
+    int len = ifs.tellg();
+    ifs.seekg(0, std::ios::beg);
+    std::string data;
+    data.resize(len);
+    ifs.read(&data[0], len);
+    lambda_man->LoadProgram(data);
   }
 
   static void InitLambdaMan(LambdaMan* lambda_man,
-                            const std::string& lambdaman_file,
                             const GameMap& game_map) {
-    {
-      std::ifstream ifs(lambdaman_file);
-      ifs.seekg(0, std::ios::end);
-      int len = ifs.tellg();
-      ifs.seekg(0, std::ios::beg);
-      std::string data;
-      data.resize(len);
-      ifs.read(&data[0], len);
-      lambda_man->LoadProgram(data);
-    }
     for (size_t y = 0; y < game_map.size(); ++y) {
       for (size_t x = 0; x < game_map[y].size(); ++x) {
         if (game_map[y][x] == '\\') {
@@ -121,6 +119,7 @@ class Simulator {
       ai_list.push_back(std::move(data));
     }
 
+    ghost_list->clear();
     int num_ghosts = 0;
     for (size_t y = 0; y < game_map.size(); ++y) {
       for (size_t x = 0; x < game_map[y].size(); ++x) {
@@ -138,6 +137,27 @@ class Simulator {
     }
   }
 
+  void LoadMap(GameMap* game_map, const std::string& map_file) {
+    game_map->clear();
+    if (map_file == "random") {
+      std::vector<std::string> random_map = GenerateMap(game_state_.game_level());
+      for (auto line : random_map) {
+        game_map->push_back(line);
+      }
+    } else {
+      std:d:ifstream in(map_file);
+      std::string line;
+      while (std::getline(in, line)) {
+        game_map->push_back(line);
+      }
+      // adjust game level
+      int area = (int)(*game_map).size() * (int)(*game_map)[0].size();
+      int level = 1;
+      while (100 * level < area) level++;
+      game_state_.set_game_level(level);
+    }
+  }
+  
   bool RunStep(int current_ticks) {
     MovePhase(current_ticks);
     ActionPhase(current_ticks);
@@ -328,6 +348,11 @@ class Simulator {
     }
   }
 
+  void PrepareForNextLevel() {
+    game_state_.set_score(0);
+    game_state_.set_game_level(game_state_.game_level() + 1);
+  }
+  
   bool GameOverCheckPhase() {
     // Check if lambdaman wins.
     bool won = true;
@@ -342,7 +367,8 @@ class Simulator {
     if (won) {
       game_state_.set_score(
           game_state_.score() * (game_state_.lambda_man().life() + 1));
-      return true;
+      InitLevel(game_state_.game_level() + 1);
+      return false;
     }
 
     // Check if game is over.
@@ -363,10 +389,13 @@ class Simulator {
   void PrintGame(int current_ticks) const {
     std::stringstream buffer;
     buffer << "\x1b[H";
-    buffer << "ticks: " << current_ticks
-           << ", lives: " << game_state_.lambda_man().life()
-           << ", vital: " << game_state_.lambda_man().vitality()
-           << ", score: " << game_state_.score() << "\n";
+    buffer << "level:" << game_state_.game_level()
+           << "  score:" << game_state_.score()
+           << "  total:" << game_state_.score() << "       \n";
+    buffer << "ticks:" << current_ticks
+           << "  life:" << game_state_.lambda_man().life()
+           << "  vital: " << game_state_.lambda_man().vitality() << "      \n";
+    
     for (size_t y = 0; y < game_state_.map_height(); ++y) {
       for (size_t x = 0; x < game_state_.map_width(); ++x) {
         if (game_state_.lambda_man().position() == Position {x, y}) {

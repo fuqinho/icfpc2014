@@ -13,14 +13,13 @@ typedef std::vector<std::string> GameMap;
 
 class GameState {
  public:
-  GameState() {
+  GameState() : game_level_(1) {
   }
 
   size_t map_width() const { return game_map_[0].size(); }
   size_t map_height() const { return game_map_.size(); }
-  int game_level() const {
-    return (map_width() * map_height() + 99) / 100;
-  }
+  int game_level() const { return game_level_; }
+  void set_game_level(int level) { game_level_ = level; }
 
   const GameMap& game_map() const { return game_map_; }
   GameMap* mutable_game_map() { return &game_map_; }
@@ -76,6 +75,7 @@ class GameState {
 
   int fruit_;
   int score_;
+  int game_level_;
 
   DISALLOW_COPY_AND_ASSIGN(GameState);
 };

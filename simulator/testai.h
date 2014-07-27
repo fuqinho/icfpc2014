@@ -7,6 +7,8 @@
 #include <map>
 #include "gamestate.h"
 
+#define PRINT_INTERNAL_AI_STATE 0
+
 using namespace std;
 
 template<class T1,class T2> ostream& operator<<(ostream& o,const pair<T1,T2>& p){return o<<"("<<p.first<<","<<p.second<<")";}
@@ -75,7 +77,9 @@ pair<Direction, int> GetDirectionFor(Coordinate start, unsigned int targets, std
       }
     }
   }
-  cerr << distance << endl;
+  if (goal == Coordinate(-1, -1))
+    return make_pair(Direction::UP, 0);
+    
   //assert(goal != Coordinate(-1, -1));
   Coordinate to = goal;
   while (distance[to] > 1) {
@@ -112,8 +116,10 @@ Direction GetNextDirectionGreedy(const GameState& state) {
     }
   }
   Coordinate start(state.lambda_man().position().y, state.lambda_man().position().x);
+  
+#if PRINT_INTERNAL_AI_STATE
   std::cerr << "Now: " << start << std::endl;
-  std::cerr << "Danger: " << danger << std::endl;
+  std::cerr << "Danger: (marked as O)" << std::endl;
   for (int r = 0; r < state.map_height(); r++) {
     for (int c = 0; c < state.map_width(); c++) {
       if (state.game_map()[r][c] == '#')
@@ -125,31 +131,40 @@ Direction GetNextDirectionGreedy(const GameState& state) {
     }
     std::cerr << std::endl;
   }
-  
-  // If lambdaman is in Danger, go to safe area.
-  if (danger.count(start)) {
-    std::cerr << "Nigeyou!" << std::endl;
-    pair<Direction, int> res = GetDirectionFor(start, TARGET_SAFE, danger, state);
-    std::cerr << "Direction: " << (int)res.first;
-    return res.first;
-  }
+#endif
   
   // If lambdaman has power and there're ghosts near him, go kill them.
   if (state.lambda_man().vitality() > 500) {
+#if PRINT_INTERNAL_AI_STATE
     std::cerr << "Go to Ghost!" << std::endl;
+#endif
     pair<Direction, int> res = GetDirectionFor(start, TARGET_GHOST, danger, state);
     if (res.second <= 6)
       return res.first;
   }
   
+  // If lambdaman is in Danger, go to safe area.
+  if (danger.count(start)) {
+    pair<Direction, int> res = GetDirectionFor(start, TARGET_SAFE, danger, state);
+#if PRINT_INTERNAL_AI_STATE
+    std::cerr << "Nigeyou! (direction: " << (int)res.first << ")" << std::endl;
+#endif
+    return res.first;
+  }
+
+  
   // If there is a fruit, get it.
   if (state.fruit() > 0) {
+#if PRINT_INTERNAL_AI_STATE
     std::cerr << "Go to Fruit!" << std::endl;
+#endif
     return GetDirectionFor(start, TARGET_FRUIT, danger, state).first;
   }
   
   // By default, go to pills.
+#if PRINT_INTERNAL_AI_STATE
   std::cerr << "Go to Pills" << std::endl;
+#endif
   return GetDirectionFor(start, TARGET_PILL|TARGET_POWER, danger, state).first;
 }
 
