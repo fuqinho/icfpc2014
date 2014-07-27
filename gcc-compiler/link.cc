@@ -1,3 +1,4 @@
+#include "common.h"
 #include "link.h"
 
 void link_and_emit(std::ostream& os, const PreLink& pl, bool show_label)

@@ -1,12 +1,5 @@
+#include "common.h"
 #include "compile.h"
-#include <algorithm>
-#include <cassert>
-#include <functional>
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-#include <iostream>
 
 #define compiler_assert(cond, ast, msg) \
 	do { \

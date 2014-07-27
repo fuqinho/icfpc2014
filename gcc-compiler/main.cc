@@ -1,7 +1,7 @@
+#include "common.h"
 #include "parse.h"
 #include "compile.h"
 #include "link.h"
-#include <iostream>
 
 int main()
 {

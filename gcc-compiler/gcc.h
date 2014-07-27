@@ -1,8 +1,5 @@
 #pragma once
-#include <memory>
-#include <ostream>
-#include <string>
-#include <vector>
+#include "common.h"
 
 namespace gcc {
 
@@ -32,19 +29,15 @@ inline void Append(OperationSequence* ops, std::shared_ptr<Op> op)
 }
 
 // Simple, zero parameter instruction.
-class OpZ : public Op
-{
-public:
+class OpZ : public Op {
+protected:
 	explicit OpZ(const std::string& name) : name(name) {}
 	virtual std::ostream& to_stream(std::ostream& os) const {
 		return os << name;
 	}
-
-private:
 	std::string name;
 };
 
-#define PP_CAT(a,b) a##b
 #define DefineOpZ(name)                   \
 	class PP_CAT(Op,name) : public OpZ {  \
 	public:                               \
@@ -64,6 +57,9 @@ DefineOpZ(CGTE);
 DefineOpZ(ATOM);
 DefineOpZ(CAR);
 DefineOpZ(CDR);
+DefineOpZ(RTN);
+DefineOpZ(JOIN);
+DefineOpZ(DBUG);
 
 class OpCONS : public OpZ {
 public:
@@ -74,18 +70,13 @@ public:
 	virtual bool assoc_left() const { return false; }
 };
 
-DefineOpZ(RTN);
-DefineOpZ(JOIN);
-DefineOpZ(DBUG);
-
 // Op with single int modifier.
 class OpI : public Op {
-public:
+protected:
 	OpI(const std::string& name, int n) : name(name), n(n) {}
 	virtual std::ostream& to_stream(std::ostream& os) const {
 		return os << name << " " << n;
 	}
-protected:
 	std::string name;
 	int n;
 };

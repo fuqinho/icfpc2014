@@ -1,9 +1,5 @@
 #pragma once
-#include <vector>
-#include <string>
-#include <memory>
-#include <ostream>
-#include <sstream>
+#include "common.h"
 
 namespace ast {
 
@@ -14,9 +10,7 @@ enum Type
 	LIST,
 };
 
-class Impl;
-
-typedef std::shared_ptr<Impl> AST;
+typedef std::shared_ptr<class Impl> AST;
 
 struct Impl
 {

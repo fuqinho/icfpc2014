@@ -1,21 +1,25 @@
 
 ./ghcasm < input > output
 
-It just resolves labels.
+Resolves labels.
 
-JGT FOOBAR,A,B
-HLT
-FOOBAR:
-HLT
+    JGT FOOBAR,A,B
+    HLT
+  FOOBAR:
+    HLT
 ==>
-0: JGT 2,A,B
-1: HLT
-2: HLT
+  JGT 2,A,B
+  HLT
+  HLT
 
 or
 
-JGT FOOBAR,A,B
-HLT
-FOOBAR: HLT
+  JGT FOOBAR,A,B
+  HLT
+  FOOBAR: HLT
 
 is also allowed.
+
+
+Resolves constants (like direction (UP,RIGHT,DOWN,LEFT) or int number).
+See main.cc.
