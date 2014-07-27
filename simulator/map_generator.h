@@ -63,7 +63,7 @@ void PlaceFruitLocation(std::vector<std::string>& cell) {
 }
 
 void PlacePowerPill(std::vector<std::string>& cell) {
-  int num = floor(cell.size() * cell[0].size() * POWER_PILL_RATE);
+  int num = floor((cell.size() - 2) * (cell[0].size() - 2) * POWER_PILL_RATE);
   while (num--) {
     pair<int,int> loc = GetEmptyLocation(cell);
     cell[loc.first][loc.second] = 'o';
@@ -71,7 +71,7 @@ void PlacePowerPill(std::vector<std::string>& cell) {
 }
 
 void PlaceGhosts(std::vector<std::string>& cell, std::pair<int,int> lambda_pos) {
-  int num = floor(cell.size() * cell[0].size() * GHOST_RATE);
+  int num = floor((cell.size() - 2) * (cell[0].size() - 2) * GHOST_RATE);
   while (num) {
     pair<int,int> loc = GetEmptyLocation(cell);
     if (abs(loc.first - lambda_pos.first) > 3 || abs(loc.second - lambda_pos.second) > 3) {
@@ -82,7 +82,7 @@ void PlaceGhosts(std::vector<std::string>& cell, std::pair<int,int> lambda_pos) 
 }
 
 void PlacePills(std::vector<std::string>& cell) {
-  int num = floor(cell.size() * cell[0].size() * PILL_RATE);
+  int num = floor((cell.size() - 2) * (cell[0].size() - 2) * PILL_RATE);
   std::vector<std::pair<int,int> > empty_cells;
   for (int i = 0; i < cell.size(); i++)
     for (int j = 0; j < cell[0].size(); j++)
