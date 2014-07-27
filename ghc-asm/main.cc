@@ -22,7 +22,35 @@ std::string lexical_cast(int n)
 
 int main()
 {
-	std::map<std::string, size_t> label;
+	std::map<std::string, size_t> defs = {
+	// direction
+		{"UP", 1},
+		{"RIGHT", 2},
+		{"DOWN", 3},
+		{"LEFT", 4},
+	// vitality
+		{"STANDARD", 0},
+		{"FRIGHT", 1},
+		{"INVISIBLE", 2},
+	// map
+		{"WALL", 0},
+		{"EMPTY", 1},
+		{"PILL", 2},
+		{"POWERPILL", 3},
+		{"FRUIT", 4},
+		{"LAMBDASTART", 5},
+		{"GHOSTSTART", 6},
+	// int
+		{"SetGhostDirection", 0},
+		{"GetLambdaXy", 1},
+		{"Get2ndLambdaXy", 2},
+		{"GetGhostIndex", 3},
+		{"GetGhostStartXy", 4},
+		{"GetGhostCurrenyXy", 5},
+		{"GetGhostState", 6},
+		{"GetMap", 7},
+		{"Debug", 8},
+	};
 	std::vector<std::string> cmd;
 
 	for(std::string str; std::getline(std::cin, str); )
@@ -32,7 +60,7 @@ int main()
 			continue;
 		size_t i = str.find(':');
 		if(i != std::string::npos) {
-			label[clean(str.substr(0, i))] = cmd.size();
+			defs[clean(str.substr(0, i))] = cmd.size();
 			str = clean(str.substr(i+1));
 			if(!str.empty())
 				cmd.push_back(str);
@@ -42,12 +70,10 @@ int main()
 	}
 
 	for(std::string str: cmd) {
-		size_t i = str.find(' ');
-		size_t k = str.find(',');
-		if(i!=std::string::npos && k!=std::string::npos && i<k) {
-			auto targ = str.substr(i+1, k-i-1);
-			if(label.count(targ))
-				str.replace(i+1, k-i-1, lexical_cast(label[targ]));
+		for(auto kv: defs) {
+			size_t i = str.find(kv.first);
+			if(i != std::string::npos)
+				str.replace(i, kv.first.size(), lexical_cast(kv.second));
 		}
 		std::cout << str << std::endl;
 	}
