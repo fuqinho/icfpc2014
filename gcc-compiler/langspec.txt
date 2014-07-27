@@ -45,8 +45,8 @@
     define ::= (define (name x1 ... xk) e)
     defmacro ::= (defmacro (name x1 ... xk) e)
     e ::=
-     | variable     # [^0-9][any]*
-     | integer      # [0-9]+  (natural number?)
+     | integer      # [-+]*[0-9]+
+     | variable     # otherwise
      | (+ e e)
      | (- e e)
      | (* e e)
