@@ -82,9 +82,10 @@ ast::AST parse_expression(Cursor& p)
 		char op = *p;
 		++p; // ')'
 		std::vector<ast::AST> list;
-		while(skip_spaces(p), !is_close_paren(*p))
+		while(skip_spaces(p), *p && !is_close_paren(*p))
 			list.emplace_back(parse_expression(p));
 		char cl = *p;
+		if(!*p) std::cerr << "More Open paren than Close paren" << std::endl;
 		assert(paren_match(op,cl));
 		++p; // ')'
 
