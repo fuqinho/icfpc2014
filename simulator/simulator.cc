@@ -366,7 +366,7 @@ class Simulator {
     buffer << "ticks: " << current_ticks
            << ", lives: " << game_state_.lambda_man().life()
            << ", vital: " << game_state_.lambda_man().vitality()
-           << ", score: " << game_state_.score() << "\n";
+           << ", score: " << game_state_.score() << "     \n";
     for (size_t y = 0; y < game_state_.map_height(); ++y) {
       for (size_t x = 0; x < game_state_.map_width(); ++x) {
         if (game_state_.lambda_man().position() == Position {x, y}) {
