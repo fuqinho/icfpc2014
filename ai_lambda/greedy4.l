@@ -131,7 +131,7 @@
       (let ((tkv (car (car tree)))
             (l (car (cdr tree)))
             (r (cdr (cdr tree))))
-        (if (pos-eq? k (car tkv)) tree
+        (if (pos-eq? k (car tkv)) (avl-create (cons k v) l r)
         (if (pos-lt? k (car tkv))
             (avl-bal tkv (avl-add k v l) r)
             (avl-bal tkv l (avl-add k v r)))))))
@@ -325,7 +325,7 @@
 ;; Look for the escape direction.
 (define (find-safe-direction map start ghost-lst)
   (let ((danger-zone (build-danger-zone map ghost-lst 3))
-        (ghost-block (build-ghost-block ghost-lst 0))
+        (ghost-block (build-ghost-block-2 ghost-lst 0))
         (last-pill
          (if (< tick 50800) (get-last-pill map) 0)))
   ; First, if last-pill exists, try to search avoiding take it.
@@ -413,6 +413,30 @@
       (build-ghost-block
            (cdr ghost-lst)
            (avl-add (car (cdr (car ghost-lst))) (cons 1000000 5) result))))
+
+(define (build-ghost-block-2 ghost-lst result)
+  (if (int? ghost-lst) result
+      (build-ghost-block-2
+           (cdr ghost-lst)
+           (build-ghost-block-2-internal (car ghost-lst) result))))
+
+(define (build-ghost-block-2-internal ghost result)
+  (let ((pos (car (cdr ghost)))
+        (dir (cdr (cdr ghost))))
+  (let ((result (avl-add pos (cons 1000000 5) result)))
+  (let ((result
+         (if (= dir 2)
+             result (avl-add (pos-add pos 0) (cons 1000000 5) result))))
+  (let ((result
+         (if (= dir 3)
+             result (avl-add (pos-add pos 1) (cons 1000000 5) result))))
+  (let ((result
+         (if (= dir 0)
+             result (avl-add (pos-add pos 2) (cons 1000000 5) result))))
+  (let ((result
+         (if (= dir 1)
+             result (avl-add (pos-add pos 3) (cons 1000000 5) result))))
+  result)))))))
 
 (define (is-dead-end map danger-zone pos)
   (is-dead-end-iter map danger-zone pos 0))
