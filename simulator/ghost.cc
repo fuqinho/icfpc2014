@@ -39,24 +39,30 @@ void Ghost::OnInt(int i, std::vector<unsigned char>& registers) {
       break;
     case 4: {
       int index = registers[GHCRegister::A];
-      registers[GHCRegister::A] =
-          game_state_->ghost(index).initial_position().x;
-      registers[GHCRegister::B] =
-          game_state_->ghost(index).initial_position().y;
+      if (index >= 0 && index < game_state_->ghost_size()) {
+        registers[GHCRegister::A] =
+            game_state_->ghost(index).initial_position().x;
+        registers[GHCRegister::B] =
+            game_state_->ghost(index).initial_position().y;
+      }
       break;
     }
     case 5: {
       int index = registers[GHCRegister::A];
-      registers[GHCRegister::A] = game_state_->ghost(index).position().x;
-      registers[GHCRegister::B] = game_state_->ghost(index).position().y;
+      if (index >= 0 && index < game_state_->ghost_size()) {
+        registers[GHCRegister::A] = game_state_->ghost(index).position().x;
+        registers[GHCRegister::B] = game_state_->ghost(index).position().y;
+      }
       break;
     }
     case 6: {
       int index = registers[GHCRegister::A];
-      registers[GHCRegister::A] =
-          static_cast<unsigned char>(game_state_->ghost(index).vitality());
-      registers[GHCRegister::B] =
-          static_cast<unsigned char>(game_state_->ghost(index).direction());
+      if (index >= 0 && index < game_state_->ghost_size()) {
+        registers[GHCRegister::A] =
+            static_cast<unsigned char>(game_state_->ghost(index).vitality());
+        registers[GHCRegister::B] =
+            static_cast<unsigned char>(game_state_->ghost(index).direction());
+      }
       break;
     }
     case 7: {
