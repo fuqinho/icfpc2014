@@ -38,7 +38,7 @@
 ;; SimpleChaser
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CloseMode:
-int Debug
+
 	jlt SC-<, A, C
 SC->:
 	jlt SC->A, B, D
