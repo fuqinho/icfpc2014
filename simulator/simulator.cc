@@ -145,27 +145,20 @@ class Simulator {
     // Get map by ID.
     std::vector<std::string> map_content = GetMap(map_file);
     
-    std::cerr << map_content.empty() << std::endl;
-    
     // If no map gotten, try to load file.
     if (map_content.empty()) {
       std::ifstream in(map_file);
       std::string line;
-      while (std::getline(in, line)) {
+      while (std::getline(in, line))
         map_content.push_back(line);
-      }
     }
     if (map_content.empty()) {
       std::cerr << "Not found: " << map_file << std::endl;
       exit(1);
     }
-    for (int i=0; i<map_content.size(); i++)
-      std::cerr << map_content[i] << std::endl;
-    
-    game_map->clear();
     for (auto line : map_content)
       game_map->push_back(line);
-    
+
     // Calculate game level.
     int area = (int)(*game_map).size() * (int)(*game_map)[0].size();
     int level = 1;
