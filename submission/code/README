@@ -1,6 +1,7 @@
 
 Infrastructural code:
   Written in standard C++. Compile with g++ 4.8 or above just by running 'make'.
+  glog library (https://code.google.com/p/google-glog/) is required.
 
   - simulator/
       Simulation environment for the both type of CPUs, their integration
