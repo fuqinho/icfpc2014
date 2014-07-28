@@ -7,6 +7,8 @@
 
 (define (wait-power-pill) 0)
 
+(define (fruit-pos) 0)
+
 ;; Boolean operation with short circuit.
 (defmacro (or x y) (if x 1 y))
 (defmacro (and x y) (if x y 0))
@@ -559,7 +561,10 @@
   (set! seed 0
   (set-tick! 127
   (set! wait-power-pill -1
-  (cons (cons 0 0) step-function)))))
+  (set! fruit-pos
+        (find-nearest-item
+             (get-map arg1) (cons 0 0) 1024 (lambda (tile) (= tile 4)))
+  (cons (cons 0 0) step-function))))))
 
 ;; Step function.
 (define (step-function ai_state state)
@@ -595,7 +600,8 @@
   (let ((plan (cache-mode ai_state (> fruit 0))))
   (if (not (int? plan)) plan
   ;; Fourth, Look for fruit.
-  (let ((plan (fruit-mode origin map ghost-lst (> fruit 0))))
+  (let ((plan (fruit-mode
+                 map origin (get-lambda-dir state) ghost-lst (> fruit 0))))
   (if (not (int? plan)) plan
   ;; Finally, normal search.
   (let ((plan (search-mode state map origin (> fruit 0))))
@@ -679,15 +685,17 @@
           (int? cache)) 0  ;; No cache available.
   (cons (cons fruit-state (cdr cache)) (car cache)))))
 
-(define (fruit-mode origin map ghost-lst fruit-state)
+(define (fruit-mode map origin lambda-dir ghost-lst fruit-state)
   (let ((last-pill (get-last-pill map)))
   (if (and (not fruit-state)
            (not (and (not (int? last-pill)) (< tick 50800))))
       0 ;; There is more than 1 pills and no-fruit is shown.
-  (if (= (get-tile map origin) 4)
+  (if (pos-eq? origin fruit-pos)
       ;; At fruit position. Try to stay there.
       (cons (cons fruit-state 0) (find-wall-dir map origin))
   ;; Search a path to fruit, and move toward there.
+  (if (> (pos-distance origin fruit-pos) 20)
+      (cons (cons fruit-state 0) (move-toward map origin lambda-dir fruit-pos))
   (let ((base-block
          (if (int? last-pill)
              0
@@ -699,7 +707,7 @@
   (if (int? bfs-result) 0 ;; Not found
   (let ((trace (backtrack (car bfs-result) origin (cdr bfs-result))))
   (if (int? trace) 0
-  (cons (cons fruit-state (cdr trace)) (car trace)))))))))))
+  (cons (cons fruit-state (cdr trace)) (car trace))))))))))))
 
 (define (search-mode state map origin fruit-state)
   (let ((cond
@@ -717,20 +725,23 @@
   (let ((nearest-pill-pos
            (find-nearest-item map origin 256
                               (lambda (tile) (or (= tile 2) (= tile 3))))))
+  (move-toward map origin lambda-dir nearest-pill-pos)))
+
+(define (move-toward map origin lambda-dir target)
   (let ((dir0 dir1 dir2 dir3
-         (if (< (abs (- (car origin) (car nearest-pill-pos)))
-                (abs (- (cdr origin) (cdr nearest-pill-pos))))
+         (if (< (abs (- (car origin) (car target)))
+                (abs (- (cdr origin) (cdr target))))
              ;; Horizontally far.
-             (if (< (car origin) (car nearest-pill-pos))
+             (if (< (car origin) (car target))
                  ;; Nearest-pill is at right.
-                 (if (< (cdr origin) (cdr nearest-pill-pos))
+                 (if (< (cdr origin) (cdr target))
                      ;; Right -> Down -> Up -> Left
                      (cons 1 2 0 3)
                      ;; Right -> Up -> Down -> Left
                      (cons 1 0 2 3)
                      )
                  ;; Nearest-pill is at left.
-                 (if (< (cdr origin) (cdr nearest-pill-pos))
+                 (if (< (cdr origin) (cdr target))
                      ;; Left -> Down -> Up -> Right
                      (cons 3 2 0 1)
                      ;; Left -> Up -> Down -> Right
@@ -738,16 +749,16 @@
                      )
                  )
              ;; Vertically far.
-             (if (< (cdr origin) (cdr nearest-pill-pos))
+             (if (< (cdr origin) (cdr target))
                  ;; Nearest-pill is at down.
-                 (if (< (car origin) (car nearest-pill-pos))
+                 (if (< (car origin) (car target))
                      ;; Down -> Right -> Left -> Up
                      (cons 2 1 3 0)
                      ;; Down -> Left -> Right -> Up
                      (cons 2 3 1 0)
                      )
                  ;; Nearest-pill is at left.
-                 (if (< (car origin) (car nearest-pill-pos))
+                 (if (< (car origin) (car target))
                      ;; Up -> Right -> Left -> Down
                      (cons 0 1 3 2)
                      ;; Up -> Left -> Right -> Down
@@ -763,4 +774,4 @@
       (cons (cons 0 0) dir2)
   (if (not (or (= uturn-dir dir3) (= (get-tile map (pos-add origin dir3)) 0)))
       (cons (cons 0 0) dir3)
-  0))))))))
+  0)))))))
