@@ -138,7 +138,7 @@ class GCC {
   }
 
   bool RunStep() {
-    // std::cerr << "reg_c: " << reg_c_ << std::endl;
+    // LOG(ERROR) << "reg_c: " << reg_c_;
 
     switch(code_[reg_c_].mnemonic) {
       case GccMnemonic::LDC:
@@ -697,6 +697,7 @@ class GCC {
   bool Dbug() {
     Value x = data_stack_.back();
     data_stack_.pop_back();
+    PrintValue(x);
     ++reg_c_;
     return false;
   }

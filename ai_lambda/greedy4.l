@@ -192,6 +192,27 @@
       (get-num-pills-row (cdr row)
                          (if (= (car row) 2) (+ cnt 1) cnt))))
 
+;; Returns last pills position (if remaining pill is only 1) or 0.
+(define (get-last-pill map)
+  (get-last-pill-iter map 0 0))
+
+(define (get-last-pill-iter rows row-index result)
+  (if (int? rows) result
+  (let ((col-index (get-last-pill-row (car rows) 0 0)))
+  (if (< col-index 0) 0
+  (if (= col-index 0)
+      (get-last-pill-iter (cdr rows) (+ row-index 1) result)
+  (if (not (int? result)) 0
+  (get-last-pill-iter
+     (cdr rows) (+ row-index 1) (cons col-index row-index))))))))
+
+(define (get-last-pill-row cols col-index result)
+  (if (int? cols) result
+  (if (= (car cols) 2)
+      (if (> result 0) -1  ;; Two (or more pills) are found.
+          (get-last-pill-row (cdr cols) (+ col-index 1) col-index))
+      (get-last-pill-row (cdr cols) (+ col-index 1) result))))
+
 ;; Returns opposite direction.
 (define (opposite dir)
   (if (= dir 0) 2
@@ -304,13 +325,52 @@
 ;; Look for the escape direction.
 (define (find-safe-direction map start ghost-lst)
   (let ((danger-zone (build-danger-zone map ghost-lst 3))
-        (ghost-block (build-ghost-block ghost-lst 0)))
+        (ghost-block (build-ghost-block ghost-lst 0))
+        (last-pill
+         (if (< tick 50800) (get-last-pill map) 0)))
+  ; First, if last-pill exists, try to search avoiding take it.
+  (let ((dir (find-safe-direction-last-pill
+                map start ghost-block danger-zone last-pill)))
+  (if (>= dir 0) dir
+  ;; If not found. Try to search without last pill
+  (let ((dir (find-safe-direction-internal map start ghost-block danger-zone)))
+  (if (>= dir 0) dir
+  ;; If not found. Do not check dead-end.
+  (let ((dir (find-safe-direction-no-deadend
+                map start ghost-block danger-zone)))
+  (if (>= dir 0) dir
+  0))))))))  ;; Give up to escape >_<
+
+(define (find-safe-direction-last-pill
+             map start ghost-block danger-zone last-pill)
+  (if (int? last-pill) -1
+  (let ((danger-zone (avl-add last-pill (cons 1 -1) danger-zone)))
+  (let ((bfs-result
+         (bfs map start 10
+              (avl-add last-pill (cons 10000000 5) ghost-block)
+              (lambda (pos _)
+                (and (int? (avl-find pos danger-zone))
+                     (not (is-dead-end map danger-zone pos)))))))
+  (if (int? bfs-result) -1
+  (car (backtrack (car bfs-result) start (cdr bfs-result))))))))
+
+(define (find-safe-direction-internal map start ghost-block danger-zone)
+  (let ((bfs-result
+         (bfs map start 10 ghost-block
+              (lambda (pos _)
+                (and (int? (avl-find pos danger-zone))
+                     (not (is-dead-end map danger-zone pos)))))))
+  (if (int? bfs-result) -1
+  (car (backtrack (car bfs-result) start (cdr bfs-result))))))
+
+(define (find-safe-direction-no-deadend map start ghost-block danger-zone)
   (let ((bfs-result
          (bfs map start 10 ghost-block
               (lambda (pos _) (int? (avl-find pos danger-zone))))))
-  (if (int? bfs-result) 0 ;; give-up to escape.
-  (let ((pos avl bfs-result))
-  (car (backtrack pos start avl)))))))
+  (if (int? bfs-result) -1
+  (car (backtrack (car bfs-result) start (cdr bfs-result))))))
+
+ ;; give-up to escape.
 
 (define (build-danger-zone map ghost-lst steps)
   (build-danger-zone-iter map ghost-lst steps 0))
@@ -353,6 +413,33 @@
       (build-ghost-block
            (cdr ghost-lst)
            (avl-add (car (cdr (car ghost-lst))) (cons 1000000 5) result))))
+
+(define (is-dead-end map danger-zone pos)
+  (is-dead-end-iter map danger-zone pos 0))
+
+(define (is-dead-end-iter map danger-zone pos visited)
+  (if (is-blocked map danger-zone pos) 1
+  (if (not (int? (avl-find pos visited))) 1
+  (if (is-junction map danger-zone pos) 0
+  (let ((visited (avl-add pos (cons 0 0) visited)))
+  (if (not (is-dead-end-iter map danger-zone (pos-add pos 0) visited)) 0
+  (if (not (is-dead-end-iter map danger-zone (pos-add pos 1) visited)) 0
+  (if (not (is-dead-end-iter map danger-zone (pos-add pos 2) visited)) 0
+  (if (not (is-dead-end-iter map danger-zone (pos-add pos 3) visited)) 0
+  1)))))))))
+
+(define (is-junction map danger-zone pos)
+  (>=
+   (+ (not (is-blocked map danger-zone (pos-add pos 0)))
+   (+ (not (is-blocked map danger-zone (pos-add pos 1)))
+   (+ (not (is-blocked map danger-zone (pos-add pos 2)))
+      (not (is-blocked map danger-zone (pos-add pos 3))))))
+   3))
+
+(define (is-blocked map danger-zone pos)
+  (if (= (get-tile map pos) 0) 1
+  (if (not (int? (avl-find pos danger-zone))) 1
+  0)))
 
 ;; Returns the direction toward a wall block.
 (define (find-wall-dir map pos)
@@ -429,21 +516,26 @@
   (cons (cons fruit-state (cdr cache)) (car cache)))))
 
 (define (fruit-mode origin map ghost-lst fruit-state)
+  (let ((last-pill (get-last-pill map)))
   (if (and (not fruit-state)
-           (not (and (= (get-num-pills map) 1) (< tick 50800))))
+           (not (and (not (int? last-pill)) (< tick 50800))))
       0 ;; There is more than 1 pills and no-fruit is shown.
   (if (= (get-tile map origin) 4)
       ;; At fruit position. Try to stay there.
       (cons (cons fruit-state 0) (find-wall-dir map origin))
   ;; Search a path to fruit, and move toward there.
+  (let ((base-block
+         (if (int? last-pill)
+             0
+             (avl-add last-pill (cons 10000000 5) 0))))
   (let ((bfs-result
          (bfs map origin 100000000
-              (build-ghost-block ghost-lst 0)
+              (build-ghost-block ghost-lst base-block)
               (lambda (_ tile) (= tile 4)))))
   (if (int? bfs-result) 0 ;; Not found
   (let ((trace (backtrack (car bfs-result) origin (cdr bfs-result))))
   (if (int? trace) 0
-  (cons (cons fruit-state (cdr trace)) (car trace)))))))))
+  (cons (cons fruit-state (cdr trace)) (car trace)))))))))))
 
 (define (search-mode map origin fruit-state)
   (let ((bfs-result
