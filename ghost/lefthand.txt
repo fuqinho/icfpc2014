@@ -1,0 +1,6 @@
+int 3
+int 6
+dec B
+and B,3
+mov A,B
+int 0

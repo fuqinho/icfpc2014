@@ -67,7 +67,7 @@ class Simulator {
     LoadLambdaMan(game_state_.mutable_lambda_man(), lambdaman_file_);
     InitLevel(1);
   }
-  
+
   void InitLevel(int level) {
     game_state_.set_game_level(level);
     LoadMap(game_state_.mutable_game_map(), map_file_);
@@ -79,7 +79,7 @@ class Simulator {
     game_state_.set_score(0);
     game_state_.mutable_lambda_man()->Init(game_state_);
   }
-  
+
   static void LoadLambdaMan(LambdaMan* lambda_man,
                             const std::string& lambdaman_file) {
     std::ifstream ifs(lambdaman_file);
@@ -144,12 +144,13 @@ class Simulator {
   void LoadMap(GameMap* game_map, const std::string& map_file) {
     game_map->clear();
     if (map_file == "random") {
-      std::vector<std::string> random_map = GenerateMap(game_state_.game_level());
+      MapGenerator generator;
+      std::vector<std::string> random_map = generator.Generate(game_state_.game_level());
       for (auto line : random_map) {
         game_map->push_back(line);
       }
     } else {
-      std:d:ifstream in(map_file);
+      std::ifstream in(map_file);
       std::string line;
       while (std::getline(in, line)) {
         game_map->push_back(line);
@@ -161,7 +162,7 @@ class Simulator {
       game_state_.set_game_level(level);
     }
   }
-  
+
   bool RunStep(int current_ticks) {
     MovePhase(current_ticks);
     ActionPhase(current_ticks);
@@ -356,7 +357,7 @@ class Simulator {
     game_state_.set_score(0);
     game_state_.set_game_level(game_state_.game_level() + 1);
   }
-  
+
   bool GameOverCheckPhase() {
     // Check if lambdaman wins.
     bool won = true;
@@ -397,7 +398,7 @@ class Simulator {
     buffer << "ticks:" << current_ticks
            << "  life:" << game_state_.lambda_man().life()
            << "  vital: " << game_state_.lambda_man().vitality() << "      \n";
-    
+
     for (size_t y = 0; y < game_state_.map_height(); ++y) {
       for (size_t x = 0; x < game_state_.map_width(); ++x) {
         if (game_state_.lambda_man().position() == Position {x, y}) {
@@ -465,7 +466,6 @@ int main(int argc, char* argv[]) {
     return 2;
   }
   sethandler();
-  
   Simulator sim;
   sim.set_map_file(argv[1]);
   sim.set_lambdaman_file(argv[2]);
