@@ -116,6 +116,7 @@ vector<string> GetMap(string id) {
     if (id.length() > 6)
       level = atoi(id.substr(6).c_str());
     MapGenerator generator;
+    generator.SetSeed(0);
     return generator.Generate(level);
   }
   return vector<string>();

@@ -469,13 +469,45 @@ int main(int argc, char* argv[]) {
     return 2;
   }
   sethandler();
-  Simulator sim;
-  sim.set_map_file(argv[1]);
-  sim.set_lambdaman_file(argv[2]);
-  for (int i = 3; i < argc; ++i) {
-    sim.add_ai_file(argv[i]);
+  
+  if (strncmp(argv[1], "series", 6) == 0) {
+    static const std::vector<std::string> MAPS = {
+      "classic",
+      "world-1",
+      "world-2",
+      "ghostbusters",
+      "proton-pack",
+      "random1",
+      "random3",
+      "random5",
+      "random7",
+      "random9",
+      "random11",
+      "random13",
+      "random15"
+    };
+    std::vector<int> scores;
+    for (auto map_id : MAPS) {
+      Simulator sim;
+      sim.set_map_file(map_id);
+      sim.set_lambdaman_file(argv[2]);
+      for (int i = 3; i < argc; ++i) {
+        sim.add_ai_file(argv[i]);
+      }
+      scores.push_back(sim.Run(false));
+      std::cout << map_id << ": " << scores.back() << std::endl;
+    }
+    for (auto s : scores) std::cout << s << ",";
+    std::cout << std::endl;
+  } else {
+    Simulator sim;
+    sim.set_map_file(argv[1]);
+    sim.set_lambdaman_file(argv[2]);
+    for (int i = 3; i < argc; ++i) {
+      sim.add_ai_file(argv[i]);
+    }
+    sim.Run(true);
   }
-  sim.Run(true);
   printf("\e[?25h");
   return 0;
 }
