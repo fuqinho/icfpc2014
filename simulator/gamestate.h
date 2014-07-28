@@ -13,7 +13,7 @@ typedef std::vector<std::string> GameMap;
 
 class GameState {
  public:
-  GameState() : game_level_(1) {
+  GameState() : game_level_(1), eaten_ghosts_(0) {
   }
 
   size_t map_width() const { return game_map_[0].size(); }
@@ -67,6 +67,16 @@ class GameState {
   int score() const { return score_; }
   void add_score(int score) { score_ += score; }
   void set_score(int score) { score_ = score; }
+  void add_ghost_score() {
+    ++eaten_ghosts_;
+    switch (eaten_ghosts_) {
+      case 1: score_ += 200; break;
+      case 2: score_ += 400; break;
+      case 3: score_ += 800; break;
+      default: score_ += 1600; break;
+    }
+  }
+  void reset_eaten_ghosts() { eaten_ghosts_ = 0; }
 
  private:
   GameMap game_map_;
@@ -76,6 +86,7 @@ class GameState {
   int fruit_;
   int score_;
   int game_level_;
+  int eaten_ghosts_;
 
   DISALLOW_COPY_AND_ASSIGN(GameState);
 };

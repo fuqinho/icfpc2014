@@ -300,6 +300,7 @@ class Simulator {
       game_state_.add_score(50);
       game_state_.mutable_lambda_man()->set_next_ticks(137 + current_ticks);
       game_state_.mutable_lambda_man()->set_vitality(127 * 20);
+      game_state_.reset_eaten_ghosts();
       *game_state_.mutable_tile(position) = ' ';
       size_t num_ghost = game_state_.ghost_size();
       for (size_t i = 0; i < num_ghost; ++i) {
@@ -335,10 +336,10 @@ class Simulator {
       }
 
       if (ghost->vitality() == GhostVitality::FRIGHT) {
-        // TODO score.
         ghost->set_position(ghost->initial_position());
         ghost->set_vitality(GhostVitality::INVISIBLE);
         ghost->set_direction(Direction::DOWN);
+        game_state_.add_ghost_score();
       } else {
         // Loose a life.
         game_state_.mutable_lambda_man()->set_life(
@@ -461,6 +462,17 @@ void sethandler() {
   sigaction(SIGINT, &sig_int_handler, NULL);
 }
 
+int run(const std::string& map_id, const std::string& lambdaman_file,
+        const std::vector<std::string>& ghost_files, bool visualize) {
+  Simulator sim;
+  sim.set_map_file(map_id);
+  sim.set_lambdaman_file(lambdaman_file);
+  for (auto ghost_file : ghost_files) {
+    sim.add_ai_file(ghost_file);
+  }
+  return sim.Run(visualize);
+}
+
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
@@ -469,44 +481,24 @@ int main(int argc, char* argv[]) {
     return 2;
   }
   sethandler();
+
+  std::string map_file = argv[1];
+  std::string lambdaman_file = argv[2];
+  std::vector<std::string> ghost_files;
+  for (int i = 3; i < argc; i++)
+    ghost_files.push_back(argv[i]);
   
-  if (strncmp(argv[1], "series", 6) == 0) {
+  if (map_file == "series") {
     static const std::vector<std::string> MAPS = {
-      "classic",
-      "world-1",
-      "world-2",
-      "ghostbusters",
-      "proton-pack",
-      "random1",
-      "random3",
-      "random5",
-      "random7",
-      "random9",
-      "random11",
-      "random13",
-      "random15"
-    };
+      "classic", "world-1", "world-2", "ghostbusters", "proton-pack",
+      "random1", "random3", "random5", "random7", "random10", "random15"};
     std::vector<int> scores;
     for (auto map_id : MAPS) {
-      Simulator sim;
-      sim.set_map_file(map_id);
-      sim.set_lambdaman_file(argv[2]);
-      for (int i = 3; i < argc; ++i) {
-        sim.add_ai_file(argv[i]);
-      }
-      scores.push_back(sim.Run(false));
+      scores.push_back(run(map_id, lambdaman_file, ghost_files, false));
       std::cout << map_id << ": " << scores.back() << std::endl;
     }
-    for (auto s : scores) std::cout << s << ",";
-    std::cout << std::endl;
   } else {
-    Simulator sim;
-    sim.set_map_file(argv[1]);
-    sim.set_lambdaman_file(argv[2]);
-    for (int i = 3; i < argc; ++i) {
-      sim.add_ai_file(argv[i]);
-    }
-    sim.Run(true);
+    run(map_file, lambdaman_file, ghost_files, true);
   }
   printf("\e[?25h");
   return 0;
