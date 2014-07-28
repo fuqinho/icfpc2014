@@ -1,0 +1,92 @@
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	mov C, A
+	mov D, B
+	int GetLambdaXy
+
+	mov E, C
+	sub E, A
+	jlt SC-ABS-X-DONE,A,C
+	xor E, 255
+	add E, 1
+SC-ABS-X-DONE:
+	mov F, D
+	sub F, B
+	jlt SC-ABS-Y-DONE,B,D
+	xor F, 255
+	add F, 1
+SC-ABS-Y-DONE:
+
+	jlt SC-<, A, C
+SC->:
+	jlt SC->A, B, D
+SC->V:
+	mov G, 198 ;D>R>U>L
+	jlt UltraChaser, E, F
+	mov G, 57  ;R>D>L>U
+	jeq UltraChaser, 1, 1
+SC->A:
+	mov G, 228  ;U>R>D>L
+	jlt UltraChaser, E, F
+	mov G, 177  ;R>U>L>D
+	jeq UltraChaser, 1, 1
+SC-<:
+	jlt SC-<A, B, D
+SC-<V:
+	mov G, 78  ;D>L>U>R
+	jlt UltraChaser, E, F
+	mov G, 27  ;L>D>R>U
+	jeq UltraChaser, 1, 1
+SC-<A:
+	mov G, 108  ;U>L>D>R
+	jlt UltraChaser, E, F
+	mov G, 147  ;L>U>R>D
+	jeq UltraChaser, 1, 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ordered candidates of dirs:
+;; G=[cand3][cand2][cand1][cand0]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+UltraChaser:
+	mov [100],0
+	mov [101],255
+	mov [102],1
+	mov [103],0
+	mov [104],0
+	mov [105],1
+	mov [106],255
+	mov [107],0
+UC-LoopHead:
+	jeq UC-LoopEnd,G,0
+	mov D,G
+	and D,3
+	div G,4
+	int GetGhostIndex
+	int GetGhostState
+	;; if fright mode, flip the direction
+	xor D,2
+	jeq UC-Fright,A,FRIGHT
+	xor D,2
+  UC-Fright:
+	;; you cannot go backwards
+	xor B,2
+	jeq UC-LoopHead,B,D
+	;; you cannot go to walls
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	mov C,D
+	mul C,2
+	add C,100
+	add A,[C]
+	add C,1
+	add B,[C]
+	int GetMap
+	jeq UC-LoopHead,A,WALL
+	;; yes, you can.
+	mov A,D
+	int SetGhostDirection
+	hlt
+UC-LoopEnd:
+	mov A,0
+	int SetGhostDirection
+	hlt

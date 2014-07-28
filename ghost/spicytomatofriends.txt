@@ -4,50 +4,58 @@ add [235],1
 int 1
 mov C, A
 mov D, B
+mov E,0
+mov B,0
+mov A,E
+add E,1
+int 5
+jeq 50,B,0
+sub A,C
+sub B,D
+add A,3
+add B,3
+jgt 7,A,7
+jgt 7,B,7
+jeq 19,1,1
 int 3
 int 5
 mov E, C
 sub E, A
-jlt 13,A,C
+jlt 26,A,C
 xor E, 255
 add E, 1
 mov F, D
 sub F, B
-jlt 18,B,D
+jlt 31,B,D
 xor F, 255
 add F, 1
-jgt 42,E,5
-jgt 42,F,5
-mov H,E
-add H,F
-jgt 42,H,6
-jlt 33, C, A
-jlt 29, D, B
+jlt 41, C, A
+jlt 37, D, B
 mov G, 198 
-jlt 85, E, F
+jlt 93, E, F
 mov G, 57  
-jeq 85, 1, 1
+jeq 93, 1, 1
 mov G, 228  
-jlt 85, E, F
+jlt 93, E, F
 mov G, 177  
-jeq 85, 1, 1
-jlt 38, D, B
+jeq 93, 1, 1
+jlt 46, D, B
 mov G, 78  
-jlt 85, E, F
+jlt 93, E, F
 mov G, 27  
-jeq 85, 1, 1
+jeq 93, 1, 1
 mov G, 108  
-jlt 85, E, F
+jlt 93, E, F
 mov G, 147  
-jeq 85, 1, 1
+jeq 93, 1, 1
 int 3
 int 5
 int 7
-jeq 48,A,3
-jeq 48,A,4
-jeq 49,1,1
+jeq 56,A,3
+jeq 56,A,4
+jeq 57,1,1
 mov [111],100
-jeq 61,[111],0
+jeq 69,[111],0
 dec [111]
 int 3
 int 6
@@ -91,17 +99,17 @@ mov [104],0
 mov [105],1
 mov [106],255
 mov [107],0
-jeq 117,G,0
+jeq 125,G,0
 mov D,G
 and D,3
 div G,4
 int 3
 int 6
 xor D,2
-jeq 102,A,1
+jeq 110,A,1
 xor D,2
 xor B,2
-jeq 93,B,D
+jeq 101,B,D
 int 3
 int 5
 mov C,D
@@ -111,7 +119,7 @@ add A,[C]
 add C,1
 add B,[C]
 int 7
-jeq 93,A,0
+jeq 101,A,0
 mov A,D
 int 0
 hlt

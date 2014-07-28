@@ -8,18 +8,36 @@
   PS1:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Precompute
-;;   Lambda @ (C,D)
-;;   Ghost  @ (A,B)
-;;   (E,F) := (|A-C|, |B-D|)
+;; Check closeness
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	int GetLambdaXy
 	mov C, A
 	mov D, B
+
+	mov E,0
+  FriendsLoopHead:
+	mov B,0
+	mov A,E
+	add E,1
+	int GetGhostCurrentXy
+	jeq FarAwayMode,B,0
+	sub A,C
+	sub B,D
+	add A,3
+	add B,3
+	jgt FriendsLoopHead,A,7
+	jgt FriendsLoopHead,B,7
+	jeq CloseMode,1,1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; When the ghost and lambda is close.
+;; UltraChaser
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+CloseMode:
+
 	int GetGhostIndex
 	int GetGhostCurrentXy
-
 	mov E, C
 	sub E, A
 	jlt ABS-X-DONE,A,C
@@ -32,18 +50,6 @@
 	xor F, 255
 	add F, 1
   ABS-Y-DONE:
-
-	jgt FarAwayMode,E,5
-	jgt FarAwayMode,F,5
-	mov H,E
-	add H,F
-	jgt FarAwayMode,H,6
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; When the ghost and lambda is close.
-;; UltraChaser
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-CloseMode:
 
 	jlt SC-<, C, A
 SC->:

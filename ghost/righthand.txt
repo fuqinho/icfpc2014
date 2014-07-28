@@ -1,6 +1,0 @@
-int 3
-int 6
-inc B
-and B,3
-mov A,B
-int 0
