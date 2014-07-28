@@ -35,7 +35,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; When the ghost and lambda is close.
-;; SimpleChaser
+;; UltraChaser
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CloseMode:
 
@@ -43,19 +43,27 @@ CloseMode:
 SC->:
 	jlt SC->A, B, D
 SC->V:
-	jlt goDown, E, F
-	jeq goRight, 1, 1
+	mov G, 198 ;D>R>U>L
+	jlt UltraChaser, E, F
+	mov G, 57  ;R>D>L>U
+	jeq UltraChaser, 1, 1
 SC->A:
-	jlt goUp, E, F
-	jeq goRight, 1, 1
+	mov G, 228  ;U>R>D>L
+	jlt UltraChaser, E, F
+	mov G, 177  ;R>U>L>D
+	jeq UltraChaser, 1, 1
 SC-<:
 	jlt SC-<A, B, D
 SC-<V:
-	jlt goDown, E, F
-	jeq goLeft, 1, 1
+	mov G, 78  ;D>L>U>R
+	jlt UltraChaser, E, F
+	mov G, 27  ;L>D>R>U
+	jeq UltraChaser, 1, 1
 SC-<A:
-	jlt goUp, E, F
-	jeq goLeft, 1, 1
+	mov G, 108  ;U>L>D>R
+	jlt UltraChaser, E, F
+	mov G, 147  ;L>U>R>D
+	jeq UltraChaser, 1, 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; When the ghost and lambda is far.
@@ -117,22 +125,51 @@ RandomMove:
 	int SetGhostDirection
 	hlt
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Common direction change routines.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-goRight:
-	mov A, RIGHT
-	jeq go,1,1
-goDown:
-	mov A, DOWN
-	jeq go,1,1
-goUp:
-	mov A, UP
-	jeq go,1,1
-goLeft:
-	mov A, LEFT
-	jeq go,1,1
-go:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; UltraCharer
+;; Ordered candidates of dirs:
+;; G=[cand3][cand2][cand1][cand0]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+UltraChaser:
+	mov [100],0
+	mov [101],255
+	mov [102],1
+	mov [103],0
+	mov [104],0
+	mov [105],1
+	mov [106],255
+	mov [107],0
+UC-LoopHead:
+	jeq UC-LoopEnd,G,0
+	mov D,G
+	and D,3
+	div G,4
+	int GetGhostIndex
+	int GetGhostState
+	;; if fright mode, flip the direction
+	xor D,2
+	jeq UC-Fright,A,FRIGHT
+	xor D,2
+  UC-Fright:
+	;; you cannot go backwards
+	xor B,2
+	jeq UC-LoopHead,B,D
+	;; you cannot go to walls
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	mov C,D
+	mul C,2
+	add C,100
+	add A,[C]
+	add C,1
+	add B,[C]
+	int GetMap
+	jeq UC-LoopHead,A,WALL
+	;; yes, you can.
+	mov A,D
+	int SetGhostDirection
+	hlt
+UC-LoopEnd:
+	mov A,0
 	int SetGhostDirection
 	hlt
