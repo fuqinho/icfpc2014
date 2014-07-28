@@ -9,7 +9,7 @@
 #include "gamestate.h"
 #include "ghost.h"
 #include "lambdaman.h"
-#include "map_generator.h"
+#include "mapstore.h"
 
 #include "glog/logging.h"
 
@@ -142,25 +142,35 @@ class Simulator {
   }
 
   void LoadMap(GameMap* game_map, const std::string& map_file) {
-    game_map->clear();
-    if (map_file == "random") {
-      MapGenerator generator;
-      std::vector<std::string> random_map = generator.Generate(game_state_.game_level());
-      for (auto line : random_map) {
-        game_map->push_back(line);
-      }
-    } else {
+    // Get map by ID.
+    std::vector<std::string> map_content = GetMap(map_file);
+    
+    std::cerr << map_content.empty() << std::endl;
+    
+    // If no map gotten, try to load file.
+    if (map_content.empty()) {
       std::ifstream in(map_file);
       std::string line;
       while (std::getline(in, line)) {
-        game_map->push_back(line);
+        map_content.push_back(line);
       }
-      // adjust game level
-      int area = (int)(*game_map).size() * (int)(*game_map)[0].size();
-      int level = 1;
-      while (100 * level < area) level++;
-      game_state_.set_game_level(level);
     }
+    if (map_content.empty()) {
+      std::cerr << "Not found: " << map_file << std::endl;
+      exit(1);
+    }
+    for (int i=0; i<map_content.size(); i++)
+      std::cerr << map_content[i] << std::endl;
+    
+    game_map->clear();
+    for (auto line : map_content)
+      game_map->push_back(line);
+    
+    // Calculate game level.
+    int area = (int)(*game_map).size() * (int)(*game_map)[0].size();
+    int level = 1;
+    while (100 * level < area) level++;
+    game_state_.set_game_level(level);
   }
 
   bool RunStep(int current_ticks) {
