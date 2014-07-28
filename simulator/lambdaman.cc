@@ -9,7 +9,11 @@
 #include "testai.h"
 #endif
 
-LambdaMan::LambdaMan() {
+LambdaMan::LambdaMan() : life_(3), vitality_(0) {
+  ai_state_.tag = ValueTag::INT;
+  ai_state_.value = 0;
+  step_function_.tag = ValueTag::INT;
+  step_function_.value = 0;
 }
 
 LambdaMan::~LambdaMan() {
@@ -23,7 +27,7 @@ void LambdaMan::Init(const GameState& game_state) {
   Value result =
       gcc_.Run(0, -1, BuildWorld(game_state),
                Value {ValueTag::INT, 0}, Value {ValueTag::INT, 0});
-    ai_state_ = gcc_.ConsCar(result);
+  ai_state_ = gcc_.ConsCar(result);
   step_function_ = gcc_.ConsCdr(result);
 }
 

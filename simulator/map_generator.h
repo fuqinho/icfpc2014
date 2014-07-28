@@ -6,6 +6,7 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <algorithm>
 
 //                       up  right down left
 static const int DR[] = {-1,   0,   1,   0};

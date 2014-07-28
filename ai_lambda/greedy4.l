@@ -5,6 +5,8 @@
 (define (tick) 0)
 (defmacro (set-tick! t e) (set! tick t e))
 
+(define (wait-power-pill) 0)
+
 ;; Boolean operation with short circuit.
 (defmacro (or x y) (if x 1 y))
 (defmacro (and x y) (if x y 0))
@@ -476,7 +478,10 @@
 
 ;; Main
 (define (main)
-  (set! seed 0 (set-tick! 127 (cons (cons 0 0) step-function))))
+  (set! seed 0
+  (set-tick! 127
+  (set! wait-power-pill -1
+  (cons (cons 0 0) step-function)))))
 
 ;; Step function.
 (define (step-function ai_state state)
@@ -497,8 +502,13 @@
         (map (get-map state))
         (ghost-lst (get-ghost-list state))
         (fruit (get-fruit state)))
+  (let ((plan (next-power-pill-mode state map origin ghost-lst (> fruit 0))))
+  (if (not (int? plan)) plan
   ;; First check if dangerous mode.
   (let ((plan (dangerous-mode state map origin ghost-lst)))
+  (if (not (int? plan)) plan
+    ;;
+  (let ((plan (power-pill-chain-mode state map origin)))
   (if (not (int? plan)) plan
   ;; Second. Check if power mode.
   (let ((plan (power-mode state map origin ghost-lst)))
@@ -510,13 +520,61 @@
   (let ((plan (fruit-mode origin map ghost-lst (> fruit 0))))
   (if (not (int? plan)) plan
   ;; Finally, normal search.
-  (let ((plan (search-mode map origin (> fruit 0))))
+  (let ((plan (search-mode state map origin (> fruit 0))))
   (if (not (int? plan)) plan
   ;; Gives up. Just random walk.
-  (cons (cons (> fruit 0) 0) (mod (rand) 4))))))))))))))
+  (cons (cons (> fruit 0) 0) (mod (rand) 4))))))))))))))))))
 
 
 ;; Sub AI definition.
+
+(define (next-power-pill-mode state map origin ghost-lst fruit-state)
+  (if (> (lambda-vitality state) 0)
+      (set! wait-power-pill -1 0)
+  (let ((next-power-pill-dir (find-next-power-pill-dir map origin)))
+  (if (< next-power-pill-dir 0)
+      (set! wait-power-pill -1 0)
+  (let ((nearest-ghost-distance
+         (find-nearest-ghost map origin ghost-lst 3)))
+  (if (<= nearest-ghost-distance 2)
+      (set! wait-power-pill -1 (cons (cons 0 0) next-power-pill-dir))
+  (if (<= nearest-ghost-distance 3)
+      ;; In dangerous-mode. Wait one more frame.
+      (cons (cons 0 0) (find-wall-dir map origin))
+  (if fruit-state
+      ;; Look for fruit if in fruit-state
+      (set! wait-power-pill -1 0)
+  (set! wait-power-pill (if (< wait-power-pill 0) 80 (- wait-power-pill 1))
+  (if (= wait-power-pill 0)
+      (set! wait-power-pill -1 (cons (cons 0 0) next-power-pill-dir))
+      (cons (cons 0 0) (find-wall-dir map origin))))))))))))
+
+(define (find-next-power-pill-dir map origin)
+  (let ((dir0 (mod tick 4))
+        (dir1 (mod (+ tick 1) 4))
+        (dir2 (mod (+ tick 2) 4))
+        (dir3 (mod (+ tick 3) 4)))
+  (if (= (get-tile map (pos-add origin dir0)) 3) dir0
+  (if (= (get-tile map (pos-add origin dir1)) 3) dir1
+  (if (= (get-tile map (pos-add origin dir2)) 3) dir2
+  (if (= (get-tile map (pos-add origin dir3)) 3) dir3
+  -1))))))
+
+(define (power-pill-chain-mode state map origin)
+  (let ((vitality (lambda-vitality state)))
+  (if (<= vitality 0) 0
+  (let ((available-distance (+ (/ vitality 137) 1)))
+  (let ((bfs-result
+         (bfs map origin available-distance
+              0
+              (lambda (_ tile) (= tile 3)))))
+  (if (int? bfs-result) 0  ;; Not found.
+  (let ((pos avl bfs-result))
+  (let ((nearest-power-pill-distance (car (avl-find pos avl))))
+  (if (or (= nearest-power-pill-distance available-distance)
+          (= nearest-power-pill-distance (- available-distance 1)))
+      (cons (cons 0 0) (car (backtrack pos origin avl)))
+  0)))))))))
 
 (define (dangerous-mode state map origin ghost-lst)
   (if (or (> (lambda-vitality state) 381)  ;; 127 * 3
@@ -561,10 +619,12 @@
   (if (int? trace) 0
   (cons (cons fruit-state (cdr trace)) (car trace)))))))))))
 
-(define (search-mode map origin fruit-state)
+(define (search-mode state map origin fruit-state)
   (let ((bfs-result
          (bfs map origin 100000000 0
-              (lambda (_ tile) (or (= tile 2) (= tile 3))))))
+              (if (> (lambda-vitality state) 0)
+                  (lambda (_ tile) (= tile 2))
+                  (lambda (_ tile) (or (= tile 2) (= tile 3)))))))
   (if (int? bfs-result) 0
   (let ((trace (backtrack (car bfs-result) origin (cdr bfs-result))))
   (cons (cons fruit-state (cdr trace)) (car trace))))))

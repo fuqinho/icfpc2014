@@ -9,7 +9,7 @@
 #include "gamestate.h"
 #include "ghost.h"
 #include "lambdaman.h"
-#include "map_generator.h"
+#include "mapstore.h"
 
 #include "glog/logging.h"
 
@@ -142,25 +142,28 @@ class Simulator {
   }
 
   void LoadMap(GameMap* game_map, const std::string& map_file) {
-    game_map->clear();
-    if (map_file == "random") {
-      MapGenerator generator;
-      std::vector<std::string> random_map = generator.Generate(game_state_.game_level());
-      for (auto line : random_map) {
-        game_map->push_back(line);
-      }
-    } else {
+    // Get map by ID.
+    std::vector<std::string> map_content = GetMap(map_file);
+    
+    // If no map gotten, try to load file.
+    if (map_content.empty()) {
       std::ifstream in(map_file);
       std::string line;
-      while (std::getline(in, line)) {
-        game_map->push_back(line);
-      }
-      // adjust game level
-      int area = (int)(*game_map).size() * (int)(*game_map)[0].size();
-      int level = 1;
-      while (100 * level < area) level++;
-      game_state_.set_game_level(level);
+      while (std::getline(in, line))
+        map_content.push_back(line);
     }
+    if (map_content.empty()) {
+      std::cerr << "Not found: " << map_file << std::endl;
+      exit(1);
+    }
+    for (auto line : map_content)
+      game_map->push_back(line);
+
+    // Calculate game level.
+    int area = (int)(*game_map).size() * (int)(*game_map)[0].size();
+    int level = 1;
+    while (100 * level < area) level++;
+    game_state_.set_game_level(level);
   }
 
   bool RunStep(int current_ticks) {
@@ -466,13 +469,45 @@ int main(int argc, char* argv[]) {
     return 2;
   }
   sethandler();
-  Simulator sim;
-  sim.set_map_file(argv[1]);
-  sim.set_lambdaman_file(argv[2]);
-  for (int i = 3; i < argc; ++i) {
-    sim.add_ai_file(argv[i]);
+  
+  if (strncmp(argv[1], "series", 6) == 0) {
+    static const std::vector<std::string> MAPS = {
+      "classic",
+      "world-1",
+      "world-2",
+      "ghostbusters",
+      "proton-pack",
+      "random1",
+      "random3",
+      "random5",
+      "random7",
+      "random9",
+      "random11",
+      "random13",
+      "random15"
+    };
+    std::vector<int> scores;
+    for (auto map_id : MAPS) {
+      Simulator sim;
+      sim.set_map_file(map_id);
+      sim.set_lambdaman_file(argv[2]);
+      for (int i = 3; i < argc; ++i) {
+        sim.add_ai_file(argv[i]);
+      }
+      scores.push_back(sim.Run(false));
+      std::cout << map_id << ": " << scores.back() << std::endl;
+    }
+    for (auto s : scores) std::cout << s << ",";
+    std::cout << std::endl;
+  } else {
+    Simulator sim;
+    sim.set_map_file(argv[1]);
+    sim.set_lambdaman_file(argv[2]);
+    for (int i = 3; i < argc; ++i) {
+      sim.add_ai_file(argv[i]);
+    }
+    sim.Run(true);
   }
-  sim.Run(true);
   printf("\e[?25h");
   return 0;
 }
