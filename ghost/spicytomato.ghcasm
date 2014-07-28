@@ -29,7 +29,7 @@
 
 	jgt FarAwayMode,E,5
 	jgt FarAwayMode,F,5
-	add H,E
+	mov H,E
 	add H,F
 	jgt FarAwayMode,H,6
 
@@ -38,7 +38,7 @@
 ;; SimpleChaser
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CloseMode:
-
+int Debug
 	jlt SC-<, A, C
 SC->:
 	jlt SC->A, B, D
