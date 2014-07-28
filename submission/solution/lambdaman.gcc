@@ -1,0 +1,2636 @@
+DUM 78
+LDF 81
+LDF 83
+LDF 89
+LDF 91
+LDF 93
+LDF 101
+LDF 109
+LDF 119
+LDF 123
+LDF 139
+LDF 161
+LDF 167
+LDF 193
+LDF 197
+LDF 211
+LDF 235
+LDF 238
+LDF 265
+LDF 275
+LDF 279
+LDF 288
+LDF 304
+LDF 441
+LDF 507
+LDF 544
+LDF 565
+LDF 568
+LDF 574
+LDF 579
+LDF 582
+LDF 587
+LDF 592
+LDF 601
+LDF 616
+LDF 636
+LDF 639
+LDF 689
+LDF 721
+LDF 740
+LDF 784
+LDF 788
+LDF 794
+LDF 1011
+LDF 1066
+LDF 1072
+LDF 1100
+LDF 1126
+LDF 1159
+LDF 1188
+LDF 1224
+LDF 1294
+LDF 1327
+LDF 1391
+LDF 1423
+LDF 1452
+LDF 1461
+LDF 1493
+LDF 1594
+LDF 1617
+LDF 1631
+LDF 1721
+LDF 1729
+LDF 1822
+LDF 1828
+LDF 1888
+LDF 1937
+LDF 1947
+LDF 2012
+LDF 2127
+LDF 2230
+LDF 2286
+LDF 2382
+LDF 2413
+LDF 2442
+LDF 2470
+LDF 2575
+LDF 2620
+LDC 12345678
+LDF 2634
+TRAP 78
+LDC 0		; [81] seed
+RTN
+LD 1 0		; [83] rand
+LDC 1
+ADD
+ST 1 0
+LD 1 0
+RTN
+LDC 0		; [89] tick
+RTN
+LDC 0		; [91] wait-power-pill
+RTN
+LD 0 0		; [93] not
+LDC 0
+CEQ
+RTN
+LD 0 0		; [97] (max-then)
+RTN
+LD 0 1		; [99] (max-else)
+RTN
+LD 0 0		; [101] max
+LD 0 1
+CGT
+TSEL 97 99
+LD 0 0		; [105] (min-then)
+RTN
+LD 0 1		; [107] (min-else)
+RTN
+LD 0 1		; [109] min
+LD 0 0
+CGT
+TSEL 105 107
+LDC 0		; [113] (abs-then)
+LD 0 0
+SUB
+RTN
+LD 0 0		; [117] (abs-else)
+RTN
+LDC 0		; [119] abs
+LD 0 0
+CGT
+TSEL 113 117
+LD 0 0		; [123] mod
+LD 0 0
+LD 0 1
+DIV
+LD 0 1
+MUL
+SUB
+RTN
+LD 0 0		; [131] (pos-eq?-then)
+CDR
+LD 0 1
+CDR
+CEQ
+RTN
+LDC 0		; [137] (pos-eq?-else)
+RTN
+LD 0 0		; [139] pos-eq?
+CAR
+LD 0 1
+CAR
+CEQ
+TSEL 131 137
+LDC 1		; [145] (pos-lt?-then)
+RTN
+LD 0 1		; [147] (pos-lt?-then)
+CDR
+LD 0 0
+CDR
+CGT
+RTN
+LDC 0		; [153] (pos-lt?-else)
+RTN
+LD 0 0		; [155] (pos-lt?-else)
+CAR
+LD 0 1
+CAR
+CEQ
+TSEL 147 153
+LD 0 1		; [161] pos-lt?
+CAR
+LD 0 0
+CAR
+CGT
+TSEL 145 155
+LD 0 0		; [167] pos-distance
+CAR
+LD 0 1
+CAR
+SUB
+LD 1 7
+AP 1
+LD 0 0
+CDR
+LD 0 1
+CDR
+SUB
+LD 1 7
+AP 1
+ADD
+RTN
+LD 0 1		; [183] (nth-then)
+CAR
+RTN
+LD 0 0		; [186] (nth-else)
+LDC 1
+SUB
+LD 0 1
+CDR
+LD 1 12
+TAP 2
+LD 0 0		; [193] nth
+LDC 0
+CEQ
+TSEL 183 186
+LD 0 0		; [197] lst-rev
+LDC 0
+LD 1 14
+TAP 2
+LD 0 1		; [201] (lst-rev-internal-then)
+RTN
+LD 0 0		; [203] (lst-rev-internal-else)
+CDR
+LD 0 0
+CAR
+LD 0 1
+CONS
+LD 1 14
+TAP 2
+LD 0 0		; [211] lst-rev-internal
+ATOM
+TSEL 201 203
+LDC 0		; [214] (lst-filter-then)
+RTN
+LD 0 1		; [216] (lst-filter-then)
+CAR
+LD 0 0
+LD 0 1
+CDR
+LD 1 15
+AP 2
+CONS
+RTN
+LD 0 0		; [225] (lst-filter-else)
+LD 0 1
+CDR
+LD 1 15
+TAP 2
+LD 0 1		; [230] (lst-filter-else)
+CAR
+LD 0 0
+AP 1
+TSEL 216 225
+LD 0 1		; [235] lst-filter
+ATOM
+TSEL 214 230
+LD 0 0		; [238] q-push
+LD 0 1
+CAR
+CONS
+LD 0 1
+CDR
+CONS
+RTN
+LDC 0		; [246] (q-pop-then)
+LD 0 0
+CAR
+LD 1 13
+AP 1
+CONS
+LD 1 17
+TAP 1
+LD 0 0		; [254] (q-pop-else)
+CDR
+CAR
+LD 0 0
+CAR
+LD 0 0
+CDR
+CDR
+CONS
+CONS
+RTN
+LD 0 0		; [265] q-pop
+CDR
+ATOM
+TSEL 246 254
+LD 0 0		; [269] (q-empty?-then)
+CDR
+ATOM
+RTN
+LDC 0		; [273] (q-empty?-else)
+RTN
+LD 0 0		; [275] q-empty?
+CAR
+ATOM
+TSEL 269 273
+LD 0 0		; [279] avl-empty?
+ATOM
+RTN
+LDC 0		; [282] (avl-height-then)
+RTN
+LD 0 0		; [284] (avl-height-else)
+CAR
+CDR
+RTN
+LD 0 0		; [288] avl-height
+ATOM
+TSEL 282 284
+LD 1 0		; [291] (avl-create-let)
+LD 0 0
+LD 0 1
+LD 2 5
+AP 2
+LDC 1
+ADD
+CONS
+LD 1 1
+LD 1 2
+CONS
+CONS
+RTN
+LD 0 1		; [304] avl-create
+LD 1 20
+AP 1
+LD 0 2
+LD 1 20
+AP 1
+LDF 291
+TAP 2
+LD 0 0		; [312] (avl-bal-then)
+LD 0 1
+LD 2 0
+LD 0 2
+LD 2 2
+LD 3 21
+AP 3
+LD 3 21
+TAP 3
+LD 0 0		; [321] (avl-bal-let)
+LD 1 0
+LD 1 1
+LD 0 1
+LD 4 21
+AP 3
+LD 3 0
+LD 0 2
+LD 3 2
+LD 4 21
+AP 3
+LD 4 21
+TAP 3
+LD 0 2		; [334] (avl-bal-else)
+CAR
+CAR
+LD 0 2
+CDR
+CAR
+LD 0 2
+CDR
+CDR
+LDF 321
+TAP 3
+LD 0 1		; [345] (avl-bal-let)
+LD 3 20
+AP 1
+LD 0 2
+LD 3 20
+AP 1
+CGTE
+TSEL 312 334
+LD 1 1		; [353] (avl-bal-then)
+CAR
+CAR
+LD 1 1
+CDR
+CAR
+LD 1 1
+CDR
+CDR
+LDF 345
+TAP 3
+LD 0 0		; [364] (avl-bal-then)
+LD 2 0
+LD 2 1
+LD 0 1
+LD 3 21
+AP 3
+LD 0 2
+LD 3 21
+TAP 3
+LD 0 0		; [373] (avl-bal-let)
+LD 3 0
+LD 3 1
+LD 0 1
+LD 4 21
+AP 3
+LD 1 0
+LD 0 2
+LD 1 2
+LD 4 21
+AP 3
+LD 4 21
+TAP 3
+LD 0 1		; [386] (avl-bal-else)
+CAR
+CAR
+LD 0 1
+CDR
+CAR
+LD 0 1
+CDR
+CDR
+LDF 373
+TAP 3
+LD 0 2		; [397] (avl-bal-let)
+LD 3 20
+AP 1
+LD 0 1
+LD 3 20
+AP 1
+CGTE
+TSEL 364 386
+LD 1 2		; [405] (avl-bal-then)
+CAR
+CAR
+LD 1 2
+CDR
+CAR
+LD 1 2
+CDR
+CDR
+LDF 397
+TAP 3
+LD 1 0		; [416] (avl-bal-else)
+LD 0 0
+LD 0 1
+LD 2 5
+AP 2
+LDC 1
+ADD
+CONS
+LD 1 1
+LD 1 2
+CONS
+CONS
+RTN
+LD 0 1		; [429] (avl-bal-else)
+LD 0 0
+LDC 2
+ADD
+CGT
+TSEL 405 416
+LD 0 0		; [435] (avl-bal-let)
+LD 0 1
+LDC 2
+ADD
+CGT
+TSEL 353 429
+LD 0 1		; [441] avl-bal
+LD 1 20
+AP 1
+LD 0 2
+LD 1 20
+AP 1
+LDF 435
+TAP 2
+LD 0 0		; [449] (avl-add-then)
+LD 0 1
+CONS
+LDC 1
+CONS
+LDC 0
+LDC 0
+CONS
+CONS
+RTN
+LD 1 0		; [459] (avl-add-then)
+LD 1 1
+CONS
+LD 0 1
+LD 0 2
+LD 2 21
+TAP 3
+LD 0 0		; [466] (avl-add-then)
+LD 1 0
+LD 1 1
+LD 0 1
+LD 2 23
+AP 3
+LD 0 2
+LD 2 22
+TAP 3
+LD 0 0		; [475] (avl-add-else)
+LD 0 1
+LD 1 0
+LD 1 1
+LD 0 2
+LD 2 23
+AP 3
+LD 2 22
+TAP 3
+LD 1 0		; [484] (avl-add-else)
+LD 0 0
+CAR
+LD 2 10
+AP 2
+TSEL 466 475
+LD 1 0		; [490] (avl-add-let)
+LD 0 0
+CAR
+LD 2 9
+AP 2
+TSEL 459 484
+LD 0 2		; [496] (avl-add-else)
+CAR
+CAR
+LD 0 2
+CDR
+CAR
+LD 0 2
+CDR
+CDR
+LDF 490
+TAP 3
+LD 0 2		; [507] avl-add
+ATOM
+TSEL 449 496
+LDC 0		; [510] (avl-find-then)
+RTN
+LD 0 0		; [512] (avl-find-then)
+CDR
+RTN
+LD 1 0		; [515] (avl-find-then)
+LD 1 1
+CDR
+CAR
+LD 2 24
+TAP 2
+LD 1 0		; [521] (avl-find-else)
+LD 1 1
+CDR
+CDR
+LD 2 24
+TAP 2
+LD 1 0		; [527] (avl-find-else)
+LD 0 0
+CAR
+LD 2 10
+AP 2
+TSEL 515 521
+LD 1 0		; [533] (avl-find-let)
+LD 0 0
+CAR
+LD 2 9
+AP 2
+TSEL 512 527
+LD 0 1		; [539] (avl-find-else)
+CAR
+CAR
+LDF 533
+TAP 1
+LD 0 1		; [544] avl-find
+ATOM
+TSEL 510 539
+LDC 0		; [547] (find-then)
+RTN
+LD 0 1		; [549] (find-then)
+CAR
+CDR
+RTN
+LD 0 0		; [553] (find-else)
+LD 0 1
+CDR
+LD 1 25
+TAP 2
+LD 0 0		; [558] (find-else)
+LD 0 1
+CAR
+CAR
+LD 1 9
+AP 2
+TSEL 549 553
+LD 0 1		; [565] find
+ATOM
+TSEL 547 558
+LD 0 0		; [568] lambda-pos
+CDR
+CAR
+CDR
+CAR
+RTN
+LD 0 0		; [574] lambda-vitality
+CDR
+CAR
+CAR
+RTN
+LD 0 0		; [579] get-map
+CAR
+RTN
+LD 0 0		; [582] get-ghost-list
+CDR
+CDR
+CAR
+RTN
+LD 0 0		; [587] get-fruit
+CDR
+CDR
+CDR
+RTN
+LD 0 1		; [592] get-tile
+CAR
+LD 0 1
+CDR
+LD 0 0
+LD 1 12
+AP 2
+LD 1 12
+TAP 2
+LD 0 0		; [601] get-num-pills
+LDC 0
+LD 1 33
+TAP 2
+LD 0 1		; [605] (get-num-pills-iter-then)
+RTN
+LD 0 0		; [607] (get-num-pills-iter-else)
+CDR
+LD 0 0
+CAR
+LD 0 1
+LD 1 34
+AP 2
+LD 1 33
+TAP 2
+LD 0 0		; [616] get-num-pills-iter
+ATOM
+TSEL 605 607
+LD 0 1		; [619] (get-num-pills-row-then)
+RTN
+LD 0 1		; [621] (get-num-pills-row-then)
+LDC 1
+ADD
+JOIN
+LD 0 1		; [625] (get-num-pills-row-else)
+JOIN
+LD 0 0		; [627] (get-num-pills-row-else)
+CDR
+LD 0 0
+CAR
+LDC 2
+CEQ
+SEL 621 625
+LD 1 34
+TAP 2
+LD 0 0		; [636] get-num-pills-row
+ATOM
+TSEL 619 627
+LD 0 0		; [639] get-last-pill
+LDC 0
+LDC 0
+LD 1 36
+TAP 3
+LD 0 2		; [644] (get-last-pill-iter-then)
+RTN
+LDC 0		; [646] (get-last-pill-iter-then)
+RTN
+LD 1 0		; [648] (get-last-pill-iter-then)
+CDR
+LD 1 1
+LDC 1
+ADD
+LD 1 2
+LD 2 36
+TAP 3
+LDC 0		; [656] (get-last-pill-iter-then)
+RTN
+LD 1 0		; [658] (get-last-pill-iter-else)
+CDR
+LD 1 1
+LDC 1
+ADD
+LD 0 0
+LD 1 1
+CONS
+LD 2 36
+TAP 3
+LD 1 2		; [668] (get-last-pill-iter-else)
+ATOM
+LD 2 4
+AP 1
+TSEL 656 658
+LD 0 0		; [673] (get-last-pill-iter-else)
+LDC 0
+CEQ
+TSEL 648 668
+LDC 0		; [677] (get-last-pill-iter-let)
+LD 0 0
+CGT
+TSEL 646 673
+LD 0 0		; [681] (get-last-pill-iter-else)
+CAR
+LDC 0
+LDC 0
+LD 1 37
+AP 3
+LDF 677
+TAP 1
+LD 0 0		; [689] get-last-pill-iter
+ATOM
+TSEL 644 681
+LD 0 2		; [692] (get-last-pill-row-then)
+RTN
+LDC -1		; [694] (get-last-pill-row-then)
+RTN
+LD 0 0		; [696] (get-last-pill-row-else)
+CDR
+LD 0 1
+LDC 1
+ADD
+LD 0 1
+LD 1 37
+TAP 3
+LD 0 2		; [704] (get-last-pill-row-then)
+LDC 0
+CGT
+TSEL 694 696
+LD 0 0		; [708] (get-last-pill-row-else)
+CDR
+LD 0 1
+LDC 1
+ADD
+LD 0 2
+LD 1 37
+TAP 3
+LD 0 0		; [716] (get-last-pill-row-else)
+CAR
+LDC 2
+CEQ
+TSEL 704 708
+LD 0 0		; [721] get-last-pill-row
+ATOM
+TSEL 692 716
+LDC 2		; [724] (opposite-then)
+RTN
+LDC 3		; [726] (opposite-then)
+RTN
+LDC 0		; [728] (opposite-then)
+RTN
+LDC 1		; [730] (opposite-else)
+RTN
+LD 0 0		; [732] (opposite-else)
+LDC 2
+CEQ
+TSEL 728 730
+LD 0 0		; [736] (opposite-else)
+LDC 1
+CEQ
+TSEL 726 732
+LD 0 0		; [740] opposite
+LDC 0
+CEQ
+TSEL 724 736
+LD 0 0		; [744] (pos-add-then)
+CAR
+LD 0 0
+CDR
+LDC 1
+SUB
+CONS
+RTN
+LD 0 0		; [752] (pos-add-then)
+CAR
+LDC 1
+ADD
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 0		; [760] (pos-add-then)
+CAR
+LD 0 0
+CDR
+LDC 1
+ADD
+CONS
+RTN
+LD 0 0		; [768] (pos-add-else)
+CAR
+LDC 1
+SUB
+LD 0 0
+CDR
+CONS
+RTN
+LD 0 1		; [776] (pos-add-else)
+LDC 2
+CEQ
+TSEL 760 768
+LD 0 1		; [780] (pos-add-else)
+LDC 1
+CEQ
+TSEL 752 776
+LD 0 1		; [784] pos-add
+LDC 0
+CEQ
+TSEL 744 780
+LD 0 0		; [788] pos-sub
+LD 0 1
+LD 1 38
+AP 1
+LD 1 39
+TAP 2
+LD 0 0		; [794] bfs
+LD 0 2
+LD 0 4
+LD 0 1
+LDC 0
+LDC 0
+CONS
+LD 1 16
+AP 2
+LD 0 1
+LDC 0
+LDC 5
+CONS
+LD 0 3
+LD 1 23
+AP 3
+LD 1 42
+TAP 5
+LDC 0		; [812] (bfs-iter-then)
+RTN
+LD 2 0		; [814] (bfs-iter-then)
+LD 2 1
+LD 2 2
+LD 1 1
+LD 2 4
+LD 3 42
+TAP 5
+LD 0 0		; [821] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [825] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [829] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 0 0		; [833] (bfs-iter-then)
+LD 0 2
+CONS
+RTN
+LD 8 0		; [837] (bfs-iter-else)
+LD 8 1
+LD 8 2
+LD 0 1
+LD 0 2
+LD 9 42
+TAP 5
+LD 0 0		; [844] (bfs-iter-let)
+ATOM
+LD 9 4
+AP 1
+TSEL 833 837
+LD 7 0		; [849] (bfs-iter-else)
+LD 7 2
+LD 0 1
+LD 0 2
+LD 6 0
+LD 3 3
+LD 8 39
+AP 2
+LD 3 3
+LD 5 0
+LD 8 43
+AP 7
+ST 8 77
+LD 8 77
+CAR
+LD 8 77
+CDR
+ST 8 77
+LD 8 77
+CAR
+LD 8 77
+CDR
+LDF 844
+TAP 3
+LD 0 0		; [873] (bfs-iter-let)
+ATOM
+LD 8 4
+AP 1
+TSEL 829 849
+LD 6 0		; [878] (bfs-iter-else)
+LD 6 2
+LD 0 1
+LD 0 2
+LD 5 0
+LD 2 2
+LD 7 39
+AP 2
+LD 2 2
+LD 4 0
+LD 7 43
+AP 7
+ST 7 77
+LD 7 77
+CAR
+LD 7 77
+CDR
+ST 7 77
+LD 7 77
+CAR
+LD 7 77
+CDR
+LDF 873
+TAP 3
+LD 0 0		; [902] (bfs-iter-let)
+ATOM
+LD 7 4
+AP 1
+TSEL 825 878
+LD 5 0		; [907] (bfs-iter-else)
+LD 5 2
+LD 0 1
+LD 0 2
+LD 4 0
+LD 1 1
+LD 6 39
+AP 2
+LD 1 1
+LD 3 0
+LD 6 43
+AP 7
+ST 6 77
+LD 6 77
+CAR
+LD 6 77
+CDR
+ST 6 77
+LD 6 77
+CAR
+LD 6 77
+CDR
+LDF 902
+TAP 3
+LD 0 0		; [931] (bfs-iter-let)
+ATOM
+LD 6 4
+AP 1
+TSEL 821 907
+LD 4 0		; [936] (bfs-iter-let)
+LD 4 2
+LD 3 1
+LD 4 4
+LD 3 0
+LD 0 0
+LD 5 39
+AP 2
+LD 0 0
+LD 2 0
+LD 5 43
+AP 7
+ST 5 77
+LD 5 77
+CAR
+LD 5 77
+CDR
+ST 5 77
+LD 5 77
+CAR
+LD 5 77
+CDR
+LDF 931
+TAP 3
+LD 0 0		; [960] (bfs-iter-let)
+LDC 4
+LD 4 8
+AP 2
+LD 0 0
+LDC 1
+ADD
+LDC 4
+LD 4 8
+AP 2
+LD 0 0
+LDC 2
+ADD
+LDC 4
+LD 4 8
+AP 2
+LD 0 0
+LDC 3
+ADD
+LDC 4
+LD 4 8
+AP 2
+LDF 936
+TAP 4
+LD 3 1		; [984] (bfs-iter-else)
+AP 0
+LDF 960
+TAP 1
+LD 0 0		; [988] (bfs-iter-let)
+LD 2 1
+CGT
+TSEL 814 984
+LD 0 0		; [992] (bfs-iter-let)
+LD 1 4
+LD 2 24
+AP 2
+CAR
+LDC 1
+ADD
+LDF 988
+TAP 1
+LD 0 3		; [1001] (bfs-iter-else)
+LD 1 17
+AP 1
+ST 1 77
+LD 1 77
+CAR
+LD 1 77
+CDR
+LDF 992
+TAP 2
+LD 0 3		; [1011] bfs-iter
+LD 1 18
+AP 1
+TSEL 812 1001
+LDC 1		; [1015] (bfs-iter2-then)
+JOIN
+LD 1 4		; [1017] (bfs-iter2-else)
+LD 1 3
+LD 2 24
+AP 2
+ATOM
+LD 2 4
+AP 1
+JOIN
+LDC 0		; [1025] (bfs-iter2-then)
+LD 1 2
+LD 1 3
+CONS
+CONS
+RTN
+LD 2 4		; [1031] (bfs-iter2-then)
+LD 0 0
+LD 0 1
+CONS
+CONS
+RTN
+LDC 0		; [1037] (bfs-iter2-else)
+LD 0 0
+LD 0 1
+CONS
+CONS
+RTN
+LD 2 4		; [1043] (bfs-iter2-let)
+LD 1 0
+LD 2 1
+AP 2
+TSEL 1031 1037
+LD 1 4		; [1048] (bfs-iter2-else)
+LD 1 2
+LD 2 16
+AP 2
+LD 1 4
+LD 1 6
+LD 1 5
+CONS
+LD 1 3
+LD 2 23
+AP 3
+LDF 1043
+TAP 2
+LD 0 0		; [1061] (bfs-iter2-let)
+LDC 0
+CEQ
+SEL 1015 1017
+TSEL 1025 1048
+LD 0 0		; [1066] bfs-iter2
+LD 0 4
+LD 1 31
+AP 2
+LDF 1061
+TAP 1
+LD 0 0		; [1072] backtrack
+LD 0 1
+LD 0 2
+LDC 0
+LD 1 45
+TAP 4
+LD 0 1		; [1078] (backtrack-iter-then)
+RTN
+LD 0 0		; [1080] (backtrack-iter-else)
+LD 2 1
+LD 2 2
+LD 0 1
+LD 3 45
+TAP 4
+LD 2 1		; [1086] (backtrack-iter-let)
+LD 0 0
+LD 3 9
+AP 2
+TSEL 1078 1080
+LD 1 0		; [1091] (backtrack-iter-let)
+LD 0 0
+LD 2 40
+AP 2
+LD 0 0
+LD 1 3
+CONS
+LDF 1086
+TAP 2
+LD 0 0		; [1100] backtrack-iter
+LD 0 2
+LD 1 24
+AP 2
+CDR
+LDF 1091
+TAP 1
+LDC 1000000		; [1107] (find-nearest-ghost-then)
+RTN
+LD 0 0		; [1109] (find-nearest-ghost-let)
+LD 0 1
+LD 3 24
+AP 2
+CAR
+RTN
+LD 0 0		; [1115] (find-nearest-ghost-else)
+ST 2 77
+LD 2 77
+CAR
+LD 2 77
+CDR
+LDF 1109
+TAP 2
+LD 0 0		; [1123] (find-nearest-ghost-let)
+ATOM
+TSEL 1107 1115
+LD 0 0		; [1126] find-nearest-ghost
+LD 0 1
+LD 0 2
+LD 0 3
+LD 1 47
+AP 4
+LDF 1123
+TAP 1
+LD 1 3		; [1134] find-nearest-ghost-internalL
+LD 0 0
+CDR
+CAR
+LD 1 1
+LD 2 11
+AP 2
+CGTE
+RTN
+LDC 0		; [1143] (find-nearest-ghost-internal-then)
+RTN
+LD 0 0		; [1145] find-nearest-ghost-internalL
+LD 2 2
+LD 3 48
+TAP 2
+LD 1 0		; [1149] (find-nearest-ghost-internal-else)
+LD 1 1
+LD 1 3
+LDC 0
+LDF 1145
+LD 2 41
+TAP 5
+LD 0 0		; [1156] (find-nearest-ghost-internal-let)
+ATOM
+TSEL 1143 1149
+LDF 1134		; [1159] find-nearest-ghost-internal
+LD 0 2
+LD 1 15
+AP 2
+LDF 1156
+TAP 1
+LDC 0		; [1165] (is-ghost-then)
+RTN
+LDC 1		; [1167] (is-ghost-then)
+RTN
+LD 1 0		; [1169] (is-ghost-else)
+LD 0 1
+LD 2 48
+TAP 2
+LD 1 0		; [1173] (is-ghost-let)
+LD 0 0
+CDR
+CAR
+LD 2 9
+AP 2
+TSEL 1167 1169
+LD 0 1		; [1180] (is-ghost-else)
+ST 1 77
+LD 1 77
+CAR
+LD 1 77
+CDR
+LDF 1173
+TAP 2
+LD 0 1		; [1188] is-ghost
+ATOM
+TSEL 1165 1180
+LD 0 0		; [1191] find-nearest-ghost-dirL
+CAR
+LDC 1
+CEQ
+RTN
+LDC 5		; [1196] (find-nearest-ghost-dir-then)
+RTN
+LD 0 0		; [1198] (find-nearest-ghost-dir-let)
+LD 3 1
+LD 0 1
+LD 4 44
+AP 3
+CAR
+RTN
+LD 0 0		; [1205] (find-nearest-ghost-dir-else)
+ST 3 77
+LD 3 77
+CAR
+LD 3 77
+CDR
+LDF 1198
+TAP 2
+LD 0 0		; [1213] (find-nearest-ghost-dir-let)
+ATOM
+TSEL 1196 1205
+LD 1 0		; [1216] (find-nearest-ghost-dir-let)
+LD 1 1
+LD 0 0
+LD 1 3
+LD 2 47
+AP 4
+LDF 1213
+TAP 1
+LDF 1191		; [1224] find-nearest-ghost-dir
+LD 0 2
+LD 1 15
+AP 2
+LDF 1216
+TAP 1
+LD 0 0		; [1230] (find-safe-direction-then)
+LD 1 35
+AP 1
+JOIN
+LDC 0		; [1234] (find-safe-direction-else)
+JOIN
+LD 0 0		; [1236] (find-safe-direction-then)
+RTN
+LD 0 0		; [1238] (find-safe-direction-then)
+RTN
+LD 0 0		; [1240] (find-safe-direction-then)
+RTN
+LD 0 0		; [1242] (find-safe-direction-then)
+RTN
+LDC 0		; [1244] (find-safe-direction-else)
+RTN
+LD 0 0		; [1246] (find-safe-direction-let)
+LDC 0
+CGTE
+TSEL 1242 1244
+LD 4 0		; [1250] (find-safe-direction-else)
+LD 4 1
+LD 3 1
+LD 3 0
+LD 5 54
+AP 4
+LDF 1246
+TAP 1
+LD 0 0		; [1258] (find-safe-direction-let)
+LDC 0
+CGTE
+TSEL 1240 1250
+LD 3 0		; [1262] (find-safe-direction-else)
+LD 3 1
+LD 2 1
+LD 2 0
+LD 4 53
+AP 4
+LDF 1258
+TAP 1
+LD 0 0		; [1270] (find-safe-direction-let)
+LDC 0
+CGTE
+TSEL 1238 1262
+LD 2 0		; [1274] (find-safe-direction-else)
+LD 2 1
+LD 1 1
+LD 1 0
+LD 1 2
+LD 3 52
+AP 5
+LDF 1270
+TAP 1
+LD 0 0		; [1283] (find-safe-direction-let)
+LDC 0
+CGTE
+TSEL 1236 1274
+LD 1 0		; [1287] (find-safe-direction-let)
+LD 1 1
+LD 0 1
+LD 2 51
+AP 3
+LDF 1283
+TAP 1
+LD 0 0		; [1294] find-safe-direction
+LD 0 2
+LDC 3
+LD 1 55
+AP 3
+LD 0 2
+LDC 0
+LD 1 59
+AP 2
+LDC 50800
+LD 1 2
+CGT
+SEL 1230 1234
+LDF 1287
+TAP 3
+LD 0 1		; [1309] find-safe-direction-power-pillL
+LDC 3
+CEQ
+RTN
+LDC -1		; [1313] (find-safe-direction-power-pill-then)
+RTN
+LD 0 0		; [1315] (find-safe-direction-power-pill-else)
+CAR
+LD 1 1
+LD 0 0
+CDR
+LD 2 44
+AP 3
+CAR
+RTN
+LD 0 0		; [1324] (find-safe-direction-power-pill-let)
+ATOM
+TSEL 1313 1315
+LD 0 0		; [1327] find-safe-direction-power-pill
+LD 0 1
+LDC 10
+LD 0 2
+LDF 1309
+LD 1 41
+AP 5
+LDF 1324
+TAP 1
+LDC -1		; [1336] (find-safe-direction-last-pill-then)
+RTN
+LD 2 0		; [1338] (find-safe-direction-last-pillL-then)
+LD 1 0
+LD 0 0
+LD 3 61
+AP 3
+LD 3 4
+TAP 1
+LDC 0		; [1345] (find-safe-direction-last-pillL-else)
+RTN
+LD 0 0		; [1347] find-safe-direction-last-pillL
+LD 1 0
+LD 3 24
+AP 2
+ATOM
+TSEL 1338 1345
+LDC -1		; [1353] (find-safe-direction-last-pill-then)
+RTN
+LD 0 0		; [1355] (find-safe-direction-last-pill-else)
+CAR
+LD 2 1
+LD 0 0
+CDR
+LD 3 44
+AP 3
+CAR
+RTN
+LD 0 0		; [1364] (find-safe-direction-last-pill-let)
+ATOM
+TSEL 1353 1355
+LD 1 0		; [1367] (find-safe-direction-last-pill-let)
+LD 1 1
+LDC 10
+LD 1 4
+LDC 10000000
+LDC 5
+CONS
+LD 1 2
+LD 2 23
+AP 3
+LDF 1347
+LD 2 41
+AP 5
+LDF 1364
+TAP 1
+LD 0 4		; [1382] (find-safe-direction-last-pill-else)
+LDC 1
+LDC -1
+CONS
+LD 0 3
+LD 1 23
+AP 3
+LDF 1367
+TAP 1
+LD 0 4		; [1391] find-safe-direction-last-pill
+ATOM
+TSEL 1336 1382
+LD 1 0		; [1394] (find-safe-direction-internalL-then)
+LD 1 3
+LD 0 0
+LD 2 61
+AP 3
+LD 2 4
+TAP 1
+LDC 0		; [1401] (find-safe-direction-internalL-else)
+RTN
+LD 0 0		; [1403] find-safe-direction-internalL
+LD 1 3
+LD 2 24
+AP 2
+ATOM
+TSEL 1394 1401
+LDC -1		; [1409] (find-safe-direction-internal-then)
+RTN
+LD 0 0		; [1411] (find-safe-direction-internal-else)
+CAR
+LD 1 1
+LD 0 0
+CDR
+LD 2 44
+AP 3
+CAR
+RTN
+LD 0 0		; [1420] (find-safe-direction-internal-let)
+ATOM
+TSEL 1409 1411
+LD 0 0		; [1423] find-safe-direction-internal
+LD 0 1
+LDC 10
+LD 0 2
+LDF 1403
+LD 1 41
+AP 5
+LDF 1420
+TAP 1
+LD 0 0		; [1432] find-safe-direction-no-deadendL
+LD 1 3
+LD 2 24
+AP 2
+ATOM
+RTN
+LDC -1		; [1438] (find-safe-direction-no-deadend-then)
+RTN
+LD 0 0		; [1440] (find-safe-direction-no-deadend-else)
+CAR
+LD 1 1
+LD 0 0
+CDR
+LD 2 44
+AP 3
+CAR
+RTN
+LD 0 0		; [1449] (find-safe-direction-no-deadend-let)
+ATOM
+TSEL 1438 1440
+LD 0 0		; [1452] find-safe-direction-no-deadend
+LD 0 1
+LDC 10
+LD 0 2
+LDF 1432
+LD 1 41
+AP 5
+LDF 1449
+TAP 1
+LD 0 0		; [1461] build-danger-zone
+LD 0 1
+LD 0 2
+LDC 0
+LD 1 56
+TAP 4
+LD 0 3		; [1467] (build-danger-zone-iter-then)
+RTN
+LD 1 0		; [1469] (build-danger-zone-iter-let)
+LD 0 1
+LD 1 2
+LD 1 0
+LD 0 0
+CDR
+CAR
+LD 0 0
+CDR
+CDR
+LD 1 2
+LD 1 3
+LD 2 57
+AP 5
+LD 2 56
+TAP 4
+LD 0 1		; [1485] (build-danger-zone-iter-else)
+ST 1 77
+LD 1 77
+CAR
+LD 1 77
+CDR
+LDF 1469
+TAP 2
+LD 0 1		; [1493] build-danger-zone-iter
+ATOM
+TSEL 1467 1485
+LD 0 4		; [1496] (build-danger-zone-ghost-then)
+RTN
+LD 0 0		; [1498] (build-danger-zone-ghost-then)
+RTN
+LD 0 0		; [1500] (build-danger-zone-ghost-then)
+JOIN
+LD 1 0		; [1502] (build-danger-zone-ghost-else)
+LD 1 1
+LDC 0
+LD 2 39
+AP 2
+LDC 0
+LD 0 1
+LD 0 0
+LD 2 57
+AP 5
+JOIN
+LD 0 0		; [1513] (build-danger-zone-ghost-then)
+JOIN
+LD 2 0		; [1515] (build-danger-zone-ghost-else)
+LD 2 1
+LDC 1
+LD 3 39
+AP 2
+LDC 1
+LD 1 1
+LD 0 0
+LD 3 57
+AP 5
+JOIN
+LD 0 0		; [1526] (build-danger-zone-ghost-then)
+JOIN
+LD 3 0		; [1528] (build-danger-zone-ghost-else)
+LD 3 1
+LDC 2
+LD 4 39
+AP 2
+LDC 2
+LD 2 1
+LD 0 0
+LD 4 57
+AP 5
+JOIN
+LD 0 0		; [1539] (build-danger-zone-ghost-then)
+JOIN
+LD 4 0		; [1541] (build-danger-zone-ghost-else)
+LD 4 1
+LDC 3
+LD 5 39
+AP 2
+LDC 3
+LD 3 1
+LD 0 0
+LD 5 57
+AP 5
+JOIN
+LD 0 0		; [1552] (build-danger-zone-ghost-let)
+RTN
+LD 4 2		; [1554] (build-danger-zone-ghost-let)
+LDC 1
+CEQ
+SEL 1539 1541
+LDF 1552
+TAP 1
+LD 3 2		; [1560] (build-danger-zone-ghost-let)
+LDC 0
+CEQ
+SEL 1526 1528
+LDF 1554
+TAP 1
+LD 2 2		; [1566] (build-danger-zone-ghost-let)
+LDC 3
+CEQ
+SEL 1513 1515
+LDF 1560
+TAP 1
+LD 1 2		; [1572] (build-danger-zone-ghost-else)
+LDC 2
+CEQ
+SEL 1500 1502
+LDF 1566
+TAP 1
+LDC 0		; [1578] (build-danger-zone-ghost-let)
+LD 0 1
+CGT
+TSEL 1498 1572
+LD 0 1		; [1582] (build-danger-zone-ghost-else)
+LDC 1
+LD 0 3
+CONS
+LD 0 4
+LD 1 23
+AP 3
+LD 0 3
+LDC 1
+SUB
+LDF 1578
+TAP 2
+LD 0 0		; [1594] build-danger-zone-ghost
+LD 0 1
+LD 1 31
+AP 2
+LDC 0
+CEQ
+TSEL 1496 1582
+LD 0 1		; [1601] (build-ghost-block-then)
+RTN
+LD 0 0		; [1603] (build-ghost-block-else)
+CDR
+LD 0 0
+CAR
+CDR
+CAR
+LDC 1000000
+LDC 5
+CONS
+LD 0 1
+LD 1 23
+AP 3
+LD 1 58
+TAP 2
+LD 0 0		; [1617] build-ghost-block
+ATOM
+TSEL 1601 1603
+LD 0 1		; [1620] (build-ghost-block-2-then)
+RTN
+LD 0 0		; [1622] (build-ghost-block-2-else)
+CDR
+LD 0 0
+CAR
+LD 0 1
+LD 1 60
+AP 2
+LD 1 59
+TAP 2
+LD 0 0		; [1631] build-ghost-block-2
+ATOM
+TSEL 1620 1622
+LD 0 0		; [1634] (build-ghost-block-2-internal-then)
+JOIN
+LD 1 0		; [1636] (build-ghost-block-2-internal-else)
+LDC 0
+LD 3 39
+AP 2
+LDC 1000000
+LDC 5
+CONS
+LD 0 0
+LD 3 23
+AP 3
+JOIN
+LD 0 0		; [1647] (build-ghost-block-2-internal-then)
+JOIN
+LD 2 0		; [1649] (build-ghost-block-2-internal-else)
+LDC 1
+LD 4 39
+AP 2
+LDC 1000000
+LDC 5
+CONS
+LD 0 0
+LD 4 23
+AP 3
+JOIN
+LD 0 0		; [1660] (build-ghost-block-2-internal-then)
+JOIN
+LD 3 0		; [1662] (build-ghost-block-2-internal-else)
+LDC 2
+LD 5 39
+AP 2
+LDC 1000000
+LDC 5
+CONS
+LD 0 0
+LD 5 23
+AP 3
+JOIN
+LD 0 0		; [1673] (build-ghost-block-2-internal-then)
+JOIN
+LD 4 0		; [1675] (build-ghost-block-2-internal-else)
+LDC 3
+LD 6 39
+AP 2
+LDC 1000000
+LDC 5
+CONS
+LD 0 0
+LD 6 23
+AP 3
+JOIN
+LD 0 0		; [1686] (build-ghost-block-2-internal-let)
+RTN
+LD 4 1		; [1688] (build-ghost-block-2-internal-let)
+LDC 1
+CEQ
+SEL 1673 1675
+LDF 1686
+TAP 1
+LD 3 1		; [1694] (build-ghost-block-2-internal-let)
+LDC 0
+CEQ
+SEL 1660 1662
+LDF 1688
+TAP 1
+LD 2 1		; [1700] (build-ghost-block-2-internal-let)
+LDC 3
+CEQ
+SEL 1647 1649
+LDF 1694
+TAP 1
+LD 1 1		; [1706] (build-ghost-block-2-internal-let)
+LDC 2
+CEQ
+SEL 1634 1636
+LDF 1700
+TAP 1
+LD 0 0		; [1712] (build-ghost-block-2-internal-let)
+LDC 1000000
+LDC 5
+CONS
+LD 1 1
+LD 2 23
+AP 3
+LDF 1706
+TAP 1
+LD 0 0		; [1721] build-ghost-block-2-internal
+CDR
+CAR
+LD 0 0
+CDR
+CDR
+LDF 1712
+TAP 2
+LD 0 0		; [1729] is-dead-end
+LD 0 1
+LD 0 2
+LDC 0
+LD 1 62
+TAP 4
+LDC 1		; [1735] (is-dead-end-iter-then)
+RTN
+LDC 1		; [1737] (is-dead-end-iter-then)
+RTN
+LDC 0		; [1739] (is-dead-end-iter-then)
+RTN
+LDC 0		; [1741] (is-dead-end-iter-then)
+RTN
+LDC 0		; [1743] (is-dead-end-iter-then)
+RTN
+LDC 0		; [1745] (is-dead-end-iter-then)
+RTN
+LDC 0		; [1747] (is-dead-end-iter-then)
+RTN
+LDC 1		; [1749] (is-dead-end-iter-else)
+RTN
+LD 1 0		; [1751] (is-dead-end-iter-else)
+LD 1 1
+LD 1 2
+LDC 3
+LD 2 39
+AP 2
+LD 0 0
+LD 2 62
+AP 4
+LD 2 4
+AP 1
+TSEL 1747 1749
+LD 1 0		; [1763] (is-dead-end-iter-else)
+LD 1 1
+LD 1 2
+LDC 2
+LD 2 39
+AP 2
+LD 0 0
+LD 2 62
+AP 4
+LD 2 4
+AP 1
+TSEL 1745 1751
+LD 1 0		; [1775] (is-dead-end-iter-else)
+LD 1 1
+LD 1 2
+LDC 1
+LD 2 39
+AP 2
+LD 0 0
+LD 2 62
+AP 4
+LD 2 4
+AP 1
+TSEL 1743 1763
+LD 1 0		; [1787] (is-dead-end-iter-let)
+LD 1 1
+LD 1 2
+LDC 0
+LD 2 39
+AP 2
+LD 0 0
+LD 2 62
+AP 4
+LD 2 4
+AP 1
+TSEL 1741 1775
+LD 0 2		; [1799] (is-dead-end-iter-else)
+LDC 0
+LDC 0
+CONS
+LD 0 3
+LD 1 23
+AP 3
+LDF 1787
+TAP 1
+LD 0 0		; [1808] (is-dead-end-iter-else)
+LD 0 1
+LD 0 2
+LD 1 63
+AP 3
+TSEL 1739 1799
+LD 0 2		; [1814] (is-dead-end-iter-else)
+LD 0 3
+LD 1 24
+AP 2
+ATOM
+LD 1 4
+AP 1
+TSEL 1737 1808
+LD 0 0		; [1822] is-dead-end-iter
+LD 0 1
+LD 0 2
+LD 1 64
+AP 3
+TSEL 1735 1814
+LD 0 0		; [1828] is-junction
+LD 0 1
+LD 0 2
+LDC 0
+LD 1 39
+AP 2
+LD 1 64
+AP 3
+LD 1 4
+AP 1
+LD 0 0
+LD 0 1
+LD 0 2
+LDC 1
+LD 1 39
+AP 2
+LD 1 64
+AP 3
+LD 1 4
+AP 1
+LD 0 0
+LD 0 1
+LD 0 2
+LDC 2
+LD 1 39
+AP 2
+LD 1 64
+AP 3
+LD 1 4
+AP 1
+LD 0 0
+LD 0 1
+LD 0 2
+LDC 3
+LD 1 39
+AP 2
+LD 1 64
+AP 3
+LD 1 4
+AP 1
+ADD
+ADD
+ADD
+LDC 3
+CGTE
+RTN
+LDC 1		; [1874] (is-blocked-then)
+RTN
+LDC 1		; [1876] (is-blocked-then)
+RTN
+LDC 0		; [1878] (is-blocked-else)
+RTN
+LD 0 2		; [1880] (is-blocked-else)
+LD 0 1
+LD 1 24
+AP 2
+ATOM
+LD 1 4
+AP 1
+TSEL 1876 1878
+LD 0 0		; [1888] is-blocked
+LD 0 2
+LD 1 31
+AP 2
+LDC 0
+CEQ
+TSEL 1874 1880
+LDC 0		; [1895] (find-wall-dir-then)
+RTN
+LDC 1		; [1897] (find-wall-dir-then)
+RTN
+LDC 2		; [1899] (find-wall-dir-then)
+RTN
+LDC 3		; [1901] (find-wall-dir-then)
+RTN
+LD 1 2		; [1903] (find-wall-dir-else)
+LDC 4
+LD 1 8
+TAP 2
+LD 0 0		; [1907] (find-wall-dir-else)
+LD 0 1
+LDC 3
+LD 1 39
+AP 2
+LD 1 31
+AP 2
+LDC 0
+CEQ
+TSEL 1901 1903
+LD 0 0		; [1917] (find-wall-dir-else)
+LD 0 1
+LDC 2
+LD 1 39
+AP 2
+LD 1 31
+AP 2
+LDC 0
+CEQ
+TSEL 1899 1907
+LD 0 0		; [1927] (find-wall-dir-else)
+LD 0 1
+LDC 1
+LD 1 39
+AP 2
+LD 1 31
+AP 2
+LDC 0
+CEQ
+TSEL 1897 1917
+LD 0 0		; [1937] find-wall-dir
+LD 0 1
+LDC 0
+LD 1 39
+AP 2
+LD 1 31
+AP 2
+LDC 0
+CEQ
+TSEL 1895 1927
+LDC 0		; [1947] main
+ST 1 0
+LDC 127
+ST 1 2
+LDC -1
+ST 1 3
+LDC 0
+LDC 0
+CONS
+LD 1 67
+CONS
+RTN
+LDC 1		; [1959] (step-function-then)
+JOIN
+LDC 1		; [1961] (step-function-then)
+JOIN
+LD 3 1		; [1963] (step-function-then)
+LD 4 30
+AP 1
+LDC 0
+CGT
+JOIN
+LDC 0		; [1969] (step-function-else)
+JOIN
+LD 0 0		; [1971] (step-function-else)
+LDC 4
+CEQ
+SEL 1963 1969
+JOIN
+LD 0 0		; [1976] (step-function-else)
+LDC 3
+CEQ
+SEL 1961 1971
+JOIN
+LDC 137		; [1981] (step-function-then)
+JOIN
+LDC 127		; [1983] (step-function-else)
+JOIN
+LD 4 2		; [1985] (step-function-let)
+LD 0 0
+LDC 2
+CEQ
+SEL 1959 1976
+SEL 1981 1983
+ADD
+ST 4 2
+LD 2 0
+RTN
+LD 2 1		; [1995] (step-function-let)
+LD 3 28
+AP 1
+LD 0 0
+LD 3 31
+AP 2
+LDF 1985
+TAP 1
+LD 1 1		; [2003] (step-function-let)
+LD 2 26
+AP 1
+LD 0 0
+CDR
+LD 2 39
+AP 2
+LDF 1995
+TAP 1
+LD 0 0		; [2012] step-function
+LD 0 1
+LD 1 68
+AP 2
+LDF 2003
+TAP 1
+LD 0 0		; [2018] (get-next-direction-then)
+RTN
+LD 0 0		; [2020] (get-next-direction-then)
+RTN
+LD 0 0		; [2022] (get-next-direction-then)
+RTN
+LD 0 0		; [2024] (get-next-direction-then)
+RTN
+LD 0 0		; [2026] (get-next-direction-then)
+RTN
+LD 0 0		; [2028] (get-next-direction-then)
+RTN
+LD 6 3		; [2030] (get-next-direction-else)
+LDC 0
+CGT
+LDC 0
+CONS
+LD 8 1
+AP 0
+LDC 4
+LD 8 8
+AP 2
+CONS
+RTN
+LD 0 0		; [2042] (get-next-direction-let)
+ATOM
+LD 8 4
+AP 1
+TSEL 2028 2030
+LD 6 1		; [2047] (get-next-direction-else)
+LD 5 1
+LD 5 0
+LD 5 3
+LDC 0
+CGT
+LD 7 76
+AP 4
+LDF 2042
+TAP 1
+LD 0 0		; [2057] (get-next-direction-let)
+ATOM
+LD 7 4
+AP 1
+TSEL 2026 2047
+LD 4 0		; [2062] (get-next-direction-else)
+LD 4 1
+LD 4 2
+LD 4 3
+LDC 0
+CGT
+LD 6 75
+AP 4
+LDF 2057
+TAP 1
+LD 0 0		; [2072] (get-next-direction-let)
+ATOM
+LD 6 4
+AP 1
+TSEL 2024 2062
+LD 4 0		; [2077] (get-next-direction-else)
+LD 3 3
+LDC 0
+CGT
+LD 5 74
+AP 2
+LDF 2072
+TAP 1
+LD 0 0		; [2085] (get-next-direction-let)
+ATOM
+LD 5 4
+AP 1
+TSEL 2022 2077
+LD 3 1		; [2090] (get-next-direction-else)
+LD 2 1
+LD 2 0
+LD 2 2
+LD 4 73
+AP 4
+LDF 2085
+TAP 1
+LD 0 0		; [2098] (get-next-direction-let)
+ATOM
+LD 4 4
+AP 1
+TSEL 2020 2090
+LD 2 1		; [2103] (get-next-direction-else)
+LD 1 1
+LD 1 0
+LD 1 2
+LD 3 72
+AP 4
+LDF 2098
+TAP 1
+LD 0 0		; [2111] (get-next-direction-let)
+ATOM
+LD 3 4
+AP 1
+TSEL 2018 2103
+LD 1 1		; [2116] (get-next-direction-let)
+LD 0 1
+LD 0 0
+LD 0 2
+LD 0 3
+LDC 0
+CGT
+LD 2 69
+AP 5
+LDF 2111
+TAP 1
+LD 0 1		; [2127] get-next-direction
+LD 1 26
+AP 1
+LD 0 1
+LD 1 28
+AP 1
+LD 0 1
+LD 1 29
+AP 1
+LD 0 1
+LD 1 30
+AP 1
+LDF 2116
+TAP 4
+LDC -1		; [2141] (next-power-pill-mode-then)
+ST 1 3
+LDC 0
+RTN
+LDC -1		; [2145] (next-power-pill-mode-then)
+ST 2 3
+LDC 0
+RTN
+LDC -1		; [2149] (next-power-pill-mode-then)
+ST 3 3
+LDC 0
+LDC 0
+CONS
+LD 1 0
+CONS
+RTN
+LDC 0		; [2157] (next-power-pill-mode-then)
+LDC 0
+CONS
+LD 2 1
+LD 2 2
+LD 3 65
+AP 2
+CONS
+RTN
+LDC -1		; [2166] (next-power-pill-mode-then)
+ST 3 3
+LDC 0
+RTN
+LDC 80		; [2170] (next-power-pill-mode-then)
+JOIN
+LD 3 3		; [2172] (next-power-pill-mode-else)
+LDC 1
+SUB
+JOIN
+LDC -1		; [2176] (next-power-pill-mode-then)
+ST 3 3
+LDC 0
+LDC 0
+CONS
+LD 1 0
+CONS
+RTN
+LDC 0		; [2184] (next-power-pill-mode-else)
+LDC 0
+CONS
+LD 2 1
+LD 2 2
+LD 3 65
+AP 2
+CONS
+RTN
+LDC 0		; [2193] (next-power-pill-mode-else)
+LD 3 3
+CGT
+SEL 2170 2172
+ST 3 3
+LD 3 3
+LDC 0
+CEQ
+TSEL 2176 2184
+LD 2 4		; [2202] (next-power-pill-mode-else)
+TSEL 2166 2193
+LDC 3		; [2204] (next-power-pill-mode-else)
+LD 0 0
+CGTE
+TSEL 2157 2202
+LDC 2		; [2208] (next-power-pill-mode-let)
+LD 0 0
+CGTE
+TSEL 2149 2204
+LD 1 1		; [2212] (next-power-pill-mode-else)
+LD 1 2
+LD 1 3
+LDC 3
+LD 2 46
+AP 4
+LDF 2208
+TAP 1
+LDC 0		; [2220] (next-power-pill-mode-let)
+LD 0 0
+CGT
+TSEL 2145 2212
+LD 0 1		; [2224] (next-power-pill-mode-else)
+LD 0 2
+LD 1 70
+AP 2
+LDF 2220
+TAP 1
+LD 0 0		; [2230] next-power-pill-mode
+LD 1 27
+AP 1
+LDC 0
+CGT
+TSEL 2141 2224
+LD 0 0		; [2236] (find-next-power-pill-dir-then)
+RTN
+LD 0 1		; [2238] (find-next-power-pill-dir-then)
+RTN
+LD 0 2		; [2240] (find-next-power-pill-dir-then)
+RTN
+LD 0 3		; [2242] (find-next-power-pill-dir-then)
+RTN
+LDC -1		; [2244] (find-next-power-pill-dir-else)
+RTN
+LD 1 0		; [2246] (find-next-power-pill-dir-else)
+LD 1 1
+LD 0 3
+LD 2 39
+AP 2
+LD 2 31
+AP 2
+LDC 3
+CEQ
+TSEL 2242 2244
+LD 1 0		; [2256] (find-next-power-pill-dir-else)
+LD 1 1
+LD 0 2
+LD 2 39
+AP 2
+LD 2 31
+AP 2
+LDC 3
+CEQ
+TSEL 2240 2246
+LD 1 0		; [2266] (find-next-power-pill-dir-else)
+LD 1 1
+LD 0 1
+LD 2 39
+AP 2
+LD 2 31
+AP 2
+LDC 3
+CEQ
+TSEL 2238 2256
+LD 1 0		; [2276] (find-next-power-pill-dir-let)
+LD 1 1
+LD 0 0
+LD 2 39
+AP 2
+LD 2 31
+AP 2
+LDC 3
+CEQ
+TSEL 2236 2266
+LD 1 2		; [2286] find-next-power-pill-dir
+LDC 4
+LD 1 8
+AP 2
+LD 1 2
+LDC 1
+ADD
+LDC 4
+LD 1 8
+AP 2
+LD 1 2
+LDC 2
+ADD
+LDC 4
+LD 1 8
+AP 2
+LD 1 2
+LDC 3
+ADD
+LDC 4
+LD 1 8
+AP 2
+LDF 2276
+TAP 4
+LDC 0		; [2310] (power-pill-chain-mode-then)
+RTN
+LD 0 1		; [2312] power-pill-chain-modeL
+LDC 3
+CEQ
+RTN
+LDC 0		; [2316] (power-pill-chain-mode-then)
+RTN
+LDC 1		; [2318] (power-pill-chain-mode-then)
+JOIN
+LD 0 0		; [2320] (power-pill-chain-mode-else)
+LD 3 0
+LDC 1
+SUB
+CEQ
+JOIN
+LDC 0		; [2326] (power-pill-chain-mode-then)
+LDC 0
+CONS
+LD 1 0
+LD 5 2
+LD 1 1
+LD 6 44
+AP 3
+CAR
+CONS
+RTN
+LDC 0		; [2337] (power-pill-chain-mode-else)
+RTN
+LD 0 0		; [2339] (power-pill-chain-mode-let)
+LD 3 0
+CEQ
+SEL 2318 2320
+TSEL 2326 2337
+LD 0 0		; [2344] (power-pill-chain-mode-let)
+LD 0 1
+LD 5 24
+AP 2
+CAR
+LDF 2339
+TAP 1
+LD 0 0		; [2351] (power-pill-chain-mode-else)
+ST 4 77
+LD 4 77
+CAR
+LD 4 77
+CDR
+LDF 2344
+TAP 2
+LD 0 0		; [2359] (power-pill-chain-mode-let)
+ATOM
+TSEL 2316 2351
+LD 2 1		; [2362] (power-pill-chain-mode-let)
+LD 2 2
+LD 0 0
+LDC 0
+LDF 2312
+LD 3 41
+AP 5
+LDF 2359
+TAP 1
+LD 0 0		; [2371] (power-pill-chain-mode-else)
+LDC 137
+DIV
+LDC 1
+ADD
+LDF 2362
+TAP 1
+LDC 0		; [2378] (power-pill-chain-mode-let)
+LD 0 0
+CGTE
+TSEL 2310 2371
+LD 0 0		; [2382] power-pill-chain-mode
+LD 1 27
+AP 1
+LDF 2378
+TAP 1
+LDC 1		; [2387] (dangerous-mode-then)
+JOIN
+LD 0 1		; [2389] (dangerous-mode-else)
+LD 0 2
+LD 0 3
+LDC 3
+LD 1 46
+AP 4
+LDC 3
+CGT
+JOIN
+LDC 0		; [2398] (dangerous-mode-then)
+RTN
+LDC 0		; [2400] (dangerous-mode-let)
+LDC 0
+CONS
+LD 0 0
+CONS
+RTN
+LD 0 1		; [2406] (dangerous-mode-else)
+LD 0 2
+LD 0 3
+LD 1 50
+AP 3
+LDF 2400
+TAP 1
+LD 0 0		; [2413] dangerous-mode
+LD 1 27
+AP 1
+LDC 381
+CGT
+SEL 2387 2389
+TSEL 2398 2406
+LDC 0		; [2420] (power-mode-then)
+RTN
+LDC 0		; [2422] (power-mode-then)
+RTN
+LDC 0		; [2424] (power-mode-else)
+LDC 0
+CONS
+LD 0 0
+CONS
+RTN
+LD 0 0		; [2430] (power-mode-let)
+LDC 4
+CGTE
+TSEL 2422 2424
+LD 0 1		; [2434] (power-mode-else)
+LD 0 2
+LD 0 3
+LDC 7
+LD 1 49
+AP 4
+LDF 2430
+TAP 1
+LDC 381		; [2442] power-mode
+LD 0 0
+LD 1 27
+AP 1
+CGT
+TSEL 2420 2434
+LDC 1		; [2448] (cache-mode-then)
+JOIN
+LD 0 1		; [2450] (cache-mode-else)
+ATOM
+JOIN
+LDC 0		; [2453] (cache-mode-then)
+RTN
+LD 1 1		; [2455] (cache-mode-else)
+LD 0 1
+CDR
+CONS
+LD 0 1
+CAR
+CONS
+RTN
+LD 1 1		; [2463] (cache-mode-let)
+LD 0 0
+CEQ
+LD 2 4
+AP 1
+SEL 2448 2450
+TSEL 2453 2455
+LD 0 0		; [2470] cache-mode
+ST 1 77
+LD 1 77
+CAR
+LD 1 77
+CDR
+LDF 2463
+TAP 2
+LDC 50800		; [2478] (fruit-mode-then)
+LD 2 2
+CGT
+JOIN
+LDC 0		; [2482] (fruit-mode-else)
+JOIN
+LD 0 0		; [2484] (fruit-mode-then)
+ATOM
+LD 2 4
+AP 1
+SEL 2478 2482
+LD 2 4
+AP 1
+JOIN
+LDC 0		; [2492] (fruit-mode-else)
+JOIN
+LDC 0		; [2494] (fruit-mode-then)
+RTN
+LD 1 3		; [2496] (fruit-mode-then)
+LDC 0
+CONS
+LD 1 1
+LD 1 0
+LD 2 65
+AP 2
+CONS
+RTN
+LDC 0		; [2505] (fruit-mode-then)
+JOIN
+LD 0 0		; [2507] (fruit-mode-else)
+LDC 10000000
+LDC 5
+CONS
+LDC 0
+LD 2 23
+AP 3
+JOIN
+LD 0 1		; [2515] fruit-modeL
+LDC 4
+CEQ
+RTN
+LDC 0		; [2519] (fruit-mode-then)
+RTN
+LDC 0		; [2521] (fruit-mode-then)
+RTN
+LD 4 3		; [2523] (fruit-mode-else)
+LD 0 0
+CDR
+CONS
+LD 0 0
+CAR
+CONS
+RTN
+LD 0 0		; [2531] (fruit-mode-let)
+ATOM
+TSEL 2521 2523
+LD 0 0		; [2534] (fruit-mode-else)
+CAR
+LD 3 0
+LD 0 0
+CDR
+LD 4 44
+AP 3
+LDF 2531
+TAP 1
+LD 0 0		; [2543] (fruit-mode-let)
+ATOM
+TSEL 2519 2534
+LD 2 1		; [2546] (fruit-mode-let)
+LD 2 0
+LDC 100000000
+LD 2 2
+LD 0 0
+LD 3 58
+AP 2
+LDF 2515
+LD 3 41
+AP 5
+LDF 2543
+TAP 1
+LD 0 0		; [2558] (fruit-mode-else)
+ATOM
+SEL 2505 2507
+LDF 2546
+TAP 1
+LD 1 1		; [2563] (fruit-mode-else)
+LD 1 0
+LD 2 31
+AP 2
+LDC 4
+CEQ
+TSEL 2496 2558
+LD 1 3		; [2570] (fruit-mode-let)
+LD 2 4
+AP 1
+SEL 2484 2492
+TSEL 2494 2563
+LD 0 1		; [2575] fruit-mode
+LD 1 35
+AP 1
+LDF 2570
+TAP 1
+LD 0 1		; [2580] search-modeL
+LDC 2
+CEQ
+RTN
+LDF 2580		; [2584] (search-mode-then)
+JOIN
+LDC 1		; [2586] (search-modeL-then)
+RTN
+LD 0 1		; [2588] (search-modeL-else)
+LDC 3
+CEQ
+RTN
+LD 0 1		; [2592] search-modeL
+LDC 2
+CEQ
+TSEL 2586 2588
+LDF 2592		; [2596] (search-mode-else)
+JOIN
+LDC 0		; [2598] (search-mode-then)
+RTN
+LD 2 3		; [2600] (search-mode-let)
+LD 0 0
+CDR
+CONS
+LD 0 0
+CAR
+CONS
+RTN
+LD 0 0		; [2608] (search-mode-else)
+CAR
+LD 1 2
+LD 0 0
+CDR
+LD 2 44
+AP 3
+LDF 2600
+TAP 1
+LD 0 0		; [2617] (search-mode-let)
+ATOM
+TSEL 2598 2608
+LD 0 1		; [2620] search-mode
+LD 0 2
+LDC 100000000
+LDC 0
+LD 0 0
+LD 1 27
+AP 1
+LDC 0
+CGT
+SEL 2584 2596
+LD 1 41
+AP 5
+LDF 2617
+TAP 1
+LD 0 66		; [2634] __dummy_main__
+TAP 0

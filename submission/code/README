@@ -1,0 +1,38 @@
+
+Infrastructural code:
+  Written in standard C++. Compile with g++ 4.8 or above just by running 'make'.
+
+  - simulator/
+      Simulation environment for the both type of CPUs, their integration
+      as the game system, and some prototype AI written in C++ that only
+      can run inside this simulator.
+
+  - gcc-compiler/
+      Compiler from a simple Lisp dialect that naturally derives from the GCC
+      instruction set. See langspec.txt for the detail of the language.
+
+  - ghc-asm/
+      Simple assembler for GHC. That resolves labels and some pre-defined
+      constants like interrupt IDs.
+
+AI code:
+  Written the hand-crafted asm/compiler introduced above. All the codes can
+  be translated to the raw gcc/ghc format by passing them via stdin to the
+  corresponding processor and saving the stdout.
+
+  - ghost/
+      Ghost AI written in the ghc-asm. 'spicytomatofriends.ghcasm' is the
+      submitted version. The AI has the following three-mode strategy.
+        * Random mode: if there's nothing to do, it walks around somewhat
+            randomly, preferring to turn left or right in + shaped junctions.
+        * Guardman mode: if it finds (i.e., steps over) powerpills or fruits,
+            it shifts to the guardman-mode for 100 turns that always turns
+            to the same direction so that it returns to the same place after
+            some amount of time.
+        * Chase mode: if some of the ghosts get closer to Lambda-man, many of
+            the Ghosts shift to the chase-mode that moves to the direction that
+            reduces the Manhattan distance to Lambda-man.
+
+  - ai_lambda/
+      Lambda-man AI in the gcc-compiler. 'greedy4.l' is the submitted
+      version.

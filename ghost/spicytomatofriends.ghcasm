@@ -17,17 +17,26 @@
 
 	mov E,0
   FriendsLoopHead:
+	int GetGhostIndex
+	xor A,E
+	add E,1    ; incr
+	jlt DoChase,E,5
+	and A,4
+	xor A,4
+	jeq DoChase,A,4
+	jeq FriendsLoopHead,1,1
+   DoChase:
 	mov B,0
 	mov A,E
-	add E,1
+	sub A,1
 	int GetGhostCurrentXy
 	jeq FarAwayMode,B,0
 	sub A,C
 	sub B,D
-	add A,3
-	add B,3
-	jgt FriendsLoopHead,A,7
-	jgt FriendsLoopHead,B,7
+	add A,4
+	add B,4
+	jgt FriendsLoopHead,A,8
+	jgt FriendsLoopHead,B,8
 	jeq CloseMode,1,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
