@@ -161,6 +161,10 @@
 (define (lambda-pos state)
   (car (cdr (car (cdr state)))))
 
+;; Returns lambda-man's direction.
+(define (get-lambda-dir state)
+  (car (cdr (cdr (car (cdr state))))))
+
 ;; Returns the lambda-man's vitality.
 (define (lambda-vitality state)
   (car (car (cdr state))))
@@ -286,6 +290,65 @@
   (if (pos-eq? origin prev-pos) result
     (backtrack-iter prev-pos origin avl result)))))
 
+;; Finds the item in max-distance. REturns 0 or 1.
+(define (has-item map start max-distance cond)
+  (has-item-iter start max-distance cond map 0))
+
+(define (has-item-iter start max-distance cond rows row-index)
+  (if (int? rows) 0
+  (if (< (+ (cdr start) max-distance) row-index) 0
+  (if (> (- (cdr start) max-distance) row-index)
+      (has-item-iter start max-distance cond (cdr rows) (+ row-index 1))
+  (if (has-item-row
+           (car start)
+           (- max-distance (abs (- (cdr start) row-index)))
+           cond
+           (car rows) 0)
+      1  ;; Found!
+  (has-item-iter start max-distance cond (cdr rows) (+ row-index 1)))))))
+
+(define (has-item-row start-x max-distance cond cols col-index)
+  (if (int? cols) 0
+  (if (< (+ start-x max-distance) col-index) 0
+  (if (> (- start-x max-distance) col-index)
+      (has-item-row start-x max-distance cond (cdr cols) (+ col-index 1))
+  (if (cond (car cols)) 1 ;; FOund.
+  (has-item-row start-x max-distance cond (cdr cols) (+ col-index 1)))))))
+
+;; Finds nearest item.
+(define (find-nearest-item map start max-distance cond)
+  (find-nearest-item-iter start max-distance cond map 0 0))
+
+(define (find-nearest-item-iter start max-distance cond
+                                rows row-index result)
+  (if (int? rows) result
+  (if (< (+ (cdr start) max-distance) row-index) result
+  (if (> (- (cdr start) max-distance) row-index)
+      (find-nearest-item-iter start max-distance cond
+                              (cdr rows) (+ row-index 1) result)
+  (find-nearest-item-iter
+     start max-distance cond (cdr rows) (+ row-index 1)
+     (find-nearest-item-row
+        start (- max-distance (abs (- (cdr start) row-index))) cond
+        (car rows) 0 row-index result))))))
+
+(define (find-nearest-item-row
+             start max-distance cond cols col-index row-index result)
+  (if (int? cols) result
+  (if (< (+ (car start) max-distance) col-index) result
+  (let ((result
+         (if (> (- (car start) max-distance) col-index)
+             result
+         (if (not (cond (car cols)))
+             result
+         (let ((pos (cons col-index row-index)))
+         (if (or (int? result)
+                 (< (pos-distance start pos) (pos-distance start result)))
+             pos
+             result))))))
+  (find-nearest-item-row
+     start max-distance cond (cdr cols) (+ col-index 1) row-index result)))))
+
 ;; Returns the distance.
 (define (find-nearest-ghost map start ghost-lst threashold)
   (let ((bfs-result
@@ -314,10 +377,14 @@
           1
           (is-ghost pos tl)))))
 
-;;
+;; Used by power-mode.
 (define (find-nearest-ghost-dir map start ghost-lst threashold)
   (let ((ghost-lst
-         (lst-filter (lambda (ghost) (= (car ghost) 1)) ghost-lst)))
+         (lst-filter
+            (lambda (ghost)
+              (and (= (car ghost) 1)
+                   (<= (pos-distance start (car (cdr ghost))) threashold)))
+            ghost-lst)))
   (let ((bfs-result
          (find-nearest-ghost-internal map start ghost-lst threashold)))
   (if (int? bfs-result) 5
@@ -347,11 +414,12 @@
   0))))))))))  ;; Give up to escape >_<
 
 (define (find-safe-direction-power-pill map start ghost-block)
+  (if (not (has-item map start 10 (lambda (tile) (= tile 3)))) -1
   (let ((bfs-result
          (bfs map start 10 ghost-block
               (lambda (_ tile) (= tile 3)))))
   (if (int? bfs-result) -1
-  (car (backtrack (car bfs-result) start (cdr bfs-result))))))
+  (car (backtrack (car bfs-result) start (cdr bfs-result)))))))
 
 (define (find-safe-direction-last-pill
              map start ghost-block danger-zone last-pill)
@@ -532,8 +600,11 @@
   ;; Finally, normal search.
   (let ((plan (search-mode state map origin (> fruit 0))))
   (if (not (int? plan)) plan
+
+  (let ((plan (large-search-mode map origin (get-lambda-dir state))))
+  (if (not (int? plan)) plan
   ;; Gives up. Just random walk.
-  (cons (cons (> fruit 0) 0) (mod (rand) 4))))))))))))))))
+  (cons (cons (> fruit 0) 0) (mod (rand) 4))))))))))))))))))
 
 
 ;; Sub AI definition.
@@ -545,19 +616,20 @@
   (if (< next-power-pill-dir 0)
       (set! wait-power-pill -1 0)
   (let ((nearest-ghost-distance
-         (find-nearest-ghost map origin ghost-lst 3)))
-  (if (<= nearest-ghost-distance 2)
+         (find-nearest-ghost
+          map (pos-add origin next-power-pill-dir) ghost-lst 4)))
+  (if (<= nearest-ghost-distance 4)
       (set! wait-power-pill -1 (cons (cons 0 0) next-power-pill-dir))
-  (if (<= nearest-ghost-distance 3)
+;;  (if (<= nearest-ghost-distance 3)
       ;; In dangerous-mode. Wait one more frame.
-      (cons (cons 0 0) (find-wall-dir map origin))
+;;      (cons (cons 0 0) (find-wall-dir map origin))
   (if fruit-state
       ;; Look for fruit if in fruit-state
       (set! wait-power-pill -1 0)
   (set! wait-power-pill (if (< wait-power-pill 0) 80 (- wait-power-pill 1))
   (if (= wait-power-pill 0)
       (set! wait-power-pill -1 (cons (cons 0 0) next-power-pill-dir))
-      (cons (cons 0 0) (find-wall-dir map origin))))))))))))
+      (cons (cons 0 0) (find-wall-dir map origin)))))))))))
 
 (define (find-next-power-pill-dir map origin)
   (let ((dir0 (mod tick 4))
@@ -621,7 +693,7 @@
              0
              (avl-add last-pill (cons 10000000 5) 0))))
   (let ((bfs-result
-         (bfs map origin 100000000
+         (bfs map origin 30
               (build-ghost-block ghost-lst base-block)
               (lambda (_ tile) (= tile 4)))))
   (if (int? bfs-result) 0 ;; Not found
@@ -630,11 +702,65 @@
   (cons (cons fruit-state (cdr trace)) (car trace)))))))))))
 
 (define (search-mode state map origin fruit-state)
-  (let ((bfs-result
-         (bfs map origin 100000000 0
-              (if (> (lambda-vitality state) 0)
-                  (lambda (_ tile) (= tile 2))
-                  (lambda (_ tile) (or (= tile 2) (= tile 3)))))))
+  (let ((cond
+         (if (> (lambda-vitality state) 0)
+             (lambda (tile) (= tile 2))
+             (lambda (tile) (or (= tile 2) (= tile 3))))))
+  (if (not (has-item map origin 15 cond)) 0
+  (let ((bfs-result (bfs map origin 15 0 (lambda (_ tile) (cond tile)))))
   (if (int? bfs-result) 0
   (let ((trace (backtrack (car bfs-result) origin (cdr bfs-result))))
-  (cons (cons fruit-state (cdr trace)) (car trace))))))
+  (if (int? trace) 0
+  (cons (cons fruit-state (cdr trace)) (car trace)))))))))
+
+(define (large-search-mode map origin lambda-dir)
+  (let ((nearest-pill-pos
+           (find-nearest-item map origin 256
+                              (lambda (tile) (or (= tile 2) (= tile 3))))))
+  (let ((dir0 dir1 dir2 dir3
+         (if (< (abs (- (car origin) (car nearest-pill-pos)))
+                (abs (- (cdr origin) (cdr nearest-pill-pos))))
+             ;; Horizontally far.
+             (if (< (car origin) (car nearest-pill-pos))
+                 ;; Nearest-pill is at right.
+                 (if (< (cdr origin) (cdr nearest-pill-pos))
+                     ;; Right -> Down -> Up -> Left
+                     (cons 1 2 0 3)
+                     ;; Right -> Up -> Down -> Left
+                     (cons 1 0 2 3)
+                     )
+                 ;; Nearest-pill is at left.
+                 (if (< (cdr origin) (cdr nearest-pill-pos))
+                     ;; Left -> Down -> Up -> Right
+                     (cons 3 2 0 1)
+                     ;; Left -> Up -> Down -> Right
+                     (cons 3 0 2 1)
+                     )
+                 )
+             ;; Vertically far.
+             (if (< (cdr origin) (cdr nearest-pill-pos))
+                 ;; Nearest-pill is at down.
+                 (if (< (car origin) (car nearest-pill-pos))
+                     ;; Down -> Right -> Left -> Up
+                     (cons 2 1 3 0)
+                     ;; Down -> Left -> Right -> Up
+                     (cons 2 3 1 0)
+                     )
+                 ;; Nearest-pill is at left.
+                 (if (< (car origin) (car nearest-pill-pos))
+                     ;; Up -> Right -> Left -> Down
+                     (cons 0 1 3 2)
+                     ;; Up -> Left -> Right -> Down
+                     (cons 0 3 1 2)
+                     )
+                 ))))
+  (let ((uturn-dir (opposite lambda-dir)))
+  (if (not (or (= uturn-dir dir0) (= (get-tile map (pos-add origin dir0)) 0)))
+      (cons (cons 0 0) dir0)
+  (if (not (or (= uturn-dir dir1) (= (get-tile map (pos-add origin dir1)) 0)))
+      (cons (cons 0 0) dir1)
+  (if (not (or (= uturn-dir dir2) (= (get-tile map (pos-add origin dir2)) 0)))
+      (cons (cons 0 0) dir2)
+  (if (not (or (= uturn-dir dir3) (= (get-tile map (pos-add origin dir3)) 0)))
+      (cons (cons 0 0) dir3)
+  0))))))))

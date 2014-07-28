@@ -15,6 +15,16 @@
 	mov C, A
 	mov D, B
 
+	;; if it is too far away, force chasing mode.
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	sub A,C
+	sub B,D
+	add A,15
+	add B,15
+	jgt CloseMode,A,30
+	jgt CloseMode,B,30
+
 	mov E,0
   FriendsLoopHead:
 	int GetGhostIndex
