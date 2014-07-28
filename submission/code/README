@@ -21,8 +21,9 @@ AI code:
   corresponding processor and saving the stdout.
 
   - ghost/
-      Ghost AI written in the ghc-asm. 'spicytomatofriends.ghcasm' is the
-      submitted version. The AI has the following three-mode strategy.
+      Ghost AI written in the ghc-asm. 'spicytomatofriends.ghcasm'*3 +
+      'ultra-chaser.ghcasm'*1 is the submitted version. The AI has the following
+      three-mode strategy.
         * Random mode: if there's nothing to do, it walks around somewhat
             randomly, preferring to turn left or right in + shaped junctions.
         * Guardman mode: if it finds (i.e., steps over) powerpills or fruits,
