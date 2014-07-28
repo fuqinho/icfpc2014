@@ -1,0 +1,138 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Precompute
+;;   Lambda @ (A,B)
+;;   Ghost  @ (C,D)
+;;   (E,F) := (|A-C|, |B-D|)
+;;   G     := turn
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	add G,1
+
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	mov C, A
+	mov D, B
+	int GetLambdaXy
+
+	mov E, C
+	sub E, A
+	jlt ABS-X-DONE,A,C
+	xor E, 255
+	add E, 1
+  ABS-X-DONE:
+	mov F, D
+	sub F, B
+	jlt ABS-Y-DONE,B,D
+	xor F, 255
+	add F, 1
+  ABS-Y-DONE:
+
+	jgt FarAwayMode,E,5
+	jgt FarAwayMode,F,5
+	mov H,E
+	add H,F
+	jgt FarAwayMode,H,6
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; When the ghost and lambda is close.
+;; SimpleChaser
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+CloseMode:
+
+	jlt SC-<, A, C
+SC->:
+	jlt SC->A, B, D
+SC->V:
+	jlt goDown, E, F
+	jeq goRight, 1, 1
+SC->A:
+	jlt goUp, E, F
+	jeq goRight, 1, 1
+SC-<:
+	jlt SC-<A, B, D
+SC-<V:
+	jlt goDown, E, F
+	jeq goLeft, 1, 1
+SC-<A:
+	jlt goUp, E, F
+	jeq goLeft, 1, 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; When the ghost and lambda is far.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+FarAwayMode:
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	int GetMap
+	jeq FoundPrecious,A,POWERPILL
+	jeq FoundPrecious,A,FRUIT
+	jeq NotFound,1,1
+FoundPrecious:
+	mov [111],100
+NotFound:
+	jeq RandomMove,[111],0
+
+;; If precious cell is found, switch to the guardman mode.
+;; Persists 100 turns
+GuradMan:
+	dec [111]
+	int GetGhostIndex
+	int GetGhostState
+	int GetGhostIndex
+	and A,1
+	mul A,2
+	add A,1
+	add A,B
+	and A,3
+	int SetGhostDirection
+	hlt
+
+;; Otherwise random move.
+;; C somewhat random int
+RandomMove:
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	add C,A
+	mul C,11
+	add C,B
+	mul C,17
+	int GetLambdaXy
+	add C,A
+	mul C,21
+	add C,B
+	mul C,23
+	add C,G
+	int GetGhostIndex
+	xor C,A
+	;; C somewhat random int
+
+	and C,1
+	mul C,2
+	add C,1
+	int GetGhostIndex
+	int GetGhostState
+	mov A,B
+	add A,C
+	and A,3
+	int SetGhostDirection
+	hlt
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Common direction change routines.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+goRight:
+	mov A, RIGHT
+	jeq go,1,1
+goDown:
+	mov A, DOWN
+	jeq go,1,1
+goUp:
+	mov A, UP
+	jeq go,1,1
+goLeft:
+	mov A, LEFT
+	jeq go,1,1
+go:
+	int SetGhostDirection
+	hlt
