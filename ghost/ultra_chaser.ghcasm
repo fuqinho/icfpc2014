@@ -1,0 +1,84 @@
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	mov C, A
+	mov D, B
+	int GetLambdaXy
+
+	mov E, C
+	sub E, A
+	jlt SC-ABS-X-DONE,A,C
+	xor E, 255
+	add E, 1
+SC-ABS-X-DONE:
+	mov F, D
+	sub F, B
+	jlt SC-ABS-Y-DONE,B,D
+	xor F, 255
+	add F, 1
+SC-ABS-Y-DONE:
+
+	jlt SC-<, A, C
+SC->:
+	jlt SC->A, B, D
+SC->V:
+	mov E, 57  ;R>D>L>U
+	jlt UltraChaser, E, F
+	mov E, 198 ;D>R>U>L
+	jeq UltraChaser, 1, 1
+SC->A:
+	mov E, 177  ;R>U>L>D
+	jlt UltraChaser, E, F
+	mov E, 228  ;U>R>D>L
+	jeq UltraChaser, 1, 1
+SC-<:
+	jlt SC-<A, B, D
+SC-<V:
+	mov E, 27  ;L>D>R>U
+	jlt UltraChaser, E, F
+	mov E, 78  ;D>L>U>R
+	jeq UltraChaser, 1, 1
+SC-<A:
+	mov E, 147  ;L>U>R>D
+	jlt UltraChaser, E, F
+	mov E, 108  ;U>L>D>R
+	jeq UltraChaser, 1, 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ordered candidates of dirs:
+;; E=[cand3][cand2][cand1][cand0]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+UltraChaser:
+	mov [100],0
+	mov [101],255
+	mov [102],1
+	mov [103],0
+	mov [104],0
+	mov [105],1
+	mov [106],255
+	mov [107],0
+UC-LoopHead:
+	jeq UC-LoopEnd,E,0
+	mov D,E
+	and D,3
+	div E,4
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	mov C,D
+	mul C,2
+	add C,100
+	add A,[C]
+	add C,1
+	add B,[C]
+	int GetMap
+	jeq UC-LoopHead,A,WALL
+	int GetGhostIndex
+	int GetGhostState
+	xor B,2
+	jeq UC-LoopHead,B,D
+	mov A,D
+	int SetGhostDirection
+	hlt
+UC-LoopEnd:
+	mov A,0
+	int SetGhostDirection
+	hlt

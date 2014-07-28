@@ -1,0 +1,52 @@
+	int GetGhostIndex
+	int GetGhostCurrentXy
+	mov C, A
+	mov D, B
+	int GetLambdaXy
+
+	mov E, C
+	sub E, A
+	jlt SC-ABS-X-DONE,A,C
+	xor E, 255
+	add E, 1
+SC-ABS-X-DONE:
+	mov F, D
+	sub F, B
+	jlt SC-ABS-Y-DONE,B,D
+	xor F, 255
+	add F, 1
+SC-ABS-Y-DONE:
+
+	jlt SC-<, A, C
+SC->:
+	jlt SC->A, B, D
+SC->V:
+	jlt goDown, E, F
+	jeq goRight, 1, 1
+SC->A:
+	jlt goUp, E, F
+	jeq goRight, 1, 1
+SC-<:
+	jlt SC-<A, B, D
+SC-<V:
+	jlt goDown, E, F
+	jeq goLeft, 1, 1
+SC-<A:
+	jlt goUp, E, F
+	jeq goLeft, 1, 1
+
+goRight:
+	mov A, RIGHT
+	jeq go,1,1
+goDown:
+	mov A, DOWN
+	jeq go,1,1
+goUp:
+	mov A, UP
+	jeq go,1,1
+goLeft:
+	mov A, LEFT
+	jeq go,1,1
+go:
+	int SetGhostDirection
+	hlt

@@ -1,0 +1,66 @@
+int 3
+int 5
+mov C, A
+mov D, B
+int 1
+mov E, C
+sub E, A
+jlt 10,A,C
+xor E, 255
+add E, 1
+mov F, D
+sub F, B
+jlt 15,B,D
+xor F, 255
+add F, 1
+jlt 25, A, C
+jlt 21, B, D
+mov E, 57  
+jlt 34, E, F
+mov E, 198 
+jeq 34, 1, 1
+mov E, 177  
+jlt 34, E, F
+mov E, 228  
+jeq 34, 1, 1
+jlt 30, B, D
+mov E, 27  
+jlt 34, E, F
+mov E, 78  
+jeq 34, 1, 1
+mov E, 147  
+jlt 34, E, F
+mov E, 108  
+jeq 34, 1, 1
+mov [100],0
+mov [101],255
+mov [102],1
+mov [103],0
+mov [104],0
+mov [105],1
+mov [106],255
+mov [107],0
+jeq 63,E,0
+mov D,E
+and D,3
+div E,4
+int 3
+int 5
+mov C,D
+mul C,2
+add C,100
+add A,[C]
+add C,1
+add B,[C]
+int 7
+jeq 42,A,0
+int 3
+int 6
+xor B,2
+jeq 42,B,D
+mov A,D
+int 0
+hlt
+mov A,0
+int 0
+hlt
