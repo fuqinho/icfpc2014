@@ -1,6 +1,6 @@
 ;; RAND
 (define (seed) 0)
-(define (rand) (set! seed (+ seed 1) seed))
+(define (rand) (set! seed (max (+ seed 1) 0) seed))
 
 (define (tick) 0)
 (defmacro (set-tick! t e) (set! tick t e))
