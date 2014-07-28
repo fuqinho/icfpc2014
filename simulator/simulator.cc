@@ -37,24 +37,28 @@ class Simulator {
     ai_file_list_.push_back(ai_file);
   }
 
-  void Run() {
+  int Run(bool visualize) {
     Init();
     int end_of_ticks =
         127 * game_state_.map_width() * game_state_.map_height() * 16;
     // Clear screen and disable cursor.
-    printf("\x1b[2J\x1b[?25l");
-    fflush(stdout);
-    PrintGame(0);
+    if (visualize) {
+      printf("\x1b[2J\x1b[?25l");
+      fflush(stdout);
+      PrintGame(0);
+    }
     for (int ticks = 1; ticks < end_of_ticks; ++ticks) {
       someone_moved_ = false;
       if (RunStep(ticks))
         break;
-      if (someone_moved_) {
+      if (visualize && someone_moved_) {
         PrintGame(ticks);
         std::cin.ignore();
       }
     }
-    PrintGame(end_of_ticks);
+    if (visualize)
+      PrintGame(end_of_ticks);
+    return game_state_.score();
   }
 
  private:
@@ -367,8 +371,7 @@ class Simulator {
     if (won) {
       game_state_.set_score(
           game_state_.score() * (game_state_.lambda_man().life() + 1));
-      InitLevel(game_state_.game_level() + 1);
-      return false;
+      return true;
     }
 
     // Check if game is over.
@@ -390,8 +393,7 @@ class Simulator {
     std::stringstream buffer;
     buffer << "\x1b[H";
     buffer << "level:" << game_state_.game_level()
-           << "  score:" << game_state_.score()
-           << "  total:" << game_state_.score() << "       \n";
+           << "  score:" << game_state_.score() << "       \n";
     buffer << "ticks:" << current_ticks
            << "  life:" << game_state_.lambda_man().life()
            << "  vital: " << game_state_.lambda_man().vitality() << "      \n";
@@ -470,7 +472,7 @@ int main(int argc, char* argv[]) {
   for (int i = 3; i < argc; ++i) {
     sim.add_ai_file(argv[i]);
   }
-  sim.Run();
+  sim.Run(true);
   printf("\e[?25h");
   return 0;
 }

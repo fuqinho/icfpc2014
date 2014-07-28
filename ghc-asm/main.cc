@@ -20,9 +20,17 @@ std::string lexical_cast(int n)
 	return sin.str();
 }
 
+struct lengthcmp {
+	bool operator()(const std::string& lhs, const std::string& rhs) {
+		if(lhs.size() != rhs.size())
+			return lhs.size()>rhs.size();
+		return lhs<rhs;
+	}
+};
+
 int main()
 {
-	std::map<std::string, size_t> defs = {
+	std::map<std::string, size_t, lengthcmp> defs = {
 	// direction
 		{"UP", 0},
 		{"RIGHT", 1},
