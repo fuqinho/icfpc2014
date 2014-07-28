@@ -30,7 +30,7 @@
 	int GetGhostIndex
 	xor A,E
 	add E,1    ; incr
-	jlt DoChase,E,5
+	jlt DoChase,E,4
 	and A,4
 	xor A,4
 	jeq DoChase,A,4

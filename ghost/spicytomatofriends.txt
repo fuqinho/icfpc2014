@@ -16,7 +16,7 @@ mov E,0
 int 3
 xor A,E
 add E,1    
-jlt 23,E,5
+jlt 23,E,4
 and A,4
 xor A,4
 jeq 23,A,4
