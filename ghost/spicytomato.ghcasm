@@ -1,18 +1,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Precompute
-;;   Lambda @ (A,B)
-;;   Ghost  @ (C,D)
-;;   (E,F) := (|A-C|, |B-D|)
-;;   G     := turn
+;; Persistent States
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-	add G,1
+	add [234],1       ; Turn
+	jlt PS1,[234],255
+	add [235],1       ; Turn/256
+  PS1:
 
-	int GetGhostIndex
-	int GetGhostCurrentXy
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Precompute
+;;   Lambda @ (C,D)
+;;   Ghost  @ (A,B)
+;;   (E,F) := (|A-C|, |B-D|)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	int GetLambdaXy
 	mov C, A
 	mov D, B
-	int GetLambdaXy
+	int GetGhostIndex
+	int GetGhostCurrentXy
 
 	mov E, C
 	sub E, A
@@ -39,9 +45,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 CloseMode:
 
-	jlt SC-<, A, C
+	jlt SC-<, C, A
 SC->:
-	jlt SC->A, B, D
+	jlt SC->A, D, B
 SC->V:
 	mov G, 198 ;D>R>U>L
 	jlt UltraChaser, E, F
@@ -53,7 +59,7 @@ SC->A:
 	mov G, 177  ;R>U>L>D
 	jeq UltraChaser, 1, 1
 SC-<:
-	jlt SC-<A, B, D
+	jlt SC-<A, D, B
 SC-<V:
 	mov G, 78  ;D>L>U>R
 	jlt UltraChaser, E, F
@@ -109,7 +115,7 @@ RandomMove:
 	mul C,21
 	add C,B
 	mul C,23
-	add C,G
+	add C,[234]
 	int GetGhostIndex
 	xor C,A
 	;; C somewhat random int
