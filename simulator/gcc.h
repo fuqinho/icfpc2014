@@ -107,6 +107,7 @@ class GCC {
     }
     current_heap_pos_ = 0;
     max_heap_pos_ = 0;
+    reg_e_ = -1;
   }
 
   Value Run(int32_t ip, int32_t env, Value arg1, Value arg2, Value arg3) {
