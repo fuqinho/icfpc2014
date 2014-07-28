@@ -9,7 +9,7 @@
 #include "testai.h"
 #endif
 
-LambdaMan::LambdaMan() {
+LambdaMan::LambdaMan() : life_(3), vitality_(0) {
   ai_state_.tag = ValueTag::INT;
   ai_state_.value = 0;
   step_function_.tag = ValueTag::INT;
