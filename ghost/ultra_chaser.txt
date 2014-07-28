@@ -15,22 +15,22 @@ xor F, 255
 add F, 1
 jlt 25, A, C
 jlt 21, B, D
-mov E, 57  
+mov G, 198 
 jlt 34, E, F
-mov E, 198 
+mov G, 57  
 jeq 34, 1, 1
-mov E, 177  
+mov G, 228  
 jlt 34, E, F
-mov E, 228  
+mov G, 177  
 jeq 34, 1, 1
 jlt 30, B, D
-mov E, 27  
+mov G, 78  
 jlt 34, E, F
-mov E, 78  
+mov G, 27  
 jeq 34, 1, 1
-mov E, 147  
+mov G, 108  
 jlt 34, E, F
-mov E, 108  
+mov G, 147  
 jeq 34, 1, 1
 mov [100],0
 mov [101],255
@@ -40,10 +40,17 @@ mov [104],0
 mov [105],1
 mov [106],255
 mov [107],0
-jeq 63,E,0
-mov D,E
+jeq 66,G,0
+mov D,G
 and D,3
-div E,4
+div G,4
+int 3
+int 6
+xor D,2
+jeq 51,A,1
+xor D,2
+xor B,2
+jeq 42,B,D
 int 3
 int 5
 mov C,D
@@ -54,10 +61,6 @@ add C,1
 add B,[C]
 int 7
 jeq 42,A,0
-int 3
-int 6
-xor B,2
-jeq 42,B,D
 mov A,D
 int 0
 hlt
