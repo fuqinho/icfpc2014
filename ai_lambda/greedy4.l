@@ -330,6 +330,9 @@
         (ghost-block (build-ghost-block-2 ghost-lst 0))
         (last-pill
          (if (< tick 50800) (get-last-pill map) 0)))
+  (let ((dir (find-safe-direction-power-pill map start ghost-block)))
+  (if (>= dir 0) dir
+
   ; First, if last-pill exists, try to search avoiding take it.
   (let ((dir (find-safe-direction-last-pill
                 map start ghost-block danger-zone last-pill)))
@@ -341,7 +344,14 @@
   (let ((dir (find-safe-direction-no-deadend
                 map start ghost-block danger-zone)))
   (if (>= dir 0) dir
-  0))))))))  ;; Give up to escape >_<
+  0))))))))))  ;; Give up to escape >_<
+
+(define (find-safe-direction-power-pill map start ghost-block)
+  (let ((bfs-result
+         (bfs map start 10 ghost-block
+              (lambda (_ tile) (= tile 3)))))
+  (if (int? bfs-result) -1
+  (car (backtrack (car bfs-result) start (cdr bfs-result))))))
 
 (define (find-safe-direction-last-pill
              map start ghost-block danger-zone last-pill)
@@ -508,8 +518,8 @@
   (let ((plan (dangerous-mode state map origin ghost-lst)))
   (if (not (int? plan)) plan
     ;;
-  (let ((plan (power-pill-chain-mode state map origin)))
-  (if (not (int? plan)) plan
+    ;; (let ((plan (power-pill-chain-mode state map origin)))
+    ;; (if (not (int? plan)) plan
   ;; Second. Check if power mode.
   (let ((plan (power-mode state map origin ghost-lst)))
   (if (not (int? plan)) plan
@@ -523,7 +533,7 @@
   (let ((plan (search-mode state map origin (> fruit 0))))
   (if (not (int? plan)) plan
   ;; Gives up. Just random walk.
-  (cons (cons (> fruit 0) 0) (mod (rand) 4))))))))))))))))))
+  (cons (cons (> fruit 0) 0) (mod (rand) 4))))))))))))))))
 
 
 ;; Sub AI definition.
